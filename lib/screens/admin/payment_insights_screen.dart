@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get.dart';
+import 'package:superapp/controllers/admin_dashboard_controller.dart';
+import 'package:intl/intl.dart';
 
 class PaymentInsightsScreen extends StatelessWidget {
   const PaymentInsightsScreen({super.key});
@@ -8,6 +11,7 @@ class PaymentInsightsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final controller = Get.find<AdminDashboardController>();
 
     return Scaffold(
       backgroundColor: isDark
@@ -15,43 +19,59 @@ class PaymentInsightsScreen extends StatelessWidget {
           : const Color(0xFFF9FAFB),
       body: Column(
         children: [
-          _buildHeader(context),
+          _buildHeader(context, controller),
           Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 20),
-                  _buildLocationDropdown(context, isDark),
-                  const SizedBox(height: 24),
-                  Text(
-                    'Performance',
-                    style: TextStyle(
-                      color: isDark ? Colors.white : const Color(0xFF1E293B),
-                      fontSize: 22,
-                      fontWeight: FontWeight.w700,
+            child: RefreshIndicator(
+              onRefresh: () => controller.fetchInsights(),
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 20),
+                    Text(
+                      'Performance',
+                      style: TextStyle(
+                        color: isDark ? Colors.white : const Color(0xFF1E293B),
+                        fontSize: 22,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Analytics & payment insights',
-                    style: TextStyle(
-                      color: isDark ? Colors.white70 : const Color(0xFF94A3B8),
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
+                    const SizedBox(height: 4),
+                    Text(
+                      'Analytics & payment insights',
+                      style: TextStyle(
+                        color: isDark
+                            ? Colors.white70
+                            : const Color(0xFF94A3B8),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                  _buildRevenueCard(context, isDark),
-                  const SizedBox(height: 16),
-                  _buildStatsRow(context, isDark),
-                  const SizedBox(height: 28),
-                  _buildStaffPerformanceSection(context, isDark),
-                  const SizedBox(height: 28),
-                  _buildTopPropertiesSection(context, isDark),
-                  const SizedBox(height: 40),
-                ],
+                    const SizedBox(height: 20),
+                    Obx(() => _buildRevenueCard(context, isDark, controller)),
+                    const SizedBox(height: 16),
+                    Obx(() => _buildStatsRow(context, isDark, controller)),
+                    const SizedBox(height: 28),
+                    Obx(
+                      () => _buildStaffPerformanceSection(
+                        context,
+                        isDark,
+                        controller,
+                      ),
+                    ),
+                    const SizedBox(height: 28),
+                    Obx(
+                      () => _buildTopPropertiesSection(
+                        context,
+                        isDark,
+                        controller,
+                      ),
+                    ),
+                    const SizedBox(height: 40),
+                  ],
+                ),
               ),
             ),
           ),
@@ -60,7 +80,10 @@ class PaymentInsightsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildHeader(
+    BuildContext context,
+    AdminDashboardController controller,
+  ) {
     return Container(
       padding: EdgeInsets.only(
         top: MediaQuery.of(context).padding.top + 15,
@@ -90,55 +113,42 @@ class PaymentInsightsScreen extends StatelessWidget {
               fontWeight: FontWeight.w600,
             ),
           ),
-          const SizedBox(width: 24),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildLocationDropdown(BuildContext context, bool isDark) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      decoration: BoxDecoration(
-        color: isDark ? Theme.of(context).cardColor : Colors.white,
-        borderRadius: BorderRadius.circular(100),
-        border: Border.all(
-          color: isDark ? Colors.white12 : const Color(0xFFE2E8F0),
-        ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SvgPicture.asset(
-            'assets/location.svg',
-            width: 18,
-            height: 18,
-            colorFilter: const ColorFilter.mode(
-              Color(0xFF38CAC7),
-              BlendMode.srcIn,
-            ),
-          ),
-          const SizedBox(width: 8),
-          Text(
-            'Croatia',
-            style: TextStyle(
-              color: isDark ? Colors.white : const Color(0xFF1E293B),
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(width: 8),
-          Icon(
-            Icons.keyboard_arrow_down_rounded,
-            color: isDark ? Colors.white70 : const Color(0xFF64748B),
-            size: 20,
+          Obx(
+            () => controller.isLoadingInsights.value
+                ? const SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  )
+                : GestureDetector(
+                    onTap: () => controller.fetchInsights(),
+                    child: const Icon(
+                      Icons.refresh,
+                      color: Colors.white,
+                      size: 24,
+                    ),
+                  ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildRevenueCard(BuildContext context, bool isDark) {
+  Widget _buildRevenueCard(
+    BuildContext context,
+    bool isDark,
+    AdminDashboardController controller,
+  ) {
+    final revenue = NumberFormat.currency(
+      symbol: '€',
+      decimalDigits: 0,
+    ).format(controller.monthlyRevenue);
+    final trend = controller.revenueTrend;
+    final isUp = trend >= 0;
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -168,16 +178,16 @@ class PaymentInsightsScreen extends StatelessWidget {
               ),
               Row(
                 children: [
-                  const Icon(
-                    Icons.north_east,
-                    color: Color(0xFF10B981),
+                  Icon(
+                    isUp ? Icons.north_east : Icons.south_east,
+                    color: isUp ? const Color(0xFF10B981) : Colors.red,
                     size: 16,
                   ),
                   const SizedBox(width: 4),
-                  const Text(
-                    '+12%',
+                  Text(
+                    '${isUp ? '+' : ''}${trend.toStringAsFixed(1)}%',
                     style: TextStyle(
-                      color: Color(0xFF10B981),
+                      color: isUp ? const Color(0xFF10B981) : Colors.red,
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                     ),
@@ -188,7 +198,7 @@ class PaymentInsightsScreen extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            '€24,580',
+            revenue,
             style: TextStyle(
               color: isDark ? Colors.white : const Color(0xFF1E293B),
               fontSize: 32,
@@ -202,35 +212,21 @@ class PaymentInsightsScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Feb',
+                'Prev',
                 style: TextStyle(
                   color: isDark ? Colors.white38 : const Color(0xFF94A3B8),
                   fontSize: 12,
                 ),
               ),
               Text(
-                'Mar',
+                'Current Month',
                 style: TextStyle(
                   color: isDark ? Colors.white38 : const Color(0xFF94A3B8),
                   fontSize: 12,
                 ),
               ),
               Text(
-                'Apr',
-                style: TextStyle(
-                  color: isDark ? Colors.white38 : const Color(0xFF94A3B8),
-                  fontSize: 12,
-                ),
-              ),
-              Text(
-                'May',
-                style: TextStyle(
-                  color: isDark ? Colors.white38 : const Color(0xFF94A3B8),
-                  fontSize: 12,
-                ),
-              ),
-              Text(
-                'Jun',
+                'Next',
                 style: TextStyle(
                   color: isDark ? Colors.white38 : const Color(0xFF94A3B8),
                   fontSize: 12,
@@ -253,7 +249,11 @@ class PaymentInsightsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildStatsRow(BuildContext context, bool isDark) {
+  Widget _buildStatsRow(
+    BuildContext context,
+    bool isDark,
+    AdminDashboardController controller,
+  ) {
     return Row(
       children: [
         Expanded(
@@ -262,8 +262,8 @@ class PaymentInsightsScreen extends StatelessWidget {
             icon: Icons.star_outline_rounded,
             iconColor: const Color(0xFFEAB308),
             label: 'Avg Rating',
-            value: '4.8',
-            change: '+0.3 this month',
+            value: controller.avgRating.toStringAsFixed(1),
+            change: 'Overall score',
             changeColor: const Color(0xFF10B981),
             isDark: isDark,
           ),
@@ -275,8 +275,8 @@ class PaymentInsightsScreen extends StatelessWidget {
             iconAsset: 'assets/tick.svg',
             iconColor: const Color(0xFF10B981),
             label: 'Jobs Done',
-            value: '142',
-            change: '+18 this week',
+            value: controller.jobsDone.toString(),
+            change: 'Total approved',
             changeColor: const Color(0xFF10B981),
             isDark: isDark,
           ),
@@ -428,7 +428,13 @@ class PaymentInsightsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildStaffPerformanceSection(BuildContext context, bool isDark) {
+  Widget _buildStaffPerformanceSection(
+    BuildContext context,
+    bool isDark,
+    AdminDashboardController controller,
+  ) {
+    final staff = controller.staffPerformance;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -444,59 +450,42 @@ class PaymentInsightsScreen extends StatelessWidget {
               ),
             ),
             Text(
-              'View all',
+              'Top performers',
               style: TextStyle(
-                color: const Color(0xFF38CAC7),
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
+                color: const Color(0xFF38CAC7).withOpacity(0.7),
+                fontSize: 13,
+                fontWeight: FontWeight.w400,
               ),
             ),
           ],
         ),
         const SizedBox(height: 16),
-        _buildStaffItem(
-          context,
-          'A',
-          const Color(0xFF38CAC7),
-          'Ana M.',
-          'Senior Cleaner',
-          '98 %',
-          '42 jobs',
-          isDark,
-        ),
-        const SizedBox(height: 12),
-        _buildStaffItem(
-          context,
-          'M',
-          const Color(0xFF8B5CF6),
-          'Marko K.',
-          'Cleaner',
-          '94 %',
-          '38 jobs',
-          isDark,
-        ),
-        const SizedBox(height: 12),
-        _buildStaffItem(
-          context,
-          'I',
-          const Color(0xFF10B981),
-          'Ivana S.',
-          'Cleaner',
-          '91 %',
-          '35 jobs',
-          isDark,
-        ),
-        const SizedBox(height: 12),
-        _buildStaffItem(
-          context,
-          'L',
-          const Color(0xFFEC4899),
-          'Luka P.',
-          'Junior Cleaner',
-          '89 %',
-          '27 jobs',
-          isDark,
-        ),
+        if (staff.isEmpty)
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 20),
+            child: Text('No staff data available'),
+          )
+        else
+          ...staff.map((s) {
+            final name = s['name'] ?? 'Staff';
+            final initial = name.isNotEmpty ? name[0] : 'S';
+            final jobCount = s['jobCount'] ?? 0;
+            final rating = (s['rating'] as num?)?.toDouble() ?? 4.5;
+
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: _buildStaffItem(
+                context,
+                initial,
+                const Color(0xFF38CAC7),
+                name,
+                'Support Team',
+                '${(rating * 20).toInt()}%',
+                '$jobCount jobs',
+                isDark,
+              ),
+            );
+          }),
       ],
     );
   }
@@ -596,7 +585,14 @@ class PaymentInsightsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTopPropertiesSection(BuildContext context, bool isDark) {
+  Widget _buildTopPropertiesSection(
+    BuildContext context,
+    bool isDark,
+    AdminDashboardController controller,
+  ) {
+    final listings = controller.topListings;
+    final maxJobs = listings.isEmpty ? 1 : listings[0]['jobCount'] as int;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -624,13 +620,19 @@ class PaymentInsightsScreen extends StatelessWidget {
           ),
           child: Column(
             children: [
-              _buildPropertyBar('Ana', 0.95, isDark),
-              const SizedBox(height: 14),
-              _buildPropertyBar('Marko', 0.82, isDark),
-              const SizedBox(height: 14),
-              _buildPropertyBar('Ivana', 0.75, isDark),
-              const SizedBox(height: 14),
-              _buildPropertyBar('Luka', 0.68, isDark),
+              if (listings.isEmpty)
+                const Text('No property data available')
+              else
+                ...listings.map(
+                  (l) => Padding(
+                    padding: const EdgeInsets.only(bottom: 14),
+                    child: _buildPropertyBar(
+                      l['title'] ?? 'Listing',
+                      maxJobs > 0 ? (l['jobCount'] as int) / maxJobs : 0.0,
+                      isDark,
+                    ),
+                  ),
+                ),
               const SizedBox(height: 16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -643,28 +645,14 @@ class PaymentInsightsScreen extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    '25',
+                    '${maxJobs ~/ 2}',
                     style: TextStyle(
                       color: isDark ? Colors.white38 : const Color(0xFF94A3B8),
                       fontSize: 12,
                     ),
                   ),
                   Text(
-                    '50',
-                    style: TextStyle(
-                      color: isDark ? Colors.white38 : const Color(0xFF94A3B8),
-                      fontSize: 12,
-                    ),
-                  ),
-                  Text(
-                    '75',
-                    style: TextStyle(
-                      color: isDark ? Colors.white38 : const Color(0xFF94A3B8),
-                      fontSize: 12,
-                    ),
-                  ),
-                  Text(
-                    '100',
+                    '$maxJobs',
                     style: TextStyle(
                       color: isDark ? Colors.white38 : const Color(0xFF94A3B8),
                       fontSize: 12,

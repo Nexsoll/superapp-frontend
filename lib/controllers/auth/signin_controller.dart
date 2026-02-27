@@ -48,6 +48,7 @@ class SignInController extends GetxController {
         userPhone: (user['phoneNumber'] as String?) ?? '',
         userPhotoUrl: (user['avatar'] as String?) ?? '',
         userFirstName: (user['firstName'] as String?) ?? '',
+        userRole: (user['role'] as String?) ?? 'USER',
       );
 
       final isProfileComplete = (user['isProfileComplete'] as bool?) ?? false;
@@ -81,7 +82,8 @@ class SignInController extends GetxController {
     try {
       // Initialize GoogleSignIn with web client ID (required for server-side auth)
       await _googleSignIn.initialize(
-        clientId: '634639795131-0uth2jlnhp540gn8ksvl6rfvtoblpofg.apps.googleusercontent.com',
+        clientId:
+            '634639795131-0uth2jlnhp540gn8ksvl6rfvtoblpofg.apps.googleusercontent.com',
       );
       final googleUser = await _googleSignIn.authenticate();
       final googleAuth = await googleUser.authentication;
@@ -89,11 +91,11 @@ class SignInController extends GetxController {
       if (googleIdToken == null || googleIdToken.isEmpty) {
         throw Exception('Google sign-in failed (missing id token)');
       }
-      final credential = GoogleAuthProvider.credential(
-        idToken: googleIdToken,
-      );
+      final credential = GoogleAuthProvider.credential(idToken: googleIdToken);
 
-      final userCredential = await _firebaseAuth.signInWithCredential(credential);
+      final userCredential = await _firebaseAuth.signInWithCredential(
+        credential,
+      );
       final firebaseUser = userCredential.user;
       if (firebaseUser == null) {
         throw Exception('Google sign-in failed');
@@ -141,15 +143,17 @@ class SignInController extends GetxController {
         rawNonce: rawNonce,
       );
 
-      final userCredential =
-          await _firebaseAuth.signInWithCredential(oauthCredential);
+      final userCredential = await _firebaseAuth.signInWithCredential(
+        oauthCredential,
+      );
       final firebaseUser = userCredential.user;
       if (firebaseUser == null) {
         throw Exception('Apple sign-in failed');
       }
 
       // Apple may not always return name/email on subsequent logins.
-      if (appleCredential.givenName != null || appleCredential.familyName != null) {
+      if (appleCredential.givenName != null ||
+          appleCredential.familyName != null) {
         final displayName =
             '${appleCredential.givenName ?? ''} ${appleCredential.familyName ?? ''}'
                 .trim();
@@ -188,6 +192,7 @@ class SignInController extends GetxController {
       userPhone: (user['phoneNumber'] as String?) ?? '',
       userPhotoUrl: (user['avatar'] as String?) ?? '',
       userFirstName: (user['firstName'] as String?) ?? '',
+      userRole: (user['role'] as String?) ?? 'USER',
     );
 
     final isProfileComplete = (user['isProfileComplete'] as bool?) ?? false;
@@ -202,8 +207,10 @@ class SignInController extends GetxController {
     const charset =
         '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._';
     final random = Random.secure();
-    return List.generate(length, (_) => charset[random.nextInt(charset.length)])
-        .join();
+    return List.generate(
+      length,
+      (_) => charset[random.nextInt(charset.length)],
+    ).join();
   }
 
   String _sha256ofString(String input) {

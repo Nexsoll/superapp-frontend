@@ -1,50 +1,68 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:superapp/modal/photo_review_modal.dart';
+import 'package:superapp/controllers/profile_controller.dart';
+import 'package:superapp/modal/job_model.dart';
+import 'package:superapp/services/api_service.dart';
 
 class PhotoReviewController extends GetxController {
-  final RxList<PhotoReviewItem> items = <PhotoReviewItem>[].obs;
+  final jobs = <Job>[].obs;
+  final isLoading = false.obs;
 
-  int get pendingCount => items.where((e) => e.pending).length;
+  String get _token {
+    try {
+      return Get.find<ProfileController>().token;
+    } catch (_) {
+      return '';
+    }
+  }
+
+  int get pendingCount => jobs.length;
 
   @override
   void onInit() {
     super.onInit();
-    _seed();
+    fetchPendingReviews();
   }
 
-  void openItem(PhotoReviewItem item) {
-    //Get.to(() => PhotoReviewDetailScreen(item: item));
+  Future<void> fetchPendingReviews() async {
+    final token = _token;
+    if (token.isEmpty) return;
+
+    isLoading.value = true;
+    try {
+      final List<Map<String, dynamic>> rawJobs =
+          await ApiService.getJobsByStatus(
+            token: token,
+            status: 'AWAITING_REVIEW',
+          );
+      jobs.value = rawJobs.map((j) => Job.fromJson(j)).toList();
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to load photo reviews: $e');
+    } finally {
+      isLoading.value = false;
+    }
   }
 
-  void _seed() {
-    items.assignAll(const [
-      PhotoReviewItem(
-        id: '1',
-        title: 'Unit 4B  -  Leak',
-        status: 'Fixed',
-        albumLine: 'Before & After',
-        photos: 2,
-        metaLine: 'Site: Mike R  •  1h ago',
-        pending: true,
-      ),
-      PhotoReviewItem(
-        id: '2',
-        title: 'Unit 12A  -  HVAC',
-        status: 'install',
-        albumLine: 'Completion',
-        photos: 3,
-        metaLine: 'Site: Sarah S  •  3h ago',
-        pending: true,
-      ),
-      PhotoReviewItem(
-        id: '3',
-        title: 'Unit 7C  -  Move-in',
-        status: 'Inspection',
-        albumLine: '',
-        photos: 8,
-        metaLine: 'Agent: Tom K  •  1d ago',
-        pending: true,
-      ),
-    ]);
+  Future<void> reviewJob(int jobId, bool approve, {String? reason}) async {
+    final token = _token;
+    if (token.isEmpty) return;
+
+    try {
+      await ApiService.reviewJob(
+        token: token,
+        jobId: jobId,
+        status: approve ? 'APPROVED' : 'REJECTED',
+        reason: reason,
+      );
+      Get.snackbar(
+        'Success',
+        'Job ${approve ? 'approved' : 'rejected'} successfully',
+        backgroundColor: approve ? Colors.green : Colors.red,
+        colorText: Colors.white,
+      );
+      await fetchPendingReviews();
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to review job: $e');
+    }
   }
 }

@@ -266,6 +266,11 @@ class ProfileScreen extends StatelessWidget {
                       title: 'Admin Dashboard',
                       onTap: controller.onAdminDashboard,
                     ),
+                    _MenuTile(
+                      icon: Icons.assignment_outlined,
+                      title: 'Staff Dashboard',
+                      onTap: controller.onStaffDashboard,
+                    ),
                   ],
                 ),
 

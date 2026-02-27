@@ -70,6 +70,7 @@ class EarningExpansesWidget extends StatelessWidget {
                   title: controller.trendLabel,
                   positive: controller.percent.value >= 0,
                   bars: controller.bars,
+                  dateRangeText: controller.dateRangeText,
                 ),
               ),
 
@@ -317,11 +318,13 @@ class _TrendCard extends StatelessWidget {
     required this.title,
     required this.positive,
     required this.bars,
+    required this.dateRangeText,
   });
 
   final String title;
   final bool positive;
   final List<double> bars;
+  final String dateRangeText;
 
   @override
   Widget build(BuildContext context) {
@@ -380,7 +383,7 @@ class _TrendCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 6),
                       Text(
-                        "Oct 1 - Oct 31",
+                        dateRangeText,
                         style: theme.textTheme.labelSmall?.copyWith(
                           color: isDark
                               ? Colors.white70
@@ -549,11 +552,6 @@ class _TxnTile extends StatelessWidget {
               color: amountColor,
               fontWeight: FontWeight.w900,
             ),
-          ),
-          const SizedBox(width: 8),
-          Icon(
-            Icons.chevron_right_rounded,
-            color: isDark ? Colors.white54 : const Color(0xFF9AA0AF),
           ),
         ],
       ),

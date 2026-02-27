@@ -220,9 +220,9 @@ class AiAssistantScreen extends StatelessWidget {
               children: const [
                 _SuggestionChip(label: 'Recommend Hotels'),
                 SizedBox(width: 8),
-                _SuggestionChip(label: 'Best time to book'),
+                _SuggestionChip(label: 'Available jobs'),
                 SizedBox(width: 8),
-                _SuggestionChip(label: 'Room suggestions'),
+                _SuggestionChip(label: 'List all staff'),
               ],
             ),
           ),
@@ -387,14 +387,16 @@ class _UserMessage extends StatelessWidget {
                 );
               }),
               const SizedBox(width: 8),
-              Obx(() => Text(
-                    profileController.displayName,
-                    style: GoogleFonts.outfit(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: const Color(0xFF1CB5B3),
-                    ),
-                  )),
+              Obx(
+                () => Text(
+                  profileController.displayName,
+                  style: GoogleFonts.outfit(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFF1CB5B3),
+                  ),
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 8),
@@ -457,12 +459,14 @@ class _HotelRecommendationCard extends StatelessWidget {
         print('AI Item Data: ${hotel.hotelData}');
 
         // Navigate with hotelData if available, otherwise create minimal data with ID
-        final data = hotel.hotelData ?? {
-          'id': hotel.id,
-          'title': hotel.name,
-          'address': hotel.location,
-          'images': ['placeholder'],
-        };
+        final data =
+            hotel.hotelData ??
+            {
+              'id': hotel.id,
+              'title': hotel.name,
+              'address': hotel.location,
+              'images': ['placeholder'],
+            };
 
         print('Navigating with data: $data');
 
@@ -497,8 +501,8 @@ class _HotelRecommendationCard extends StatelessWidget {
               child: Image.network(
                 hotel.id > 0
                     ? (isProperty
-                        ? ListingService.propertyImageUrl(hotel.id, 0)
-                        : ListingService.hotelImageUrl(hotel.id, 0))
+                          ? ListingService.propertyImageUrl(hotel.id, 0)
+                          : ListingService.hotelImageUrl(hotel.id, 0))
                     : hotel.image,
                 width: 100,
                 height: 100,
@@ -515,99 +519,99 @@ class _HotelRecommendationCard extends StatelessWidget {
                 ),
               ),
             ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          hotel.name,
-                          style: GoogleFonts.outfit(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: theme.brightness == Brightness.dark
-                                ? Colors.white
-                                : const Color(0xFF1F2937),
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF4ADE80),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          hotel.match,
-                          style: GoogleFonts.outfit(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.location_on_outlined,
-                        size: 14,
-                        color: Color(0xFF9CA3AF),
-                      ),
-                      const SizedBox(width: 4),
-                      Expanded(
-                        child: Text(
-                          hotel.location,
-                          style: GoogleFonts.outfit(
-                            fontSize: 12,
-                            color: const Color(0xFF9CA3AF),
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  RichText(
-                    text: TextSpan(
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
                       children: [
-                        TextSpan(
-                          text: '\$${hotel.price.toStringAsFixed(0)}',
-                          style: GoogleFonts.outfit(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                            color: const Color(0xFF1CB5B3),
+                        Expanded(
+                          child: Text(
+                            hotel.name,
+                            style: GoogleFonts.outfit(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: theme.brightness == Brightness.dark
+                                  ? Colors.white
+                                  : const Color(0xFF1F2937),
+                            ),
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                        if (!isProperty)
-                          TextSpan(
-                            text: '/night',
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF4ADE80),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            hotel.match,
                             style: GoogleFonts.outfit(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w400,
-                              color: const Color(0xFF9CA3AF),
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
                             ),
                           ),
+                        ),
                       ],
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.location_on_outlined,
+                          size: 14,
+                          color: Color(0xFF9CA3AF),
+                        ),
+                        const SizedBox(width: 4),
+                        Expanded(
+                          child: Text(
+                            hotel.location,
+                            style: GoogleFonts.outfit(
+                              fontSize: 12,
+                              color: const Color(0xFF9CA3AF),
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    RichText(
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: '\$${hotel.price.toStringAsFixed(0)}',
+                            style: GoogleFonts.outfit(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                              color: const Color(0xFF1CB5B3),
+                            ),
+                          ),
+                          if (!isProperty)
+                            TextSpan(
+                              text: '/night',
+                              style: GoogleFonts.outfit(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400,
+                                color: const Color(0xFF9CA3AF),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
       ),
     );
   }

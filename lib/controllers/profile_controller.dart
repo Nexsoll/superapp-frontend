@@ -3,6 +3,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:superapp/screens/admin/admin_dashboard_screen.dart';
+import 'package:superapp/screens/staff/staff_dashboard_screen.dart';
 import 'package:superapp/screens/bottomNavScreen/edit_profile_screen.dart';
 import 'package:superapp/screens/my_wallet_screen.dart';
 import 'package:superapp/screens/notification_setting_screen.dart';
@@ -23,6 +24,7 @@ class ProfileController extends GetxController {
   final photoUrl = ''.obs;
   final firstName = ''.obs;
   final userCurrency = 'USD'.obs;
+  final role = 'USER'.obs;
 
   // Auth data
   int userId = 0;
@@ -37,6 +39,7 @@ class ProfileController extends GetxController {
   static const _userIdKey = 'user_id';
   static const _tokenKey = 'user_token';
   static const _currencyKey = 'user_currency';
+  static const _roleKey = 'user_role';
 
   final isDark = true.obs;
 
@@ -63,6 +66,7 @@ class ProfileController extends GetxController {
     phone.value = prefs.getString(_phoneKey) ?? '';
     firstName.value = prefs.getString(_firstNameKey) ?? '';
     userCurrency.value = prefs.getString(_currencyKey) ?? 'USD';
+    role.value = prefs.getString(_roleKey) ?? 'USER';
     userId = prefs.getInt(_userIdKey) ?? 0;
     token = prefs.getString(_tokenKey) ?? '';
 
@@ -94,6 +98,7 @@ class ProfileController extends GetxController {
     String? userPhotoUrl,
     String? userFirstName,
     String? currency,
+    String? userRole,
     int? id,
     String? userToken,
   }) async {
@@ -122,6 +127,10 @@ class ProfileController extends GetxController {
     if (currency != null && currency.isNotEmpty) {
       userCurrency.value = currency;
       await prefs.setString(_currencyKey, currency);
+    }
+    if (userRole != null && userRole.isNotEmpty) {
+      role.value = userRole;
+      await prefs.setString(_roleKey, userRole);
     }
     if (id != null && id > 0) {
       userId = id;
@@ -185,6 +194,7 @@ class ProfileController extends GetxController {
     await prefs.remove(_photoUrlKey);
     await prefs.remove(_firstNameKey);
     await prefs.remove(_currencyKey);
+    await prefs.remove(_roleKey);
     await prefs.remove(_userIdKey);
     await prefs.remove(_tokenKey);
 
@@ -194,6 +204,7 @@ class ProfileController extends GetxController {
     photoUrl.value = '';
     firstName.value = '';
     userCurrency.value = 'USD';
+    role.value = 'USER';
     userId = 0;
     token = '';
 
@@ -201,4 +212,5 @@ class ProfileController extends GetxController {
   }
 
   void onAdminDashboard() => Get.to(() => const AdminDashboardScreen());
+  void onStaffDashboard() => Get.to(() => const StaffDashboardScreen());
 }

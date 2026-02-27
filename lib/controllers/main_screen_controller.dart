@@ -3,6 +3,7 @@ import 'package:superapp/screens/notification_screen.dart';
 import 'package:superapp/services/listing_service.dart';
 import 'package:superapp/services/currency_service.dart';
 import 'package:superapp/controllers/profile_controller.dart';
+import 'package:superapp/controllers/dashboard_controller.dart';
 
 import '../modal/announcement_modal.dart';
 
@@ -148,6 +149,15 @@ class MainScreenController extends GetxController {
   }
 
   void onBottomNavTap(int index) {
+    // If tapping the dashboard tab (index 2) while in property mode, refresh dashboard
+    if (index == 2 && categoryIndex.value == 1) {
+      try {
+        final dashboardController = Get.find<DashboardController>();
+        dashboardController.refreshOwnerSummary();
+      } catch (_) {
+        // DashboardController not yet registered, ignore
+      }
+    }
     bottomIndex.value = index;
   }
 

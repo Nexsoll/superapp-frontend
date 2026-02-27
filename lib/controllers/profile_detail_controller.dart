@@ -33,9 +33,7 @@ class PhotoDetailsController extends GetxController {
         timeAgo: '1h ago',
         isActive: true,
       ),
-      TimeLineModal(title: 'Job completed', timeAgo: '2h ago'),
-      TimeLineModal(title: 'Tech assigned', timeAgo: '1d ago'),
-      TimeLineModal(title: 'Job created', timeAgo: '2d ago'),
+      TimeLineModal(title: 'Job in progress', timeAgo: '2h ago'),
     ]);
   }
 

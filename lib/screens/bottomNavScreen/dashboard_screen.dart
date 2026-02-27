@@ -13,95 +13,103 @@ class DashboardScreen extends StatelessWidget {
     return Container(
       color: theme.scaffoldBackgroundColor,
       child: SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(horizontal: 25, vertical: 10),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  const Spacer(),
-                  TextButton(
-                    onPressed: controller.onViewReport,
-                    style: TextButton.styleFrom(
-                      padding: EdgeInsets.zero,
-                      minimumSize: const Size(0, 0),
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
-                    child: Text(
-                      'View Report',
-                      style: theme.textTheme.labelLarge?.copyWith(
-                        color: theme.colorScheme.primary,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-
-              Obx(
-                () => _EarningsCard(
-                  total: controller.earningsFormatted,
-                  chipText: controller.growthText,
-                  onTap: controller.onTotalEarnings,
-                ),
-              ),
-
-              const SizedBox(height: 12),
-
-              Padding(
-                padding: EdgeInsetsGeometry.symmetric(horizontal: 10),
-                child: Row(
+        child: RefreshIndicator(
+          onRefresh: controller.refreshOwnerSummary,
+          color: theme.colorScheme.primary,
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: EdgeInsets.symmetric(horizontal: 25, vertical: 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
                   children: [
-                    Expanded(
-                      child: Obx(
-                        () => _MiniStatCard(
-                          onTap: controller.onActiveListings,
-                          icon: Icons.home_outlined,
-                          iconBg: const Color(0xFFE6F7F7),
-                          iconColor: theme.colorScheme.primary,
-                          title: 'Active Listings',
-                          value: '${controller.activeListings.value}',
-                        ),
+                    const Spacer(),
+                    TextButton(
+                      onPressed: controller.onViewReport,
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.zero,
+                        minimumSize: const Size(0, 0),
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Obx(
-                        () => _MiniRequestCard(
-                          onTap: controller.onPendingRequests,
-                          badgeText: controller.pendingRequestsBadge.value,
+                      child: Text(
+                        'View Report',
+                        style: theme.textTheme.labelLarge?.copyWith(
+                          color: theme.colorScheme.primary,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
                   ],
                 ),
-              ),
+                const SizedBox(height: 8),
 
-              const SizedBox(height: 14),
-
-              Text(
-                'Management Tools',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  color: Get.isDarkMode
-                      ? Colors.white
-                      : const Color(0xFF1D2330),
-                  fontWeight: FontWeight.w800,
+                Obx(
+                  () => _EarningsCard(
+                    total: controller.earningsFormatted,
+                    chipText: controller.growthText,
+                    onTap: controller.onTotalEarnings,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 12),
 
-              Padding(
-                padding: EdgeInsetsGeometry.symmetric(horizontal: 10),
-                child: _ToolsGrid(
-                  onMyListings: controller.onMyListings,
-                  onEarnings: controller.onEarnings,
-                  onExpenses: controller.onExpenses,
-                  onAnalytics: controller.onAnalytics,
+                const SizedBox(height: 12),
+
+                Padding(
+                  padding: EdgeInsetsGeometry.symmetric(horizontal: 10),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Obx(
+                          () => _MiniStatCard(
+                            onTap: controller.onActiveListings,
+                            icon: Icons.home_outlined,
+                            iconBg: const Color(0xFFE6F7F7),
+                            iconColor: theme.colorScheme.primary,
+                            title: 'Active Listings',
+                            value: '${controller.activeListings.value}',
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Obx(
+                          () => _MiniRequestCard(
+                            onTap: controller.onPendingRequests,
+                            badgeText: controller.pendingRequestsBadge.value,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+
+                const SizedBox(height: 14),
+
+                Text(
+                  'Management Tools',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: Get.isDarkMode
+                        ? Colors.white
+                        : const Color(0xFF1D2330),
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 12),
+
+                Padding(
+                  padding: EdgeInsetsGeometry.symmetric(horizontal: 10),
+                  child: Obx(
+                    () => _ToolsGrid(
+                      onMyListings: controller.onMyListings,
+                      onEarnings: controller.onEarnings,
+                      onExpenses: controller.onExpenses,
+                      onAnalytics: controller.onAnalytics,
+                      propertyCount: controller.activeProperties.value,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -333,7 +341,9 @@ class _MiniRequestCard extends StatelessWidget {
                   width: 32,
                   height: 32,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFFF3D6).withOpacity(isDark ? 0.2 : 1),
+                    color: const Color(
+                      0xFFFFF3D6,
+                    ).withOpacity(isDark ? 0.2 : 1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   alignment: Alignment.center,
@@ -372,7 +382,9 @@ class _MiniRequestCard extends StatelessWidget {
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFFE6B7).withOpacity(isDark ? 0.2 : 1),
+                          color: const Color(
+                            0xFFFFE6B7,
+                          ).withOpacity(isDark ? 0.2 : 1),
                           borderRadius: BorderRadius.circular(999),
                         ),
                         child: Text(
@@ -402,12 +414,14 @@ class _ToolsGrid extends StatelessWidget {
     required this.onEarnings,
     required this.onExpenses,
     required this.onAnalytics,
+    required this.propertyCount,
   });
 
   final VoidCallback onMyListings;
   final VoidCallback onEarnings;
   final VoidCallback onExpenses;
   final VoidCallback onAnalytics;
+  final int propertyCount;
 
   @override
   Widget build(BuildContext context) {
@@ -426,7 +440,7 @@ class _ToolsGrid extends StatelessWidget {
           iconBg: const Color(0xFFE6F7F7),
           iconColor: theme.colorScheme.primary,
           title: 'My Listings',
-          subtitle: 'Manage 5\nproperties',
+          subtitle: 'Manage $propertyCount\nproperties',
           onTap: onMyListings,
         ),
         _ToolTile(

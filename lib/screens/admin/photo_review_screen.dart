@@ -1,8 +1,8 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:superapp/modal/photo_review_modal.dart';
 import 'package:superapp/controllers/photo_review_controller.dart';
-import 'package:superapp/screens/photo_detail_screen.dart';
+import 'package:superapp/modal/job_model.dart';
 
 class PhotoReviewScreen extends StatelessWidget {
   const PhotoReviewScreen({super.key});
@@ -14,65 +14,270 @@ class PhotoReviewScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      body: Column(
+      appBar: AppBar(
+        title: const Text('Photo Review'),
+        centerTitle: true,
+        actions: [
+          Obx(() {
+            final pending = controller.pendingCount;
+            if (pending <= 0) return const SizedBox.shrink();
+            return _PendingBadge(text: '$pending pending');
+          }),
+          const SizedBox(width: 16),
+        ],
+      ),
+      body: Obx(() {
+        if (controller.isLoading.value) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        final list = controller.jobs;
+
+        if (list.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.photo_library_outlined,
+                  size: 64,
+                  color: Colors.grey.shade300,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'No pending photo reviews',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: Colors.grey.shade500,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return RefreshIndicator(
+          onRefresh: controller.fetchPendingReviews,
+          child: ListView.separated(
+            padding: const EdgeInsets.all(20),
+            itemCount: list.length,
+            separatorBuilder: (_, __) => const SizedBox(height: 20),
+            itemBuilder: (context, i) {
+              return _ReviewCard(job: list[i], controller: controller);
+            },
+          ),
+        );
+      }),
+    );
+  }
+}
+
+class _ReviewCard extends StatelessWidget {
+  const _ReviewCard({required this.job, required this.controller});
+  final Job job;
+  final PhotoReviewController controller;
+
+  void _showRejectionModal(BuildContext context) {
+    final reasonController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Reject Submission'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Please provide a reason for rejection:'),
+            const SizedBox(height: 16),
+            TextField(
+              controller: reasonController,
+              maxLines: 3,
+              decoration: const InputDecoration(
+                hintText: 'e.g. After photo is blurry or work incomplete',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (reasonController.text.trim().isEmpty) return;
+              controller.reviewJob(
+                job.id,
+                false,
+                reason: reasonController.text.trim(),
+              );
+              Navigator.pop(context);
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text('Reject', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.grey.shade200),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildHeader(context, theme, controller),
+          _buildJobHeader(theme),
+          _buildPhotos(),
+          _buildActions(context),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildJobHeader(ThemeData theme) {
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  job.title,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              Text(
+                job.timeAgo,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey.shade500,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Row(
+            children: [
+              Icon(
+                Icons.person_pin_circle_outlined,
+                size: 14,
+                color: Colors.grey.shade600,
+              ),
+              const SizedBox(width: 4),
+              Text(
+                'Staff: ${job.assigneeName ?? 'Unknown'}',
+                style: TextStyle(
+                  fontSize: 13,
+                  color: Colors.grey.shade600,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 2),
+          Row(
+            children: [
+              Icon(
+                Icons.location_on_outlined,
+                size: 14,
+                color: Colors.grey.shade600,
+              ),
+              const SizedBox(width: 4),
+              Text(
+                job.propertyName ?? job.hotelName ?? 'Unknown Location',
+                style: TextStyle(
+                  fontSize: 13,
+                  color: Colors.grey.shade600,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPhotos() {
+    return Container(
+      height: 180,
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Row(
+        children: [
           Expanded(
-            child: SafeArea(
-              top: false,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 30,
-                  vertical: 10,
-                ),
-                child: Column(
-                  children: [
-                    const SizedBox(height: 10),
-                    Flexible(
-                      fit: FlexFit.loose,
-                      child: Obx(() {
-                        final list = controller.items;
+            child: _PhotoBox(label: 'BEFORE', url: job.beforeImage),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: _PhotoBox(label: 'AFTER', url: job.afterImage),
+          ),
+        ],
+      ),
+    );
+  }
 
-                        if (list.isEmpty) {
-                          return Center(
-                            child: Text(
-                              'No pending photo reviews',
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                fontWeight: FontWeight.w600,
-                                color: theme.colorScheme.onSurface.withOpacity(0.45),
-                              ),
-                            ),
-                          );
-                        }
-
-                        return ListView.separated(
-                          shrinkWrap: true,
-                          padding: const EdgeInsets.only(top: 6),
-                          itemCount: list.length,
-                          separatorBuilder: (_, __) => const SizedBox(height: 12),
-                          itemBuilder: (context, i) {
-                            final item = list[i];
-                            return _ReviewTile(
-                              item: item,
-                              onTap: () => controller.openItem(item),
-                            );
-                          },
-                        );
-                      }),
-                    ),
-                    const SizedBox(height: 20),
-                    GestureDetector(
-                      onTap: () => Get.to(() => const PhotoDetailsScreen()),
-                      child: Text(
-                        'Tap to review & approve photos',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: theme.colorScheme.onSurface.withOpacity(0.40),
-                        ),
-                      ),
-                    ),
-                  ],
+  Widget _buildActions(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: Row(
+        children: [
+          Expanded(
+            child: OutlinedButton(
+              onPressed: () => _showRejectionModal(context),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: Colors.red,
+                side: const BorderSide(color: Colors.red),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
                 ),
+                padding: const EdgeInsets.symmetric(vertical: 14),
+              ),
+              child: const Text(
+                'Reject',
+                style: TextStyle(fontWeight: FontWeight.w700),
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: ElevatedButton(
+              onPressed: () => controller.reviewJob(job.id, true),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF38CAC7),
+                foregroundColor: Colors.white,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 14),
+              ),
+              child: const Text(
+                'Approve',
+                style: TextStyle(fontWeight: FontWeight.w700),
               ),
             ),
           ),
@@ -80,48 +285,56 @@ class PhotoReviewScreen extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget _buildHeader(
-      BuildContext context, ThemeData theme, PhotoReviewController controller) {
-    return Container(
-      padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top + 15,
-        bottom: 70,
-        left: 20,
-        right: 20,
-      ),
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Color(0xFF38CAC7), Color(0xFF2DD4BF)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+class _PhotoBox extends StatelessWidget {
+  const _PhotoBox({required this.label, this.url});
+  final String label;
+  final String? url;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w800,
+            color: Colors.grey.shade400,
+            letterSpacing: 1,
+          ),
         ),
-      ),
-      child: Row(
-        children: [
-          GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: const Icon(Icons.arrow_back, color: Colors.white, size: 24),
-          ),
-          Expanded(
-            child: Center(
-              child: Text(
-                'Photo Review',
-                style: theme.textTheme.titleLarge?.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 18,
-                ),
-              ),
+        const SizedBox(height: 8),
+        Expanded(
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.grey.shade100,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.grey.shade200),
             ),
+            clipBehavior: Clip.antiAlias,
+            child: url != null
+                ? Image.file(
+                    File(url!),
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => const Center(
+                      child: Icon(
+                        Icons.broken_image_outlined,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  )
+                : const Center(
+                    child: Icon(
+                      Icons.image_not_supported_outlined,
+                      color: Colors.grey,
+                    ),
+                  ),
           ),
-          Obx(() {
-            final pending = controller.pendingCount;
-            if (pending <= 0) return const SizedBox(width: 24);
-            return _PendingBadge(text: '$pending pending');
-          }),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -144,163 +357,6 @@ class _PendingBadge extends StatelessWidget {
           color: Colors.white,
           fontWeight: FontWeight.w800,
           fontSize: 12,
-        ),
-      ),
-    );
-  }
-}
-
-class _ReviewTile extends StatelessWidget {
-  const _ReviewTile({required this.item, required this.onTap});
-
-  final PhotoReviewItem item;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final cs = theme.colorScheme;
-    final isDark = theme.brightness == Brightness.dark;
-
-    final borderColor = isDark ? Colors.white12 : const Color(0xFFE9EEF0);
-    final cardColor = isDark ? theme.cardColor : Colors.white;
-
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(14),
-        onTap: onTap,
-        child: Container(
-          height: 110,
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-          decoration: BoxDecoration(
-            color: cardColor,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: borderColor, width: 1),
-            boxShadow: isDark
-                ? null
-                : const [
-                    BoxShadow(
-                      color: Color(0x12000000),
-                      blurRadius: 18,
-                      offset: Offset(0, 10),
-                    ),
-                  ],
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  color: isDark ? Colors.white10 : const Color(0xFFF1F4F6),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: isDark ? Colors.white12 : const Color(0xFFE4EAEE),
-                  ),
-                ),
-                child: Icon(
-                  Icons.photo_camera_outlined,
-                  size: 18,
-                  color: cs.onSurface.withOpacity(0.55),
-                ),
-              ),
-              const SizedBox(width: 12),
-
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 1),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        item.title,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: theme.textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w800,
-                          height: 1.1,
-                          color: cs.onSurface,
-                        ),
-                      ),
-                      SizedBox(height: 5),
-
-                      if (item.status.trim().isNotEmpty) ...[
-                        const SizedBox(height: 2),
-                        Text(
-                          item.status,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            fontWeight: FontWeight.w900,
-                            height: 1.1,
-                          ),
-                        ),
-                      ],
-
-                      const SizedBox(height: 6),
-
-                      Row(
-                        children: [
-                          if (item.albumLine.isNotEmpty)
-                            Flexible(
-                              child: Text(
-                                item.albumLine,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  fontSize: 10.5,
-                                  color: cs.onSurface.withOpacity(0.55),
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          if (item.albumLine.isNotEmpty)
-                            Text(
-                              '  •  ',
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                fontSize: 10.5,
-                                color: cs.onSurface.withOpacity(0.35),
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          Text(
-                            '${item.photos} photos',
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              fontSize: 10.5,
-                              color: cs.onSurface.withOpacity(0.55),
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 4),
-
-                      Text(
-                        item.metaLine,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          fontSize: 10.5,
-                          color: cs.onSurface.withOpacity(0.45),
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              const SizedBox(width: 8),
-              Icon(
-                Icons.chevron_right_rounded,
-                size: 22,
-                color: cs.onSurface.withOpacity(0.30),
-              ),
-            ],
-          ),
         ),
       ),
     );

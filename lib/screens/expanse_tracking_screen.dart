@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:superapp/controllers/expanse_tracking_controller.dart';
 import 'package:superapp/modal/expanse_tracking_modal.dart';
+import 'package:superapp/screens/expanses_screen.dart';
+import 'package:superapp/screens/expense_detail_screen.dart';
 
 class ExpenseTrackingScreen extends StatelessWidget {
   const ExpenseTrackingScreen({super.key});
@@ -11,22 +13,31 @@ class ExpenseTrackingScreen extends StatelessWidget {
     final controller = Get.put(ExpenseTrackingController());
     final theme = Theme.of(context);
 
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.ensureFresh();
+    });
+
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       floatingActionButton: Padding(
         padding: const EdgeInsets.only(bottom: 20),
         child: FloatingActionButton(
-          onPressed: controller.onAddExpense,
+          onPressed: () async {
+            await controller.onAddExpense();
+          },
           backgroundColor: theme.colorScheme.primary,
           child: const Icon(Icons.add, color: Colors.white),
         ),
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.only(bottom: 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+        child: RefreshIndicator(
+          onRefresh: controller.refresh,
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.only(bottom: 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
               Row(
                 children: [
                   IconButton(
@@ -46,6 +57,19 @@ class ExpenseTrackingScreen extends StatelessWidget {
                       style: theme.textTheme.titleMedium?.copyWith(
                         color: theme.colorScheme.primary,
                         fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      await Get.to(() => const ExpensesScreen());
+                      await controller.ensureFresh();
+                    },
+                    child: Text(
+                      'Details',
+                      style: theme.textTheme.labelLarge?.copyWith(
+                        color: theme.colorScheme.primary,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
@@ -70,9 +94,14 @@ class ExpenseTrackingScreen extends StatelessWidget {
 
                     const SizedBox(height: 14),
 
-                    _InsightCard(
-                      primary: theme.colorScheme.primary,
-                      theme: theme,
+                    Obx(
+                      () => _InsightCard(
+                        primary: theme.colorScheme.primary,
+                        theme: theme,
+                        insight: controller.insight.value,
+                        tips: controller.tips,
+                        isLoading: controller.isLoading.value,
+                      ),
                     ),
 
                     const SizedBox(height: 18),
@@ -219,7 +248,8 @@ class ExpenseTrackingScreen extends StatelessWidget {
                   ],
                 ),
               ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -330,14 +360,33 @@ class _TotalExpenseCard extends StatelessWidget {
 }
 
 class _InsightCard extends StatelessWidget {
-  const _InsightCard({required this.primary, required this.theme});
+  const _InsightCard({
+    required this.primary,
+    required this.theme,
+    required this.insight,
+    required this.tips,
+    this.isLoading = false,
+  });
 
   final Color primary;
   final ThemeData theme;
+  final String insight;
+  final List<String> tips;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
     final isDark = Get.isDarkMode;
+    
+    String displayText = insight;
+    if (displayText.isEmpty) {
+      displayText = isLoading 
+          ? "Analyzing your expenses..."
+          : "Add expenses to get AI-powered insights about your spending patterns.";
+    } else if (tips.isNotEmpty) {
+      displayText = "$insight\n\n${tips.take(2).map((t) => '• $t').join('\n')}";
+    }
+    
     return _Card(
       child: Padding(
         padding: const EdgeInsets.all(14),
@@ -352,7 +401,16 @@ class _InsightCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
               alignment: Alignment.center,
-              child: Icon(Icons.auto_awesome_rounded, size: 18, color: primary),
+              child: isLoading
+                  ? SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: primary,
+                      ),
+                    )
+                  : Icon(Icons.auto_awesome_rounded, size: 18, color: primary),
             ),
             const SizedBox(width: 10),
             Expanded(
@@ -368,7 +426,7 @@ class _InsightCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    "Utilities are 15% higher than average this month. Consider checking for leaks at Sunset Villa.",
+                    displayText,
                     style: theme.textTheme.labelMedium?.copyWith(
                       color: isDark ? Colors.white70 : const Color(0xFF9AA0AF),
                       fontWeight: FontWeight.w600,
@@ -465,6 +523,8 @@ class _TxnRow extends StatelessWidget {
       case ExpenseTrackingFilter.tax:
         return "Tax";
       case ExpenseTrackingFilter.all:
+        return "All";
+      case ExpenseTrackingFilter.other:
         return "Other";
     }
   }
@@ -475,26 +535,59 @@ class _TxnRow extends StatelessWidget {
     final isDark = Get.isDarkMode;
     final amountText = "- \$${txn.amount.abs().toStringAsFixed(2)}";
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-      child: Row(
-        children: [
-          SizedBox(
-            width: 34,
-            height: 34,
-            child: Icon(
-              _iconForTitle(txn.title),
-              size: 20,
-              color: isDark ? Colors.white : const Color(0xFF1D2330),
+    return InkWell(
+      onTap: () async {
+        await Get.to(
+          () => ExpenseDetailScreen(expenseId: txn.id),
+        );
+        // Always refresh when returning from detail screen
+        if (Get.isRegistered<ExpenseTrackingController>()) {
+          await Get.find<ExpenseTrackingController>()
+              .fetchExpenses(forceReloadToken: true);
+        }
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        child: Row(
+          children: [
+            SizedBox(
+              width: 34,
+              height: 34,
+              child: Icon(
+                _iconForTitle(txn.title),
+                size: 20,
+                color: isDark ? Colors.white : const Color(0xFF1D2330),
+              ),
             ),
-          ),
-          const SizedBox(width: 6),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            const SizedBox(width: 6),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    txn.title,
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      color: isDark ? Colors.white : const Color(0xFF1D2330),
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    "${txn.place}  •  ${txn.dateText}",
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: isDark ? Colors.white70 : const Color(0xFF9AA0AF),
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 10),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  txn.title,
+                  amountText,
                   style: theme.textTheme.titleSmall?.copyWith(
                     color: isDark ? Colors.white : const Color(0xFF1D2330),
                     fontWeight: FontWeight.w900,
@@ -502,37 +595,16 @@ class _TxnRow extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  "${txn.place}  •  ${txn.dateText}",
+                  _catText(txn.category),
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: isDark ? Colors.white70 : const Color(0xFF9AA0AF),
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w800,
                   ),
                 ),
               ],
             ),
-          ),
-          const SizedBox(width: 10),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                amountText,
-                style: theme.textTheme.titleSmall?.copyWith(
-                  color: isDark ? Colors.white : const Color(0xFF1D2330),
-                  fontWeight: FontWeight.w900,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                _catText(txn.category),
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: isDark ? Colors.white70 : const Color(0xFF9AA0AF),
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-            ],
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -124,15 +124,15 @@ class AddExpenseScreen extends StatelessWidget {
 
                         const SizedBox(height: 14),
 
-                        _Label("Property", theme),
+                        _Label("Hotel/Property", theme),
                         const SizedBox(height: 6),
                         Obx(
                           () => _DropdownField(
-                            hint: "Select a property",
+                            hint: "Select hotel or property",
                             value: controller.property.value.isEmpty
                                 ? null
                                 : controller.property.value,
-                            items: controller.properties,
+                            items: controller.listingNames,
                             onChanged: (v) => controller.pickProperty(v ?? ''),
                           ),
                         ),
@@ -231,20 +231,33 @@ class AddExpenseScreen extends StatelessWidget {
                   child: SizedBox(
                     height: 52,
                     width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: controller.saveExpense,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: theme.colorScheme.primary,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
+                    child: Obx(
+                      () => ElevatedButton.icon(
+                        onPressed: controller.isLoading.value
+                            ? null
+                            : () => controller.saveExpense(),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: theme.colorScheme.primary,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
                         ),
-                      ),
-                      icon: const Icon(Icons.check_rounded, size: 18),
-                      label: Text(
-                        "Save Expense",
-                        style: theme.textTheme.titleSmall?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w800,
+                        icon: controller.isLoading.value
+                            ? const SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : const Icon(Icons.check_rounded, size: 18),
+                        label: Text(
+                          controller.isLoading.value ? "Saving..." : "Save Expense",
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w800,
+                          ),
                         ),
                       ),
                     ),
@@ -343,69 +356,65 @@ class _ReceiptBox extends StatelessWidget {
     final hasFile = fileName.isNotEmpty;
     final isDark = Get.isDarkMode;
 
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(30),
-      decoration: BoxDecoration(
-        color: isDark ? theme.cardColor : Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: isDark ? Colors.white24 : const Color(0xFFEDEFF5)),
-      ),
-      child: Column(
-        children: [
-          Container(
-            width: 34,
-            height: 34,
-            decoration: BoxDecoration(
-              color: isDark ? Colors.white12 : Colors.grey.shade200,
-              borderRadius: BorderRadius.circular(12),
+    return InkWell(
+      onTap: onTapUpload,
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(30),
+        decoration: BoxDecoration(
+          color: isDark ? theme.cardColor : Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: isDark ? Colors.white24 : const Color(0xFFEDEFF5)),
+        ),
+        child: Column(
+          children: [
+            Container(
+              width: 34,
+              height: 34,
+              decoration: BoxDecoration(
+                color: isDark ? Colors.white12 : Colors.grey.shade200,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              alignment: Alignment.center,
+              child: Icon(Icons.camera_alt_outlined, size: 18, color: primary),
             ),
-            alignment: Alignment.center,
-            child: Icon(Icons.camera_alt_outlined, size: 18, color: primary),
-          ),
-          const SizedBox(height: 10),
+            const SizedBox(height: 10),
 
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              TextButton(
-                onPressed: onTapUpload,
-                style: TextButton.styleFrom(
-                  padding: EdgeInsets.zero,
-                  minimumSize: const Size(0, 0),
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-                child: Text(
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
                   hasFile ? "Selected: $fileName" : "Click to upload",
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: primary,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
-              ),
-              const SizedBox(width: 4),
-              Text(
-                "or drag and drop ",
-                textAlign: TextAlign.center,
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: isDark ? Colors.white54 : const Color(0xFF9AA0AF),
-                  fontWeight: FontWeight.w700,
-                  height: 1.2,
+                const SizedBox(width: 4),
+                Text(
+                  "or drag and drop ",
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: isDark ? Colors.white54 : const Color(0xFF9AA0AF),
+                    fontWeight: FontWeight.w700,
+                    height: 1.2,
+                  ),
                 ),
-              ),
-            ],
-          ),
-
-          Text(
-            "SVG, PNG, JPG or PDF",
-            textAlign: TextAlign.center,
-            style: theme.textTheme.labelSmall?.copyWith(
-              color: isDark ? Colors.white54 : const Color(0xFF9AA0AF),
-              fontWeight: FontWeight.w700,
-              height: 1.2,
+              ],
             ),
-          ),
-        ],
+
+            Text(
+              "SVG, PNG, JPG or PDF",
+              textAlign: TextAlign.center,
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: isDark ? Colors.white54 : const Color(0xFF9AA0AF),
+                fontWeight: FontWeight.w700,
+                height: 1.2,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

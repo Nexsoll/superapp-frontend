@@ -4,11 +4,13 @@ import 'package:flutter_svg/flutter_svg.dart';
 class AdminBottomBar extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
+  final Map<int, String>? badges;
 
   const AdminBottomBar({
     super.key,
     required this.currentIndex,
     required this.onTap,
+    this.badges,
   });
 
   @override
@@ -43,9 +45,8 @@ class AdminBottomBar extends StatelessWidget {
             children: List.generate(items.length, (index) {
               final item = items[index];
               final isSelected = index == currentIndex;
+              final badge = badges?[index];
 
-              // Colors: In light mode, Active is dark slate, Inactive is grey.
-              // In dark mode, Active is white, Inactive is grey.
               final color = isSelected
                   ? (isDark ? Colors.white : const Color(0xFF1F2937))
                   : (isDark ? Colors.white54 : const Color(0xFF9CA3AF));
@@ -58,12 +59,47 @@ class AdminBottomBar extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Using SvgPicture for all icons
-                      SvgPicture.asset(
-                        item.asset,
-                        width: 24,
-                        height: 24,
-                        colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+                      Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          SvgPicture.asset(
+                            item.asset,
+                            width: 24,
+                            height: 24,
+                            colorFilter: ColorFilter.mode(
+                              color,
+                              BlendMode.srcIn,
+                            ),
+                          ),
+                          if (badge != null && badge.isNotEmpty)
+                            Positioned(
+                              right: -8,
+                              top: -4,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 4,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.red,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                constraints: const BoxConstraints(
+                                  minWidth: 16,
+                                  minHeight: 16,
+                                ),
+                                child: Text(
+                                  badge,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 8,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
                       const SizedBox(height: 6),
                       Text(

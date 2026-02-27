@@ -1,53 +1,93 @@
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:superapp/modal/expanse_tracking_modal.dart';
 import 'package:superapp/screens/add_expanse_screen.dart';
+import 'package:superapp/services/api_service.dart';
 
 class ExpenseTrackingController extends GetxController {
   final selectedFilter = ExpenseTrackingFilter.all.obs;
   final sortNewestFirst = true.obs;
 
-  final totalThisMonth = 4250.00.obs;
-  final deltaPercent = (-5.0).obs;
+  final totalThisMonth = 0.0.obs;
+  final deltaPercent = 0.0.obs;
+  final isLoading = false.obs;
+  final insight = ''.obs;
+  final tips = <String>[].obs;
 
   final txns = <ExpenseTrackingModal>[].obs;
+
+  String? _token;
+  DateTime? _lastFetchAt;
 
   @override
   void onInit() {
     super.onInit();
-    _seed();
+    _loadTokenAndFetch();
   }
 
-  void _seed() {
-    txns.assignAll(const [
-      ExpenseTrackingModal(
-        title: "HVAC Repair",
-        place: "Ocean View Apt",
-        dateText: "Oct 24",
-        amount: -150.00,
-        category: ExpenseTrackingFilter.maintenance,
-      ),
-      ExpenseTrackingModal(
-        title: "Water Bill",
-        place: "Sunset Villa",
-        dateText: "Oct 22",
-        amount: -85.50,
-        category: ExpenseTrackingFilter.utilities,
-      ),
-      ExpenseTrackingModal(
-        title: "Repainting Hallway",
-        place: "Sunset Villa",
-        dateText: "Oct 20",
-        amount: -400.00,
-        category: ExpenseTrackingFilter.maintenance,
-      ),
-      ExpenseTrackingModal(
-        title: "Property Tax Q3",
-        place: "Multiple Properties",
-        dateText: "Oct 15",
-        amount: -1200.00,
-        category: ExpenseTrackingFilter.tax,
-      ),
-    ]);
+  Future<void> _loadTokenAndFetch() async {
+    final prefs = await SharedPreferences.getInstance();
+    _token = prefs.getString('user_token');
+    await fetchExpenses();
+  }
+
+  Future<void> ensureFresh() async {
+    // If you return to this screen, ensure data is refreshed.
+    // Prevent aggressive refetching during rebuilds.
+    final now = DateTime.now();
+    if (isLoading.value) return;
+    if (_lastFetchAt != null && now.difference(_lastFetchAt!).inSeconds < 2) {
+      return;
+    }
+    await fetchExpenses(forceReloadToken: true);
+  }
+
+  Future<void> fetchExpenses({bool forceReloadToken = false}) async {
+    if (forceReloadToken || _token == null || _token!.isEmpty) {
+      final prefs = await SharedPreferences.getInstance();
+      _token = prefs.getString('user_token');
+    }
+
+    if (_token == null || _token!.isEmpty) return;
+
+    isLoading.value = true;
+
+    try {
+      final results = await Future.wait([
+        ApiService.getExpenses(token: _token!),
+        ApiService.getExpenseSummary(token: _token!),
+        ApiService.getExpenseInsight(token: _token!),
+      ]);
+
+      // Parse expenses
+      final expenseList = results[0] as List<Map<String, dynamic>>;
+      txns.assignAll(
+        expenseList.map((json) => ExpenseTrackingModal.fromJson(json)).toList(),
+      );
+
+      // Parse summary
+      final summary = results[1] as Map<String, dynamic>;
+      totalThisMonth.value = (summary['totalThisMonth'] as num?)?.toDouble() ?? 0.0;
+      deltaPercent.value = (summary['deltaPercent'] as num?)?.toDouble() ?? 0.0;
+
+      // Parse insight
+      final insightData = results[2] as Map<String, dynamic>;
+      insight.value = insightData['insight'] as String? ?? '';
+      final tipsList = insightData['tips'] as List?;
+      if (tipsList != null) {
+        tips.assignAll(tipsList.map((e) => e.toString()).toList());
+      }
+
+      _lastFetchAt = DateTime.now();
+    } catch (e) {
+      print('Error fetching expenses: $e');
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> refresh() async {
+    await fetchExpenses();
   }
 
   void back() => Get.back();
@@ -56,7 +96,16 @@ class ExpenseTrackingController extends GetxController {
 
   void toggleSort() => sortNewestFirst.value = !sortNewestFirst.value;
 
-  void onAddExpense() => Get.to(() => AddExpenseScreen());
+  Future<void> onAddExpense() async {
+    await Get.to(() => AddExpenseScreen());
+    // Always refresh when returning from Add Expense.
+    // Some navigation paths may return null/false even after saving.
+    // We still refetch to guarantee latest data without manual pull-to-refresh.
+    await Future.delayed(const Duration(milliseconds: 200));
+    await fetchExpenses(forceReloadToken: true);
+    await Future.delayed(const Duration(milliseconds: 600));
+    await fetchExpenses(forceReloadToken: true);
+  }
 
   List<ExpenseTrackingModal> get filteredTxns {
     final f = selectedFilter.value;
