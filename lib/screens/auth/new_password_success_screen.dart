@@ -27,8 +27,7 @@ class NewPasswordSuccessScreen extends StatelessWidget {
 
                 const SizedBox(height: 14),
 
-                Text(
-                  'Successful',
+                Text('Successful'.tr,
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.w700,
                     color: const Color(0xFF111827),
@@ -37,8 +36,7 @@ class NewPasswordSuccessScreen extends StatelessWidget {
 
                 const SizedBox(height: 10),
 
-                Text(
-                  'Congratulations! Your password has been successfully updated. Click Continue to login',
+                Text('Congratulations! Your password has been successfully updated. Click Continue to login'.tr,
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: const Color(0xFF6B7280),
@@ -61,8 +59,7 @@ class NewPasswordSuccessScreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                    child: Text(
-                      'Continue',
+                    child: Text('Continue'.tr,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.w700,

@@ -63,8 +63,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                 onPressed: () => Get.back(),
                 icon: Icon(Icons.close, color: theme.brightness == Brightness.dark ? Colors.white : const Color(0xFF1D2330), size: 24),
               ),
-              Text(
-                'Filter options',
+              Text('Filter options'.tr,
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w800,
@@ -80,8 +79,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                     selectedAmenities = ['Free wifi'];
                   });
                 },
-                child: const Text(
-                  'Reset',
+                child: Text('Reset'.tr,
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
@@ -99,8 +97,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Number of Guests
-                  Text(
-                    'Number of Guests',
+                  Text('Number of Guests'.tr,
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w800,
@@ -138,8 +135,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                   
                   const SizedBox(height: 32),
                   // Price Range
-                  Text(
-                    'Price Range',
+                  Text('Price Range'.tr,
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w800,
@@ -184,8 +180,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
 
                   const SizedBox(height: 24),
                   // Calendar
-                  Text(
-                    'Check-in/Check-out Dates',
+                  Text('Check-in/Check-out Dates'.tr,
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w800,
@@ -201,8 +196,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                     ),
                     child: Column(
                       children: [
-                        Text(
-                          'December',
+                        Text('December'.tr,
                           style: TextStyle(
                             color: theme.brightness == Brightness.dark ? Colors.white70 : const Color(0xFF9AA0AF),
                             fontWeight: FontWeight.w600,
@@ -218,17 +212,17 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('Check-in', style: TextStyle(color: theme.brightness == Brightness.dark ? Colors.white70 : const Color(0xFF9AA0AF), fontSize: 14, fontWeight: FontWeight.w500)),
+                                Text('Check-in'.tr, style: TextStyle(color: theme.brightness == Brightness.dark ? Colors.white70 : Color(0xFF9AA0AF), fontSize: 14, fontWeight: FontWeight.w500)),
                                 const SizedBox(height: 4),
-                                Text('Dec 13', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: theme.brightness == Brightness.dark ? Colors.white : const Color(0xFF1D2330))),
+                                Text('Dec 13'.tr, style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: theme.brightness == Brightness.dark ? Colors.white : Color(0xFF1D2330))),
                               ],
                             ),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
-                                Text('Check-out', style: TextStyle(color: theme.brightness == Brightness.dark ? Colors.white70 : const Color(0xFF9AA0AF), fontSize: 14, fontWeight: FontWeight.w500)),
+                                Text('Check-out'.tr, style: TextStyle(color: theme.brightness == Brightness.dark ? Colors.white70 : Color(0xFF9AA0AF), fontSize: 14, fontWeight: FontWeight.w500)),
                                 const SizedBox(height: 4),
-                                Text('Dec 16', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: theme.brightness == Brightness.dark ? Colors.white : const Color(0xFF1D2330))),
+                                Text('Dec 16'.tr, style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: theme.brightness == Brightness.dark ? Colors.white : Color(0xFF1D2330))),
                               ],
                             ),
                           ],
@@ -239,8 +233,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
 
                   const SizedBox(height: 24),
                   // Amenities
-                  Text(
-                    'Amenities',
+                  Text('Amenities'.tr,
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w800,
@@ -271,7 +264,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                               : theme.cardColor,
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(
-                              color: isSelected ? const Color(0xFF2FC1BE) : (theme.brightness == Brightness.dark ? Colors.white24 : Colors.transparent),
+                              color: isSelected ? Color(0xFF2FC1BE) : (theme.brightness == Brightness.dark ? Colors.white24 : Colors.transparent),
                               width: 1.5,
                             ),
                           ),
@@ -311,8 +304,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                         ),
                         elevation: 0,
                       ),
-                      child: const Text(
-                        'Apply',
+                      child: Text('Apply'.tr,
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w800,

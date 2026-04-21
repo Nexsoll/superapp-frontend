@@ -39,8 +39,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
               const SizedBox(height: 10),
 
-              Text(
-                'Create Your Account',
+              Text('Create Your Account'.tr,
                 style: theme.textTheme.titleMedium?.copyWith(
                   color: theme.colorScheme.primary,
                   fontWeight: FontWeight.w700,
@@ -167,8 +166,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  child: Text(
-                    'Sign Up',
+                  child: Text('Sign Up'.tr,
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: Colors.white,
                       fontWeight: FontWeight.w700,
@@ -180,12 +178,11 @@ class _SignupScreenState extends State<SignupScreen> {
               const SizedBox(height: 12),
 
               Row(
-                children: const [
+                children: [
                   Expanded(child: Divider(color: Color(0xFF6B7280))),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 10),
-                    child: Text(
-                      'or',
+                    child: Text('or'.tr,
                       style: TextStyle(
                         color: Color(0xFF6B7280),
                         fontWeight: FontWeight.w500,
@@ -215,8 +212,7 @@ class _SignupScreenState extends State<SignupScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    'Already have an account? ',
+                  Text('Already have an account?'.tr,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: const Color(0xFF6B7280),
                       fontWeight: FontWeight.w500,
@@ -224,8 +220,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                   TextButton(
                     onPressed: controller.goTosignIn,
-                    child: Text(
-                      'Sign in',
+                    child: Text('Sign in'.tr,
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.primary,
                         fontWeight: FontWeight.w900,

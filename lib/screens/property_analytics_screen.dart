@@ -32,8 +32,7 @@ class PropertyAnalyticsScreen extends StatelessWidget {
                       ),
                       const SizedBox(width: 2),
                       Expanded(
-                        child: Text(
-                          "Property Analytics",
+                        child: Text("Property Analytics".tr,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: theme.textTheme.titleMedium?.copyWith(
@@ -130,8 +129,7 @@ class PropertyAnalyticsScreen extends StatelessWidget {
                         children: [
                           Row(
                             children: [
-                              Text(
-                                "Occupancy Trends",
+                              Text("Occupancy Trends".tr,
                                 style: theme.textTheme.titleSmall?.copyWith(
                                   color: Get.isDarkMode
                                       ? Colors.white
@@ -150,8 +148,7 @@ class PropertyAnalyticsScreen extends StatelessWidget {
                           const SizedBox(height: 4),
                           Align(
                             alignment: Alignment.centerLeft,
-                            child: Text(
-                              "Daily occupancy rate over selected period",
+                            child: Text("Daily occupancy rate over selected period".tr,
                               style: theme.textTheme.labelSmall?.copyWith(
                                 color: Get.isDarkMode
                                     ? Colors.white54
@@ -194,8 +191,7 @@ class PropertyAnalyticsScreen extends StatelessWidget {
                           children: [
                             Row(
                               children: [
-                                Text(
-                                  "Financial Breakdown",
+                                Text("Financial Breakdown".tr,
                                   style: theme.textTheme.titleSmall?.copyWith(
                                     color: Get.isDarkMode
                                         ? Colors.white
@@ -235,8 +231,7 @@ class PropertyAnalyticsScreen extends StatelessWidget {
                                   ),
                                 ),
                                 const SizedBox(width: 8),
-                                Text(
-                                  "Net income",
+                                Text("Net income".tr,
                                   style: theme.textTheme.labelMedium?.copyWith(
                                     color: Get.isDarkMode
                                         ? Colors.white54
@@ -292,8 +287,7 @@ class PropertyAnalyticsScreen extends StatelessWidget {
                         size: 18,
                         color: theme.iconTheme.color,
                       ),
-                      label: Text(
-                        "Export Full Report",
+                      label: Text("Export Full Report".tr,
                         style: theme.textTheme.titleSmall?.copyWith(
                           color: Colors.white,
                           fontWeight: FontWeight.w800,

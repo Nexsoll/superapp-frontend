@@ -69,10 +69,9 @@ class JobAssignmentScreen extends StatelessWidget {
                             )
                           else
                             const SizedBox(width: 16),
-                          const Expanded(
+                          Expanded(
                             child: Center(
-                              child: Text(
-                                'Jobs',
+                              child: Text('Jobs'.tr,
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w600,
@@ -211,15 +210,13 @@ class _EmptyState extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          Text(
-            'No jobs found',
+          Text('No jobs found'.tr,
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w700,
             ),
           ),
           const SizedBox(height: 6),
-          Text(
-            'Tap + to create a new job',
+          Text('Tap + to create a new job'.tr,
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -241,8 +238,7 @@ class _JobCard extends StatelessWidget {
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: isDark ? theme.cardColor : Colors.white,
-        title: Text(
-          'Delete Job',
+        title: Text('Delete Job'.tr,
           style: theme.textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.w700,
           ),
@@ -256,8 +252,7 @@ class _JobCard extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(
-              'Cancel',
+            child: Text('Cancel'.tr,
               style: TextStyle(
                 color: isDark ? Colors.white54 : const Color(0xFF94A3B8),
               ),
@@ -273,7 +268,7 @@ class _JobCard extends StatelessWidget {
               Navigator.pop(context);
               controller.deleteJob(job);
             },
-            child: const Text('Delete'),
+            child: Text('Delete'.tr),
           ),
         ],
       ),
@@ -361,8 +356,7 @@ class _JobCard extends StatelessWidget {
                           ),
                         ),
                         if (job.ownerName != null) ...[
-                          const Text(
-                            '  •  ',
+                          Text('•'.tr,
                             style: TextStyle(color: Color(0xFF94A3B8)),
                           ),
                           Text(
@@ -377,8 +371,7 @@ class _JobCard extends StatelessWidget {
                         ],
                         if (job.assigneeName != null &&
                             job.status != JobStatus.QUEUED) ...[
-                          const Text(
-                            '  →  ',
+                          Text('→'.tr,
                             style: TextStyle(
                               color: Color(0xFF94A3B8),
                               fontSize: 12,
@@ -614,14 +607,12 @@ class _ActionButton extends StatelessWidget {
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: isDark ? theme.cardColor : Colors.white,
-        title: Text(
-          'Assignment Method',
+        title: Text('Assignment Method'.tr,
           style: theme.textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.w700,
           ),
         ),
-        content: Text(
-          'How would you like to assign this job?',
+        content: Text('How would you like to assign this job?'.tr,
           style: theme.textTheme.bodyMedium?.copyWith(
             color: isDark ? Colors.white60 : const Color(0xFF64748B),
           ),
@@ -634,7 +625,7 @@ class _ActionButton extends StatelessWidget {
               elevation: 0,
             ),
             icon: const Icon(Icons.person_search_rounded, size: 18),
-            label: const Text('Manual'),
+            label: Text('Manual'.tr),
             onPressed: () {
               Navigator.pop(context);
               controller.clearUserSearch();
@@ -655,7 +646,7 @@ class _ActionButton extends StatelessWidget {
               elevation: 0,
             ),
             icon: const Icon(Icons.auto_awesome_rounded, size: 18),
-            label: const Text('AI Auto-Assign'),
+            label: Text('AI Auto-Assign'.tr),
             onPressed: () {
               Navigator.pop(context);
               controller.autoAssignJob(job);
@@ -767,8 +758,7 @@ class _AssignUserSheetState extends State<_AssignUserSheet> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'Assign Job',
+                          Text('Assign Job'.tr,
                             style: theme.textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.w800,
                               color: isDark
@@ -826,7 +816,7 @@ class _AssignUserSheetState extends State<_AssignUserSheet> {
                       fontSize: 15,
                     ),
                     decoration: InputDecoration(
-                      hintText: 'Search by name or email...',
+                      hintText: 'Search by name or email...'.tr,
                       hintStyle: TextStyle(
                         color: isDark
                             ? Colors.white30
@@ -895,8 +885,7 @@ class _AssignUserSheetState extends State<_AssignUserSheet> {
                                 : const Color(0xFFCBD5E1),
                           ),
                           const SizedBox(height: 12),
-                          Text(
-                            'No users found',
+                          Text('No users found'.tr,
                             style: theme.textTheme.bodyMedium?.copyWith(
                               color: isDark
                                   ? Colors.white38
@@ -1020,8 +1009,7 @@ class _UserTile extends StatelessWidget {
                 color: theme.colorScheme.primary,
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Text(
-                'Assign',
+              child: Text('Assign'.tr,
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 12,

@@ -75,8 +75,7 @@ class SelectRoomSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Select Room',
+        Text('Select Room'.tr,
           style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.w900,
@@ -225,8 +224,7 @@ class SelectRoomSection extends StatelessWidget {
                         color: Color(0xFF2FC1BE),
                       ),
                     ),
-                    Text(
-                      '/night',
+                    Text('/night'.tr,
                       style: TextStyle(
                         color: theme.brightness == Brightness.dark
                             ? Colors.white54

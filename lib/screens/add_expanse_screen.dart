@@ -32,8 +32,7 @@ class AddExpenseScreen extends StatelessWidget {
                       ),
                       const SizedBox(width: 2),
                       Expanded(
-                        child: Text(
-                          "Add Expense",
+                        child: Text("Add Expense".tr,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: theme.textTheme.titleMedium?.copyWith(
@@ -59,8 +58,7 @@ class AddExpenseScreen extends StatelessWidget {
                             child: Column(
                               children: [
                                 SizedBox(height: 10),
-                                Text(
-                                  "TOTAL AMOUNT",
+                                Text("TOTAL AMOUNT".tr,
                                   style: theme.textTheme.labelSmall?.copyWith(
                                     color: Get.isDarkMode ? Colors.white70 : const Color(0xFF9AA0AF),
                                     fontWeight: FontWeight.w800,
@@ -114,7 +112,7 @@ class AddExpenseScreen extends StatelessWidget {
                             fontWeight: FontWeight.w600,
                           ),
                           decoration: InputDecoration(
-                            hintText: "e.g., Plumbing Repair",
+                            hintText: "e.g., Plumbing Repair".tr,
                             hintStyle: theme.textTheme.bodyLarge?.copyWith(
                               color: Get.isDarkMode ? Colors.white54 : const Color(0xFFB6BAC5),
                               fontWeight: FontWeight.w600,
@@ -392,8 +390,7 @@ class _ReceiptBox extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 4),
-                Text(
-                  "or drag and drop ",
+                Text("or drag and drop".tr,
                   textAlign: TextAlign.center,
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: isDark ? Colors.white54 : const Color(0xFF9AA0AF),
@@ -404,8 +401,7 @@ class _ReceiptBox extends StatelessWidget {
               ],
             ),
 
-            Text(
-              "SVG, PNG, JPG or PDF",
+            Text("SVG, PNG, JPG or PDF".tr,
               textAlign: TextAlign.center,
               style: theme.textTheme.labelSmall?.copyWith(
                 color: isDark ? Colors.white54 : const Color(0xFF9AA0AF),

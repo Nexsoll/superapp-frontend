@@ -233,7 +233,7 @@ class _PropertyCard extends StatelessWidget {
                           fontWeight: FontWeight.w800,
                         ),
                       ),
-                      const Padding(
+                      Padding(
                         padding: EdgeInsets.only(right: 20),
                         child: Row(
                           children: [
@@ -243,8 +243,7 @@ class _PropertyCard extends StatelessWidget {
                               color: Color(0xFFFFC107),
                             ),
                             SizedBox(width: 4),
-                            Text(
-                              '4.8',
+                            Text('4.8'.tr,
                               style: TextStyle(
                                 fontWeight: FontWeight.w700,
                               ),
@@ -400,7 +399,7 @@ class _ComposerBar extends StatelessWidget {
                       colorBlendMode: BlendMode.srcIn,
                     ),
                   ),
-                  hintText: 'Message...',
+                  hintText: 'Message...'.tr,
                   hintStyle: theme.textTheme.bodyMedium?.copyWith(
                     color: const Color(0xFF9AA0AF),
                     fontWeight: FontWeight.w500,

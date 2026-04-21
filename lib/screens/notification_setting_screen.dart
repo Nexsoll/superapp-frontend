@@ -28,8 +28,7 @@ class NotificationsSettingsScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 4),
-                  Text(
-                    'Notifications',
+                  Text('Notifications'.tr,
                     style: theme.textTheme.titleMedium?.copyWith(
                       color: theme.colorScheme.primary,
                       fontWeight: FontWeight.w700,
@@ -162,8 +161,7 @@ class NotificationsSettingsScreen extends StatelessWidget {
                   ),
                   Padding(
                     padding: EdgeInsetsGeometry.symmetric(horizontal: 10),
-                    child: Text(
-                      'Preview message text inside new message notifications.',
+                    child: Text('Preview message text inside new message notifications.'.tr,
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: Colors.grey,
                         fontWeight: FontWeight.w500,
@@ -185,8 +183,7 @@ class NotificationsSettingsScreen extends StatelessWidget {
                           alignment: AlignmentGeometry.centerLeft,
                           child: TextButton(
                             onPressed: () {},
-                            child: Text(
-                              'Reset Notification Settings',
+                            child: Text('Reset Notification Settings'.tr,
                               style: theme.textTheme.bodyLarge?.copyWith(
                                 color: const Color(0xFFEF4444),
                                 fontWeight: FontWeight.w500,
@@ -213,7 +210,7 @@ class _SectionTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (text.trim().isEmpty) return const SizedBox(height: 0);
+    if (text.trim().isEmpty) return SizedBox(height: 0);
 
     final theme = Theme.of(context);
     return Padding(

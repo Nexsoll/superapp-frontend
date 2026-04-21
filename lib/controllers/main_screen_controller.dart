@@ -1,7 +1,9 @@
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:superapp/screens/notification_screen.dart';
 import 'package:superapp/services/listing_service.dart';
 import 'package:superapp/services/currency_service.dart';
+import 'package:superapp/services/api_service.dart';
 import 'package:superapp/controllers/profile_controller.dart';
 import 'package:superapp/controllers/dashboard_controller.dart';
 
@@ -20,6 +22,15 @@ class MainScreenController extends GetxController {
   // Real property data from backend (top 3 featured)
   final featuredPropertiesData = <Map<String, dynamic>>[].obs;
   final isFetchingProperties = true.obs;
+
+  // AI Recommendations
+  final aiRecommendations = <Map<String, dynamic>>[].obs;
+  final aiRecommendationCount = 0.obs;
+  final isFetchingRecommendations = false.obs;
+
+  // AI investment announcement for property mode
+  final investmentAnnouncementData = Rxn<Map<String, dynamic>>();
+  final isFetchingInvestmentAnnouncement = false.obs;
 
   // Full lists for explore / search screens
   final allPropertiesData = <Map<String, dynamic>>[].obs;
@@ -42,6 +53,7 @@ class MainScreenController extends GetxController {
     super.onInit();
     fetchFeaturedHotels();
     fetchFeaturedProperties();
+    fetchInvestmentAnnouncement();
   }
 
   Future<void> fetchFeaturedHotels() async {
@@ -74,11 +86,141 @@ class MainScreenController extends GetxController {
     }
   }
 
+  Future<void> fetchAiRecommendations({String? forceType}) async {
+    isFetchingRecommendations.value = true;
+    try {
+      final type =
+          forceType ?? (categoryIndex.value == 1 ? 'Property' : 'Hotel');
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('user_token');
+      if (token == null || token.isEmpty) return;
+
+      final result = await ApiService.getAiRecommendations(
+        token: token,
+        type: type,
+      );
+      final recommendations = result['recommendations'] as List? ?? [];
+
+      aiRecommendations.value = recommendations.cast<Map<String, dynamic>>();
+      aiRecommendationCount.value = result['count'] ?? recommendations.length;
+    } catch (e) {
+      aiRecommendationCount.value = 0;
+    } finally {
+      isFetchingRecommendations.value = false;
+    }
+  }
+
+  Future<void> fetchInvestmentAnnouncement({bool forceRefresh = false}) async {
+    if (isFetchingInvestmentAnnouncement.value) return;
+    if (!forceRefresh && investmentAnnouncementData.value != null) return;
+
+    isFetchingInvestmentAnnouncement.value = true;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('user_token');
+      if (token == null || token.isEmpty) return;
+
+      final result = await ApiService.getInvestmentAnnouncement(token: token);
+      investmentAnnouncementData.value = result;
+    } catch (_) {
+      // Keep static announcement fallback on failure
+    } finally {
+      isFetchingInvestmentAnnouncement.value = false;
+    }
+  }
+
+  Map<String, dynamic>? _asMap(dynamic value) {
+    if (value is Map<String, dynamic>) return value;
+    if (value is Map) {
+      return value.map(
+        (key, val) => MapEntry(key.toString(), val),
+      );
+    }
+    return null;
+  }
+
+  Map<String, dynamic>? get investmentRecommendation {
+    return _asMap(investmentAnnouncementData.value?['recommendation']);
+  }
+
+  int? get recommendedInvestmentPropertyId {
+    final id = investmentRecommendation?['propertyId'];
+    if (id is num) return id.toInt();
+    return null;
+  }
+
+  Map<String, dynamic>? get recommendedInvestmentProperty {
+    final recommendedId = recommendedInvestmentPropertyId;
+    if (recommendedId != null) {
+      for (final property in allPropertiesData) {
+        final propertyId = (property['id'] as num?)?.toInt();
+        if (propertyId == recommendedId) {
+          return property;
+        }
+      }
+    }
+
+    final rec = investmentRecommendation;
+    if (rec == null || recommendedId == null) return null;
+
+    return {
+      'id': recommendedId,
+      'title': rec['propertyTitle'],
+      'address': rec['address'],
+      'price': rec['priceUsd'],
+    };
+  }
+
+  String get investmentAnnouncementTitle {
+    final announcementMap = _asMap(investmentAnnouncementData.value?['announcement']);
+    final title = announcementMap?['title']?.toString().trim();
+    if (title != null && title.isNotEmpty) return title;
+    return 'Property for Investment';
+  }
+
+  String get investmentAnnouncementButtonText {
+    final announcementMap = _asMap(investmentAnnouncementData.value?['announcement']);
+    final text = announcementMap?['buttonText']?.toString().trim();
+    if (text != null && text.isNotEmpty) return text;
+    return propertyAnnouncement.buttonText;
+  }
+
+  String get investmentAnnouncementDescription {
+    final rec = investmentRecommendation;
+    if (rec != null) {
+      final title = rec['propertyTitle']?.toString().trim();
+      final chance = (rec['investmentChancePercent'] as num?)?.round();
+      final roi = (rec['expectedRoiPercent'] as num?)?.toDouble();
+      final profitUsd = (rec['estimatedProfit12MonthsUsd'] as num?)?.toDouble();
+
+      if (title != null &&
+          title.isNotEmpty &&
+          chance != null &&
+          roi != null &&
+          profitUsd != null) {
+        return 'Buy "$title" for investment. Today market chance: $chance%. Estimated 12-month profit: ${formatProjectedProfit(profitUsd)} (${roi.toStringAsFixed(1)}% ROI).';
+      }
+    }
+
+    final announcementMap = _asMap(investmentAnnouncementData.value?['announcement']);
+    final desc = announcementMap?['description']?.toString().trim();
+    if (desc != null && desc.isNotEmpty) return desc;
+
+    return propertyAnnouncement.description;
+  }
+
+  String formatProjectedProfit(double usdAmount) {
+    final profileController = Get.find<ProfileController>();
+    final userCurrency = profileController.userCurrency.value;
+    final converted = CurrencyService.convertFromUSD(usdAmount, userCurrency);
+    return CurrencyService.formatAmount(converted, userCurrency, decimals: 0);
+  }
+
   /// Get cheapest room price for display
   String getMinPrice(Map<String, dynamic> hotel) {
     final roomsData = hotel['rooms'];
     if (roomsData == null) return '';
-    
+
     List<dynamic> rooms;
     if (roomsData is List) {
       rooms = roomsData;
@@ -88,7 +230,7 @@ class MainScreenController extends GetxController {
     } else {
       return '';
     }
-    
+
     if (rooms.isEmpty) return '';
     double minPrice = double.infinity;
     for (final room in rooms) {
@@ -105,9 +247,17 @@ class MainScreenController extends GetxController {
     final userCurrency = profileController.userCurrency.value;
 
     // Convert from USD to user's currency
-    final convertedPrice = CurrencyService.convertFromUSD(minPrice, userCurrency);
+    final convertedPrice = CurrencyService.convertFromUSD(
+      minPrice,
+      userCurrency,
+    );
 
-    return CurrencyService.formatAmount(convertedPrice, userCurrency, decimals: 0) + '/night';
+    return CurrencyService.formatAmount(
+          convertedPrice,
+          userCurrency,
+          decimals: 0,
+        ) +
+        '/night';
   }
 
   /// Get average rating from reviews (fallback to 0.0)
@@ -135,11 +285,25 @@ class MainScreenController extends GetxController {
 
     // Format with appropriate suffix
     if (convertedPrice >= 1000000) {
-      return CurrencyService.formatAmount(convertedPrice / 1000000, userCurrency, decimals: 1) + 'M';
+      return CurrencyService.formatAmount(
+            convertedPrice / 1000000,
+            userCurrency,
+            decimals: 1,
+          ) +
+          'M';
     } else if (convertedPrice >= 1000) {
-      return CurrencyService.formatAmount(convertedPrice / 1000, userCurrency, decimals: 0) + 'K';
+      return CurrencyService.formatAmount(
+            convertedPrice / 1000,
+            userCurrency,
+            decimals: 0,
+          ) +
+          'K';
     }
-    return CurrencyService.formatAmount(convertedPrice, userCurrency, decimals: 0);
+    return CurrencyService.formatAmount(
+      convertedPrice,
+      userCurrency,
+      decimals: 0,
+    );
   }
 
   /// Get property growth tag (placeholder for now)
@@ -163,6 +327,9 @@ class MainScreenController extends GetxController {
 
   void onCategoryTap(int index) {
     categoryIndex.value = index;
+    if (index == 1) {
+      fetchInvestmentAnnouncement();
+    }
   }
 
   void goToNotifiction() {

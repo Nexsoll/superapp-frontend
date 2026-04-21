@@ -101,8 +101,7 @@ class _CreateForumScreenState extends State<CreateForumScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Forum Type',
+                    Text('Forum Type'.tr,
                       style: theme.textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.w700,
                       ),
@@ -110,8 +109,7 @@ class _CreateForumScreenState extends State<CreateForumScreen> {
                     const SizedBox(height: 12),
                     _buildTypeSelector(cs),
                     const SizedBox(height: 24),
-                    Text(
-                      'Title',
+                    Text('Title'.tr,
                       style: theme.textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.w700,
                       ),
@@ -128,8 +126,7 @@ class _CreateForumScreenState extends State<CreateForumScreen> {
                       },
                     ),
                     const SizedBox(height: 24),
-                    Text(
-                      'Content',
+                    Text('Content'.tr,
                       style: theme.textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.w700,
                       ),
@@ -147,8 +144,7 @@ class _CreateForumScreenState extends State<CreateForumScreen> {
                       },
                     ),
                     const SizedBox(height: 24),
-                    Text(
-                      'Link (Optional)',
+                    Text('Link (Optional)'.tr,
                       style: theme.textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.w700,
                       ),
@@ -180,8 +176,7 @@ class _CreateForumScreenState extends State<CreateForumScreen> {
                                   color: Colors.white,
                                 ),
                               )
-                            : const Text(
-                                'Create Forum',
+                            : Text('Create Forum'.tr,
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w700,
@@ -223,8 +218,7 @@ class _CreateForumScreenState extends State<CreateForumScreen> {
           const SizedBox(width: 16),
           Expanded(
             child: Center(
-              child: Text(
-                'Create Forum',
+              child: Text('Create Forum'.tr,
                 style: theme.textTheme.titleLarge?.copyWith(
                   color: Colors.white,
                   fontWeight: FontWeight.w600,

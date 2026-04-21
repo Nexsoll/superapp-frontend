@@ -132,8 +132,7 @@ class _AllTransactionsScreenState extends State<AllTransactionsScreen> {
             ? const Center(child: CircularProgressIndicator())
             : transactions.isEmpty
                 ? Center(
-                    child: Text(
-                      "No transactions found",
+                    child: Text("No transactions found".tr,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: isDark ? Colors.white70 : const Color(0xFF9AA0AF),
                       ),

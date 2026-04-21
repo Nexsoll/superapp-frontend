@@ -166,13 +166,11 @@ class _HotelSearchScreenState extends State<HotelSearchScreen> {
           children: [
             Icon(Icons.search_off_rounded, size: 64, color: Colors.grey[400]),
             const SizedBox(height: 16),
-            Text(
-              'No hotels found',
+            Text('No hotels found'.tr,
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.grey[600]),
             ),
             const SizedBox(height: 8),
-            Text(
-              'Try a different search term',
+            Text('Try a different search term'.tr,
               style: TextStyle(fontSize: 14, color: Colors.grey[500]),
             ),
           ],
@@ -233,8 +231,7 @@ class _HotelSearchScreenState extends State<HotelSearchScreen> {
       final hotels = controller.allHotelsData;
       if (hotels.isEmpty) {
         return Center(
-          child: Text(
-            'No hotels found',
+          child: Text('No hotels found'.tr,
             style: TextStyle(
               fontSize: 16,
               color: theme.brightness == Brightness.dark
@@ -308,8 +305,7 @@ class _HotelSearchScreenState extends State<HotelSearchScreen> {
                     icon: const Icon(Icons.arrow_back_ios_new_rounded,
                         color: Color(0xFF2FC1BE), size: 28),
                   ),
-                  const Text(
-                    'Hotels',
+                  Text('Hotels'.tr,
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.w700,
@@ -323,8 +319,7 @@ class _HotelSearchScreenState extends State<HotelSearchScreen> {
               padding: const EdgeInsets.only(left: 56, right: 24),
               child: Align(
                 alignment: Alignment.centerLeft,
-                child: Text(
-                  'Explore hotels curated for your stay',
+                child: Text('Explore hotels curated for your stay'.tr,
                   style: TextStyle(
                     fontSize: 16,
                     color: theme.brightness == Brightness.dark ? Colors.white70 : const Color(0xFF1D2330),
@@ -372,8 +367,8 @@ class _HotelSearchScreenState extends State<HotelSearchScreen> {
                           },
                           cursorColor: theme.colorScheme.primary,
                           selectionControls: materialTextSelectionControls,
-                          decoration: const InputDecoration(
-                            hintText: 'Search hotels...',
+                          decoration: InputDecoration(
+                            hintText: 'Search hotels...'.tr,
                             hintStyle:
                                 TextStyle(color: Color(0xFF9AA0AF), fontSize: 18),
                             border: InputBorder.none,
@@ -472,21 +467,21 @@ class _HotelSearchScreenState extends State<HotelSearchScreen> {
                         ],
                       ),
                       itemBuilder: (context) => [
-                        const PopupMenuItem(
+                        PopupMenuItem(
                           value: 'recommended',
-                          child: Text('Recommended'),
+                          child: Text('Recommended'.tr),
                         ),
-                        const PopupMenuItem(
+                        PopupMenuItem(
                           value: 'price_low',
-                          child: Text('Price: Low to High'),
+                          child: Text('Price: Low to High'.tr),
                         ),
-                        const PopupMenuItem(
+                        PopupMenuItem(
                           value: 'price_high',
-                          child: Text('Price: High to Low'),
+                          child: Text('Price: High to Low'.tr),
                         ),
-                        const PopupMenuItem(
+                        PopupMenuItem(
                           value: 'rating',
-                          child: Text('Rating'),
+                          child: Text('Rating'.tr),
                         ),
                       ],
                     ),

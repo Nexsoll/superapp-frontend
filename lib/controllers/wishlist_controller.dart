@@ -13,6 +13,8 @@ class WishlistController extends GetxController {
   var hotels = <Map<String, dynamic>>[].obs;
   var propertyWishlistStatus = <int, bool>{}.obs;
   var hotelWishlistStatus = <int, bool>{}.obs;
+  var propertyCostBreakdowns = <int, Map<String, dynamic>>{}.obs;
+  var isCalculatingPropertyCosts = <int, bool>{}.obs;
 
   String? get token => _prefs?.getString('user_token');
 
@@ -166,6 +168,51 @@ class WishlistController extends GetxController {
 
   bool isHotelInWishlistSync(int hotelId) {
     return hotelWishlistStatus[hotelId] ?? false;
+  }
+
+  bool isCalculatingPropertyCost(int propertyId) {
+    return isCalculatingPropertyCosts[propertyId] ?? false;
+  }
+
+  Future<Map<String, dynamic>?> calculatePropertyCostBreakdown(
+    int propertyId, {
+    bool forceRefresh = false,
+  }) async {
+    if (token == null) {
+      Get.snackbar('Error', 'Please login to continue');
+      return null;
+    }
+
+    if (!forceRefresh && propertyCostBreakdowns.containsKey(propertyId)) {
+      return propertyCostBreakdowns[propertyId];
+    }
+
+    try {
+      isCalculatingPropertyCosts[propertyId] = true;
+      final result = await _wishlistService.getPropertyCostBreakdown(
+        token: token!,
+        propertyId: propertyId,
+      );
+      propertyCostBreakdowns[propertyId] = result;
+      return result;
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to calculate costs: $e');
+      return null;
+    } finally {
+      isCalculatingPropertyCosts[propertyId] = false;
+      isCalculatingPropertyCosts.refresh();
+    }
+  }
+
+  String formatUsdAmount(double usdAmount, {int decimals = 0}) {
+    final profileController = Get.find<ProfileController>();
+    final userCurrency = profileController.userCurrency.value;
+    final convertedPrice = CurrencyService.convertFromUSD(usdAmount, userCurrency);
+    return CurrencyService.formatAmount(
+      convertedPrice,
+      userCurrency,
+      decimals: decimals,
+    );
   }
 
   /// Get formatted price for hotel (cheapest room)

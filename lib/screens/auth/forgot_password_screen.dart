@@ -23,8 +23,7 @@ class ForgotPasswordScreen extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 2),
                 child: TextButton(
                   onPressed: controller.back,
-                  child: Text(
-                    'Back',
+                  child: Text('Back'.tr,
                     style: theme.textTheme.titleSmall?.copyWith(
                       color: theme.colorScheme.primary,
                       fontWeight: FontWeight.w500,
@@ -35,8 +34,7 @@ class ForgotPasswordScreen extends StatelessWidget {
 
               const SizedBox(height: 18),
 
-              Text(
-                'Forgot Password',
+              Text('Forgot Password'.tr,
                 style: theme.textTheme.titleLarge?.copyWith(
                   color: theme.colorScheme.primary,
                   fontWeight: FontWeight.w700,
@@ -45,8 +43,7 @@ class ForgotPasswordScreen extends StatelessWidget {
 
               const SizedBox(height: 6),
 
-              Text(
-                'Please enter your email to reset password',
+              Text('Please enter your email to reset password'.tr,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: const Color(0xFF6B7280),
                   fontWeight: FontWeight.w400,
@@ -89,8 +86,7 @@ class ForgotPasswordScreen extends StatelessWidget {
                               strokeWidth: 2,
                             ),
                           )
-                        : Text(
-                            'Reset Password',
+                        : Text('Reset Password'.tr,
                             style: theme.textTheme.bodyMedium?.copyWith(
                               color: Colors.white,
                               fontWeight: FontWeight.w700,

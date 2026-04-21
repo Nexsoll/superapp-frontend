@@ -33,8 +33,7 @@ class CommunityScreen extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 30),
                     child: Align(
                       alignment: Alignment.centerLeft,
-                      child: Text(
-                        'Community',
+                      child: Text('Community'.tr,
                         style: theme.textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.w800,
                         ),
@@ -46,8 +45,7 @@ class CommunityScreen extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 30),
                     child: Align(
                       alignment: Alignment.centerLeft,
-                      child: Text(
-                        'Connect with owners & staff',
+                      child: Text('Connect with owners & staff'.tr,
                         style: theme.textTheme.bodySmall?.copyWith(
                           fontWeight: FontWeight.w500,
                         ),
@@ -117,8 +115,7 @@ class CommunityScreen extends StatelessWidget {
           ),
           Expanded(
             child: Center(
-              child: Text(
-                'Community',
+              child: Text('Community'.tr,
                 style: theme.textTheme.titleLarge?.copyWith(
                   color: Colors.white,
                   fontWeight: FontWeight.w600,
@@ -161,7 +158,7 @@ class CommunityScreen extends StatelessWidget {
               const SizedBox(height: 20),
               ListTile(
                 leading: const Icon(Icons.add_circle_outline, color: Color(0xFF38CAC7)),
-                title: const Text('Create Forum'),
+                title: Text('Create Forum'.tr),
                 onTap: () {
                   Navigator.pop(context);
                   Navigator.push(
@@ -172,7 +169,7 @@ class CommunityScreen extends StatelessWidget {
               ),
               ListTile(
                 leading: const Icon(Icons.manage_accounts_outlined, color: Color(0xFF38CAC7)),
-                title: const Text('Manage Forums'),
+                title: Text('Manage Forums'.tr),
                 onTap: () {
                   Navigator.pop(context);
                   Navigator.push(
@@ -222,8 +219,7 @@ class CommunityScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 20),
-                      Text(
-                        'Comments',
+                      Text('Comments'.tr,
                         style: theme.textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.w800,
                         ),
@@ -233,7 +229,7 @@ class CommunityScreen extends StatelessWidget {
                         controller: commentController,
                         maxLines: 2,
                         decoration: InputDecoration(
-                          hintText: 'Write a comment...',
+                          hintText: 'Write a comment...'.tr,
                           hintStyle: TextStyle(
                             color: cs.onSurface.withOpacity(0.4),
                           ),
@@ -276,8 +272,7 @@ class CommunityScreen extends StatelessWidget {
                       final comments = snapshot.data ?? [];
                       if (comments.isEmpty) {
                         return Center(
-                          child: Text(
-                            'No comments yet',
+                          child: Text('No comments yet'.tr,
                             style: TextStyle(color: cs.onSurface.withOpacity(0.5)),
                           ),
                         );
@@ -379,16 +374,16 @@ class CommunityScreen extends StatelessWidget {
   Future<void> _deleteComment(BuildContext context, int commentId, String postId) async {
     final confirmed = await Get.dialog<bool>(
       AlertDialog(
-        title: const Text('Delete Comment'),
-        content: const Text('Are you sure you want to delete this comment?'),
+        title: Text('Delete Comment'.tr),
+        content: Text('Are you sure you want to delete this comment?'.tr),
         actions: [
           TextButton(
             onPressed: () => Get.back(result: false),
-            child: const Text('Cancel'),
+            child: Text('Cancel'.tr),
           ),
           TextButton(
             onPressed: () => Get.back(result: true),
-            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+            child: Text('Delete'.tr, style: TextStyle(color: Colors.red)),
           ),
         ],
       ),

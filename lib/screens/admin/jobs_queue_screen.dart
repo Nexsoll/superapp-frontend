@@ -1,3 +1,4 @@
+import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -23,8 +24,7 @@ class JobsQueueScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 24),
-                  Text(
-                    '5 jobs in queue',
+                  Text('5 jobs in queue'.tr,
                     style: TextStyle(
                       color: isDark ? Colors.white60 : const Color(0xFF94A3B8),
                       fontSize: 14,
@@ -147,8 +147,7 @@ class JobsQueueScreen extends StatelessWidget {
             onTap: () => Navigator.pop(context),
             child: const Icon(Icons.arrow_back, color: Colors.white, size: 24),
           ),
-          const Text(
-            'Jobs Queue',
+          Text('Jobs Queue'.tr,
             style: TextStyle(
               color: Colors.white,
               fontSize: 18,
@@ -264,8 +263,7 @@ class JobsQueueScreen extends StatelessWidget {
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 6),
-                      child: Text(
-                        '•',
+                      child: Text('•'.tr,
                         style: TextStyle(
                           color: isDark
                               ? Colors.white60

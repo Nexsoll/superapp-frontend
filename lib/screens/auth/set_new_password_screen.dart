@@ -23,8 +23,7 @@ class SetNewPasswordScreen extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 2),
                 child: TextButton(
                   onPressed: controller.back,
-                  child: Text(
-                    'Back',
+                  child: Text('Back'.tr,
                     style: theme.textTheme.titleSmall?.copyWith(
                       color: theme.colorScheme.primary,
                       fontWeight: FontWeight.w500,
@@ -35,8 +34,7 @@ class SetNewPasswordScreen extends StatelessWidget {
 
               const SizedBox(height: 18),
 
-              Text(
-                'Set a new password',
+              Text('Set a new password'.tr,
                 style: theme.textTheme.titleLarge?.copyWith(
                   color: theme.colorScheme.primary,
                   fontWeight: FontWeight.w900,
@@ -45,8 +43,7 @@ class SetNewPasswordScreen extends StatelessWidget {
 
               const SizedBox(height: 10),
 
-              Text(
-                'Create a new password. Ensure it differs from\nprevious ones for security',
+              Text('Create a new password. Ensure it differs from\nprevious ones for security'.tr,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: const Color(0xFF6B7280),
                   fontWeight: FontWeight.w400,
@@ -112,8 +109,7 @@ class SetNewPasswordScreen extends StatelessWidget {
                               strokeWidth: 2,
                             ),
                           )
-                        : Text(
-                            'Update Password',
+                        : Text('Update Password'.tr,
                             style: theme.textTheme.bodyMedium?.copyWith(
                               color: Colors.white,
                               fontWeight: FontWeight.w700,

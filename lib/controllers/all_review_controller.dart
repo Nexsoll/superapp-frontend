@@ -1,7 +1,14 @@
 import 'package:get/get.dart';
 import 'package:superapp/modal/all_review_modal.dart';
+import 'package:superapp/services/listing_service.dart';
 
 class AllReviewsController extends GetxController {
+  final int? hotelId;
+  final int? propertyId;
+  final List<dynamic>? initialReviews;
+
+  AllReviewsController({this.hotelId, this.propertyId, this.initialReviews});
+
   final RxInt selectedFilter = 0.obs;
 
   final List<ReviewFilter> filters = const [
@@ -12,32 +19,31 @@ class AllReviewsController extends GetxController {
     ReviewFilter(label: '2', stars: 2),
   ];
 
-  final RxList<AllReviewItem> allReviews = <AllReviewItem>[
-    const AllReviewItem(
-      initials: 'BS',
-      name: 'Bimosaurus',
-      role: 'Real Estate Investor',
-      stars: 5,
-      text:
-          "I've used other kits, but this one is the best. The attention to detail and usability are truly amazing.",
-    ),
-    const AllReviewItem(
-      initials: 'LQ',
-      name: 'Lauralee Quinn',
-      role: 'Real Estate Investor',
-      stars: 5,
-      text:
-          "I've used other kits, but this one is the best. The attention to detail and usability are truly amazing.",
-    ),
-    const AllReviewItem(
-      initials: 'BS',
-      name: 'Bimosaurus',
-      role: 'Real Estate Investor',
-      stars: 5,
-      text:
-          "I've used other kits, but this one is the best. The attention to detail and usability are truly amazing.",
-    ),
-  ].obs;
+  final RxList<AllReviewItem> allReviews = <AllReviewItem>[].obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    if (initialReviews != null) {
+      allReviews.value = initialReviews!.map((r) {
+        final user = r['user'] as Map<String, dynamic>?;
+        final firstName = user?['firstName'] ?? 'User';
+        final lastName = user?['lastName'] ?? '';
+        final avatar = user?['avatar'] as String?;
+        final avatarUrl = (avatar != null && avatar.isNotEmpty) 
+            ? ListingService.avatarImageUrl(avatar) 
+            : null;
+        return AllReviewItem(
+          initials: (firstName.isNotEmpty ? firstName[0] : '') + (lastName.isNotEmpty ? lastName[0] : ''),
+          name: '$firstName $lastName',
+          role: 'Guest',
+          stars: (r['rating'] as num?)?.toInt() ?? 0,
+          text: r['comment'] ?? '',
+          avatarUrl: avatarUrl,
+        );
+      }).toList();
+    }
+  }
 
   void onFilterTap(int index) => selectedFilter.value = index;
 

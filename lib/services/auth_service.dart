@@ -1,3 +1,4 @@
+import 'package:get/get.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
@@ -411,6 +412,17 @@ class AuthService {
         body: jsonEncode({'fcmToken': fcmToken}),
       );
       return _handleResponse(response, 'update fcm token');
+    } catch (e) {
+      throw Exception('Error connecting to server: $e');
+    }
+  }
+
+  Future<Map<String, dynamic>> getMe({required String token}) async {
+    final url = Uri.parse('$_usersBaseUrl/me');
+
+    try {
+      final response = await http.get(url, headers: _headers(token: token));
+      return _handleResponse(response, 'get profile');
     } catch (e) {
       throw Exception('Error connecting to server: $e');
     }

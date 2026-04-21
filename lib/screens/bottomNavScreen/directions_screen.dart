@@ -190,8 +190,7 @@ class _DirectionsScreenState extends State<DirectionsScreen> {
                     ),
                   ),
                   const SizedBox(width: 16),
-                  const Text(
-                    'Directions',
+                  Text('Directions'.tr,
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -264,8 +263,7 @@ class _DirectionsScreenState extends State<DirectionsScreen> {
                           ),
                           alignment: Alignment.centerLeft,
                           padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: Text(
-                            'Your Location',
+                          child: Text('Your Location'.tr,
                             style: TextStyle(
                               color: theme.brightness == Brightness.dark ? Colors.white70 : const Color(0xFF555555),
                               fontSize: 16,

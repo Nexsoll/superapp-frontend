@@ -7,7 +7,11 @@ class BookingCard extends StatelessWidget {
   final String imagePath;
   final String dateRange;
   final String status;
+  final String? buttonLabel;
+  final Widget? buttonIcon;
+  final VoidCallback? onButtonTap;
   final VoidCallback? onBookingDetailsTap;
+  final bool showActionButton;
 
   const BookingCard({
     super.key,
@@ -16,7 +20,11 @@ class BookingCard extends StatelessWidget {
     required this.imagePath,
     required this.dateRange,
     required this.status,
+    this.buttonLabel,
+    this.buttonIcon,
+    this.onButtonTap,
     this.onBookingDetailsTap,
+    this.showActionButton = true,
   });
 
   Color _getStatusColor() {
@@ -31,6 +39,43 @@ class BookingCard extends StatelessWidget {
         return const Color(0xFFF44336);
       default:
         return const Color(0xFF9AA0AF);
+    }
+  }
+
+  Widget _buildImage() {
+    // Check if imagePath is a URL or local asset
+    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+      return Image.network(
+        imagePath,
+        width: 135,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => Container(
+          width: 135,
+          color: Colors.grey[300],
+          child: const Icon(Icons.hotel, size: 40, color: Colors.grey),
+        ),
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return Container(
+            width: 135,
+            color: Colors.grey[200],
+            child: const Center(
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+          );
+        },
+      );
+    } else {
+      return Image.asset(
+        imagePath,
+        width: 135,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => Container(
+          width: 135,
+          color: Colors.grey[300],
+          child: const Icon(Icons.hotel, size: 40, color: Colors.grey),
+        ),
+      );
     }
   }
 
@@ -60,16 +105,7 @@ class BookingCard extends StatelessWidget {
               topLeft: Radius.circular(20),
               bottomLeft: Radius.circular(20),
             ),
-            child: Image.asset(
-              imagePath,
-              width: 135,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) => Container(
-                width: 135,
-                color: Colors.grey[300],
-                child: const Icon(Icons.hotel, size: 40),
-              ),
-            ),
+            child: _buildImage(),
           ),
           // Hotel Details
           Expanded(
@@ -178,47 +214,56 @@ class BookingCard extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 8),
-                  // Booking Details Button
-                  GestureDetector(
-                    onTap: onBookingDetailsTap,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 5,
-                      ),
-                      decoration: BoxDecoration(
-                        color: theme.brightness == Brightness.dark ? Colors.white10 : const Color(0xFFF5F5F5),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: theme.brightness == Brightness.dark ? Colors.white24 : const Color(0xFFE0E0E0),
-                          width: 1,
+                   if (showActionButton)
+                    GestureDetector(
+                      onTap: onButtonTap ?? onBookingDetailsTap,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 5,
+                        ),
+                        decoration: BoxDecoration(
+                          color: theme.brightness == Brightness.dark
+                              ? Colors.white10
+                              : const Color(0xFFF5F5F5),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: theme.brightness == Brightness.dark
+                                ? Colors.white24
+                                : const Color(0xFFE0E0E0),
+                            width: 1,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            buttonIcon ??
+                                SvgPicture.asset(
+                                  'assets/booking-detail.svg',
+                                  width: 13,
+                                  height: 13,
+                                  colorFilter: ColorFilter.mode(
+                                    theme.brightness == Brightness.dark
+                                        ? Colors.white
+                                        : const Color(0xFF1D2330),
+                                    BlendMode.srcIn,
+                                  ),
+                                ),
+                            const SizedBox(width: 4),
+                            Text(
+                              buttonLabel ?? 'Booking Details',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: theme.brightness == Brightness.dark
+                                    ? Colors.white
+                                    : const Color(0xFF1D2330),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          SvgPicture.asset(
-                            'assets/booking-detail.svg',
-                            width: 13,
-                            height: 13,
-                            colorFilter: ColorFilter.mode(
-                              theme.brightness == Brightness.dark ? Colors.white : const Color(0xFF1D2330),
-                              BlendMode.srcIn,
-                            ),
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            'Booking Details',
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                              color: theme.brightness == Brightness.dark ? Colors.white : const Color(0xFF1D2330),
-                            ),
-                          ),
-                        ],
-                      ),
                     ),
-                  ),
                 ],
               ),
             ),

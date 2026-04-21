@@ -35,8 +35,7 @@ class MyWalletScreen extends StatelessWidget {
                     splashRadius: 20,
                   ),
                   const SizedBox(width: 8),
-                  Text(
-                    "My Wallet",
+                  Text("My Wallet".tr,
                     style: theme.textTheme.titleMedium?.copyWith(
                       color: primary,
                       fontWeight: FontWeight.w800,
@@ -114,8 +113,7 @@ class MyWalletScreen extends StatelessWidget {
                       padding: EdgeInsetsGeometry.symmetric(horizontal: 10),
                       child: Row(
                         children: [
-                          Text(
-                            "Recent Transactions",
+                          Text("Recent Transactions".tr,
                             style: theme.textTheme.titleSmall?.copyWith(
                               color: theme.brightness == Brightness.dark ? Colors.white : const Color(0xFF1D2330),
                               fontWeight: FontWeight.w900,
@@ -129,8 +127,7 @@ class MyWalletScreen extends StatelessWidget {
                               minimumSize: const Size(0, 0),
                               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                             ),
-                            child: Text(
-                              "See All",
+                            child: Text("See All".tr,
                               style: theme.textTheme.labelLarge?.copyWith(
                                 color: primary,
                                 fontWeight: FontWeight.w800,
@@ -211,8 +208,7 @@ class _WalletTopCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Text(
-                "Total Expenses (This Month)",
+              Text("Wallet Balance".tr,
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: Colors.white.withOpacity(0.92),
                   fontWeight: FontWeight.w700,
@@ -382,16 +378,14 @@ class _InfoCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  "Ready for your next trip?",
+                Text("Ready for your next trip?".tr,
                   style: theme.textTheme.labelLarge?.copyWith(
                     color: theme.brightness == Brightness.dark ? Colors.white : const Color(0xFF1D2330),
                     fontWeight: FontWeight.w900,
                   ),
                 ),
                 const SizedBox(height: 2),
-                Text(
-                  "Use your wallet balance to book hotels instantly without fees.",
+                Text("Use your wallet balance to book hotels instantly without fees.".tr,
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: theme.brightness == Brightness.dark ? Colors.white70 : const Color(0xFF9AA0AF),
                     fontWeight: FontWeight.w600,

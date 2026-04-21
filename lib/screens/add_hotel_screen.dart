@@ -287,8 +287,7 @@ class _AddHotelScreenState extends State<AddHotelScreen> {
           color: isDark ? Colors.white54 : const Color(0xFF9CA3AF),
         ),
         const SizedBox(height: 8),
-        Text(
-          'Add Room Image',
+        Text('Add Room Image'.tr,
           style: GoogleFonts.outfit(
             color: isDark ? Colors.white54 : const Color(0xFF9CA3AF),
             fontSize: 14,
@@ -378,8 +377,7 @@ class _AddHotelScreenState extends State<AddHotelScreen> {
                 ),
               ),
               const SizedBox(height: 8),
-              Text(
-                'Current images (upload new to replace)',
+              Text('Current images (upload new to replace)'.tr,
                 style: GoogleFonts.outfit(
                   fontSize: 11,
                   color: isDark ? Colors.white38 : Colors.grey,
@@ -410,8 +408,7 @@ class _AddHotelScreenState extends State<AddHotelScreen> {
                         size: 28,
                       ),
                       const SizedBox(height: 8),
-                      Text(
-                        'Add Photo',
+                      Text('Add Photo'.tr,
                         style: GoogleFonts.outfit(
                           color: isDark
                               ? Colors.white54
@@ -517,8 +514,7 @@ class _AddHotelScreenState extends State<AddHotelScreen> {
                         size: 28,
                       ),
                       const SizedBox(height: 8),
-                      Text(
-                        'New Photos',
+                      Text('New Photos'.tr,
                         style: GoogleFonts.outfit(
                           color: isDark
                               ? Colors.white54
@@ -545,7 +541,7 @@ class _AddHotelScreenState extends State<AddHotelScreen> {
               theme: theme,
               isDark: isDark,
               controller: _locationController,
-              hintText: 'Enter address',
+              hintText: 'Enter address'.tr,
             ),
             const SizedBox(height: 24),
             Row(
@@ -555,8 +551,7 @@ class _AddHotelScreenState extends State<AddHotelScreen> {
                 TextButton.icon(
                   onPressed: _addRoom,
                   icon: const Icon(Icons.add, color: Color(0xFF2FC1BE)),
-                  label: Text(
-                    'Add Room',
+                  label: Text('Add Room'.tr,
                     style: GoogleFonts.outfit(
                       color: const Color(0xFF2FC1BE),
                       fontWeight: FontWeight.w600,
@@ -614,7 +609,7 @@ class _AddHotelScreenState extends State<AddHotelScreen> {
                         TextField(
                           controller: _roomNameControllers[index],
                           decoration: InputDecoration(
-                            hintText: 'Room name',
+                            hintText: 'Room name'.tr,
                             hintStyle: GoogleFonts.outfit(
                               color: isDark
                                   ? Colors.white54
@@ -661,7 +656,7 @@ class _AddHotelScreenState extends State<AddHotelScreen> {
                             decimal: true,
                           ),
                           decoration: InputDecoration(
-                            hintText: 'Price per night',
+                            hintText: 'Price per night'.tr,
                             hintStyle: GoogleFonts.outfit(
                               color: isDark
                                   ? Colors.white54

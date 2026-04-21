@@ -4,11 +4,24 @@ import 'package:superapp/controllers/all_review_controller.dart';
 import 'package:superapp/modal/all_review_modal.dart';
 
 class AllReviewsScreen extends StatelessWidget {
-  const AllReviewsScreen({super.key});
+  final int? hotelId;
+  final int? propertyId;
+  final List<dynamic>? initialReviews;
+
+  const AllReviewsScreen({
+    super.key,
+    this.hotelId,
+    this.propertyId,
+    this.initialReviews,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(AllReviewsController());
+    final controller = Get.put(AllReviewsController(
+      hotelId: hotelId,
+      propertyId: propertyId,
+      initialReviews: initialReviews,
+    ));
     final theme = Theme.of(context);
 
     return Scaffold(
@@ -42,8 +55,7 @@ class AllReviewsScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 15),
-                  Text(
-                    'All Reviews',
+                  Text('All Reviews'.tr,
                     style: theme.textTheme.bodyLarge?.copyWith(
                       color: theme.colorScheme.primary,
                       fontWeight: FontWeight.w700,
@@ -199,12 +211,27 @@ class _ReviewCard extends StatelessWidget {
                     ),
                   ),
                   alignment: Alignment.center,
-                  child: Text(
-                    item.initials,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurface,
-                      fontWeight: FontWeight.w900,
-                    ),
+                  child: ClipOval(
+                    child: item.avatarUrl != null
+                        ? Image.network(
+                            item.avatarUrl!,
+                            width: 42,
+                            height: 42,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) =>
+                                Image.asset(
+                              'assets/avatar.png',
+                              width: 42,
+                              height: 42,
+                              fit: BoxFit.cover,
+                            ),
+                          )
+                        : Image.asset(
+                            'assets/avatar.png',
+                            width: 42,
+                            height: 42,
+                            fit: BoxFit.cover,
+                          ),
                   ),
                 ),
                 const SizedBox(width: 10),

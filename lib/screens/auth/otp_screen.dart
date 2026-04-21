@@ -23,8 +23,7 @@ class OtpScreen extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 2),
                 child: TextButton(
                   onPressed: () => controller.back(),
-                  child: Text(
-                    'Back',
+                  child: Text('Back'.tr,
                     style: theme.textTheme.titleSmall?.copyWith(
                       color: theme.colorScheme.primary,
                       fontWeight: FontWeight.w500,
@@ -35,8 +34,7 @@ class OtpScreen extends StatelessWidget {
 
               const SizedBox(height: 18),
 
-              Text(
-                'Enter OTP',
+              Text('Enter OTP'.tr,
                 style: theme.textTheme.titleLarge?.copyWith(
                   color: theme.colorScheme.primary,
                   fontWeight: FontWeight.w900,
@@ -45,8 +43,7 @@ class OtpScreen extends StatelessWidget {
 
               const SizedBox(height: 6),
 
-              Text(
-                'Please enter OTP sent to your registered email',
+              Text('Please enter OTP sent to your registered email'.tr,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: const Color(0xFF6B7280),
                   fontWeight: FontWeight.w400,
@@ -135,8 +132,7 @@ class OtpScreen extends StatelessWidget {
                               strokeWidth: 2,
                             ),
                           )
-                        : Text(
-                            'Verify',
+                        : Text('Verify'.tr,
                             style: theme.textTheme.bodyMedium?.copyWith(
                               color: Colors.white,
                               fontWeight: FontWeight.w700,

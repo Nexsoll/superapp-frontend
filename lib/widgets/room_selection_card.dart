@@ -1,3 +1,4 @@
+import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -182,8 +183,7 @@ class RoomSelectionCard extends StatelessWidget {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'Price per night',
+                          Text('Price per night'.tr,
                             style: TextStyle(
                               fontSize: 14,
                               color: theme.brightness == Brightness.dark

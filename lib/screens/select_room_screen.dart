@@ -88,8 +88,7 @@ class _SelectRoomScreenState extends State<SelectRoomScreen> {
                                 ),
                               ),
                               const SizedBox(width: 12),
-                              const Text(
-                                'Select Room',
+                              Text('Select Room'.tr,
                                 style: TextStyle(
                                   color: Color(0xFF2FC1BE), // Primary
                                   fontSize: 18,
@@ -142,8 +141,7 @@ class _SelectRoomScreenState extends State<SelectRoomScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    '3 Rooms Found',
+                  Text('3 Rooms Found'.tr,
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -169,9 +167,8 @@ class _SelectRoomScreenState extends State<SelectRoomScreen> {
                       ),
                     ),
                     child: Row(
-                      children: const [
-                        Text(
-                          'sort by : Best Value',
+                      children: [
+                        Text('sort by : Best Value'.tr,
                           style: TextStyle(
                             color: Color(0xFF2FC1BE),
                             fontSize: 10,

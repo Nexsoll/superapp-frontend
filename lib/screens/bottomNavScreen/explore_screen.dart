@@ -280,8 +280,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                               ),
                             ),
                             const SizedBox(height: 2),
-                            const Text(
-                              'Directions',
+                            Text('Directions'.tr,
                               style: TextStyle(
                                 fontSize: 14,
                                 color: Color(0xFF2FC1BE),
@@ -319,8 +318,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 10),
               child: Row(
                 children: [
-                  const Text(
-                    'Explore',
+                  Text('Explore'.tr,
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.w700,
@@ -663,8 +661,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                     
                     if (properties.isEmpty) {
                       return Center(
-                        child: Text(
-                          'No properties found',
+                        child: Text('No properties found'.tr,
                           style: TextStyle(
                             fontSize: 16,
                             color: theme.brightness == Brightness.dark
@@ -713,8 +710,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                     final hotels = controller.allHotelsData;
                     if (hotels.isEmpty) {
                       return Center(
-                        child: Text(
-                          'No hotels found',
+                        child: Text('No hotels found'.tr,
                           style: TextStyle(
                             fontSize: 16,
                             color: theme.brightness == Brightness.dark
@@ -859,8 +855,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                child: const Text(
-                  'View Details',
+                child: Text('View Details'.tr,
                   style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                 ),
               ),
@@ -1090,8 +1085,7 @@ class _PropertyTypeToggle extends StatelessWidget {
                   borderRadius: BorderRadius.circular(23),
                 ),
                 alignment: Alignment.center,
-                child: Text(
-                  'Buy',
+                child: Text('Buy'.tr,
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -1115,8 +1109,7 @@ class _PropertyTypeToggle extends StatelessWidget {
                   borderRadius: BorderRadius.circular(23),
                 ),
                 alignment: Alignment.center,
-                child: Text(
-                  'Rent',
+                child: Text('Rent'.tr,
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,

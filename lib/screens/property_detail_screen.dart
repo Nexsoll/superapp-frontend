@@ -14,87 +14,13 @@ import 'booking_summary_screen.dart';
 import 'chat_detail_screen.dart';
 import 'main_screen.dart';
 
-class PropertyDetailScreen extends StatelessWidget {
+class PropertyDetailScreen extends StatefulWidget {
   final Map<String, dynamic>? propertyData;
 
   const PropertyDetailScreen({super.key, this.propertyData});
 
-  // ── helpers ──────────────────────────────────────────────────────────
-  static const Map<String, String> _enumToType = {
-    'VILLA': 'Villa',
-    'BUNGALOW': 'Apartment',
-    'PALACE': 'Condo',
-  };
-
-  String get _title => (propertyData?['title'] ?? 'Luxury Villa') as String;
-  String get _description => (propertyData?['description'] ?? '') as String;
-  String get _address => (propertyData?['address'] ?? '') as String;
-
-  int get _rooms {
-    final r = propertyData?['rooms'];
-    if (r == null) return 0;
-    if (r is int) return r;
-    return int.tryParse(r.toString()) ?? 0;
-  }
-
-  int get _bathrooms {
-    final b = propertyData?['bathrooms'];
-    if (b == null) return 0;
-    if (b is int) return b;
-    return int.tryParse(b.toString()) ?? 0;
-  }
-
-  double get _area {
-    final a = propertyData?['area'];
-    if (a == null) return 0;
-    if (a is num) return a.toDouble();
-    return double.tryParse(a.toString()) ?? 0;
-  }
-
-  String get _propertyType {
-    final t = propertyData?['type'] as String?;
-    if (t != null && _enumToType.containsKey(t)) return _enumToType[t]!;
-    return 'Property';
-  }
-
-  List<String> get _amenities {
-    final a = propertyData?['amenities'] as List<dynamic>?;
-    if (a == null || a.isEmpty) return [];
-    return a.map((e) => e.toString()).toList();
-  }
-
-  List<String> get _neighborhoodInsights {
-    final n = propertyData?['neighborhoodInsights'] as List<dynamic>?;
-    if (n == null || n.isEmpty) return [];
-    return n.map((e) => e.toString()).toList();
-  }
-
-  List<String> get _imageUrls {
-    if (propertyData == null) return [];
-    final id = propertyData!['id'];
-    if (id == null) return [];
-    final images = propertyData!['images'] as List<dynamic>?;
-    if (images == null || images.isEmpty) return [];
-    return List.generate(
-      images.length,
-      (i) => ListingService.propertyImageUrl(id as int, i),
-    );
-  }
-
-  int get _ownerId {
-    final ownerId = propertyData?['ownerId'];
-    if (ownerId is int) return ownerId;
-    return int.tryParse(ownerId.toString()) ?? 0;
-  }
-
-  Map<String, dynamic>? get _owner {
-    return propertyData?['owner'] as Map<String, dynamic>?;
-  }
-
-  bool get _isOwner {
-    final profileController = Get.find<ProfileController>();
-    return _ownerId == profileController.userId;
-  }
+  @override
+  State<PropertyDetailScreen> createState() => _PropertyDetailScreenState();
 
   // icon lookup for neighborhood insights
   static IconData _insightIcon(String label) {
@@ -124,6 +50,111 @@ class PropertyDetailScreen extends StatelessWidget {
         return Icons.place_outlined;
     }
   }
+}
+
+class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
+  late Map<String, dynamic> _propertyData;
+
+  @override
+  void initState() {
+    super.initState();
+    _propertyData = widget.propertyData ?? {};
+    _loadPropertyData();
+  }
+
+  Future<void> _loadPropertyData() async {
+    final id = widget.propertyData?['id'];
+    if (id == null) return;
+
+    try {
+      final updatedData = await ListingService().getPropertyById(id as int);
+      if (mounted) {
+        setState(() {
+          _propertyData = updatedData;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loading property data: $e');
+    }
+  }
+
+  // ── helpers ──────────────────────────────────────────────────────────
+  static const Map<String, String> _enumToType = {
+    'VILLA': 'Villa',
+    'BUNGALOW': 'Apartment',
+    'PALACE': 'Condo',
+  };
+
+  String get _title => (_propertyData['title'] ?? 'Luxury Villa') as String;
+  String get _description => (_propertyData['description'] ?? '') as String;
+  String get _address => (_propertyData['address'] ?? '') as String;
+
+  int get _rooms {
+    final r = _propertyData['rooms'];
+    if (r == null) return 0;
+    if (r is int) return r;
+    return int.tryParse(r.toString()) ?? 0;
+  }
+
+  int get _bathrooms {
+    final b = _propertyData['bathrooms'];
+    if (b == null) return 0;
+    if (b is int) return b;
+    return int.tryParse(b.toString()) ?? 0;
+  }
+
+  double get _area {
+    final a = _propertyData['area'];
+    if (a == null) return 0;
+    if (a is num) return a.toDouble();
+    return double.tryParse(a.toString()) ?? 0;
+  }
+
+  String get _propertyType {
+    final t = _propertyData['type'] as String?;
+    if (t != null && _enumToType.containsKey(t)) return _enumToType[t]!;
+    return 'Property';
+  }
+
+  List<String> get _amenities {
+    final a = _propertyData['amenities'] as List<dynamic>?;
+    if (a == null || a.isEmpty) return [];
+    return a.map((e) => e.toString()).toList();
+  }
+
+  List<String> get _neighborhoodInsights {
+    final n = _propertyData['neighborhoodInsights'] as List<dynamic>?;
+    if (n == null || n.isEmpty) return [];
+    return n.map((e) => e.toString()).toList();
+  }
+
+  List<String> get _imageUrls {
+    final id = _propertyData['id'];
+    if (id == null) return [];
+    final images = _propertyData['images'] as List<dynamic>?;
+    if (images == null || images.isEmpty) return [];
+    return List.generate(
+      images.length,
+      (i) => ListingService.propertyImageUrl(id as int, i),
+    );
+  }
+
+  int get _ownerId {
+    final ownerId = _propertyData['ownerId'];
+    if (ownerId is int) return ownerId;
+    return int.tryParse(ownerId.toString()) ?? 0;
+  }
+
+  Map<String, dynamic>? get _owner {
+    return _propertyData['owner'] as Map<String, dynamic>?;
+  }
+
+  bool get _isOwner {
+    final profileController = Get.isRegistered<ProfileController>()
+        ? Get.find<ProfileController>()
+        : Get.put(ProfileController());
+    return _ownerId == profileController.userId;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -143,7 +174,7 @@ class PropertyDetailScreen extends StatelessWidget {
             children: [
               HotelImageCarousel(
                 imageUrls: _imageUrls.isNotEmpty ? _imageUrls : null,
-                propertyId: propertyData?['id'] as int?,
+                propertyId: _propertyData['id'] as int?,
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -176,7 +207,7 @@ class PropertyDetailScreen extends StatelessWidget {
                     const SizedBox(height: 22),
                     _InvestmentAnalysisSection(
                       theme: theme,
-                      propertyId: propertyData?['id'] as int?,
+                      propertyId: _propertyData['id'] as int?,
                     ),
                     if (_description.isNotEmpty) ...[
                       const SizedBox(height: 22),
@@ -190,13 +221,16 @@ class PropertyDetailScreen extends StatelessWidget {
                       ),
                     ],
                     const SizedBox(height: 22),
-                    const HotelReviewsSection(),
+                    HotelReviewsSection(
+                      reviews: (_propertyData['reviews'] as List<dynamic>?) ?? [],
+                      propertyId: _propertyData['id'] as int?,
+                    ),
                     if (!_isOwner && _owner != null) ...[
                       const SizedBox(height: 22),
                       _ListedBySection(
                         theme: theme,
                         owner: _owner!,
-                        propertyData: propertyData,
+                        propertyData: _propertyData,
                       ),
                     ],
                     const SizedBox(height: 30),
@@ -219,14 +253,14 @@ class PropertyDetailScreen extends StatelessWidget {
                 },
               ),
             )
-          : _BottomBar(theme, propertyData),
+          : _BottomBar(theme, _propertyData),
     );
   }
 }
 
-// ═══════════════════════════════════════════════════════════════════════
-// Header — title, rating badge, location
-// ═══════════════════════════════════════════════════════════════════════
+// ─────────────────────────────────────────────────────────────────────────────
+// Child Widgets
+// ─────────────────────────────────────────────────────────────────────────────
 
 class _PropertyHeaderInfo extends StatelessWidget {
   final ThemeData theme;
@@ -261,8 +295,7 @@ class _PropertyHeaderInfo extends StatelessWidget {
               const SizedBox(height: 10),
               Row(
                 children: [
-                  const Text(
-                    'Superb',
+                  Text('Superb'.tr,
                     style: TextStyle(
                       color: Color(0xFF2FC1BE),
                       fontWeight: FontWeight.w600,
@@ -315,14 +348,11 @@ class _PropertyHeaderInfo extends StatelessWidget {
             children: [
               const Icon(Icons.star, color: Color(0xFFFFB300), size: 18),
               const SizedBox(width: 4),
-              Text(
-                '4.8',
+              Text('4.8'.tr,
                 style: TextStyle(
                   fontWeight: FontWeight.w900,
                   fontSize: 16,
-                  color: theme.brightness == Brightness.dark
-                      ? Colors.white
-                      : const Color(0xFF1D2330),
+                  color: Color(0xFF1D2330),
                 ),
               ),
             ],
@@ -332,10 +362,6 @@ class _PropertyHeaderInfo extends StatelessWidget {
     );
   }
 }
-
-// ═══════════════════════════════════════════════════════════════════════
-// AR Experience
-// ═══════════════════════════════════════════════════════════════════════
 
 class _PropertyARExperienceSection extends StatelessWidget {
   final ThemeData theme;
@@ -351,13 +377,6 @@ class _PropertyARExperienceSection extends StatelessWidget {
             : const Color(0x292FC1BE),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(color: const Color(0xFF2FC1BE), width: 1.5),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.12),
-            blurRadius: 18,
-            offset: const Offset(0, 8),
-          ),
-        ],
       ),
       child: Column(
         children: [
@@ -384,8 +403,7 @@ class _PropertyARExperienceSection extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Experience in AR',
+                    Text('Experience in AR'.tr,
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
@@ -395,8 +413,7 @@ class _PropertyARExperienceSection extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    Text(
-                      'Take a closer property in augmented reality',
+                    Text('Take a closer property in augmented reality'.tr,
                       style: TextStyle(
                         color: theme.brightness == Brightness.dark
                             ? Colors.white70
@@ -423,8 +440,7 @@ class _PropertyARExperienceSection extends StatelessWidget {
                 ),
                 elevation: 0,
               ),
-              child: const Text(
-                'Start Tour',
+              child: Text('Start Tour'.tr,
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 16,
@@ -438,10 +454,6 @@ class _PropertyARExperienceSection extends StatelessWidget {
     );
   }
 }
-
-// ═══════════════════════════════════════════════════════════════════════
-// Property Features (bedrooms, bathrooms, sqft, type)
-// ═══════════════════════════════════════════════════════════════════════
 
 class _PropertyFeaturesSection extends StatelessWidget {
   final ThemeData theme;
@@ -463,8 +475,7 @@ class _PropertyFeaturesSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Property Features',
+        Text('Property Features'.tr,
           style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.w900,
@@ -563,10 +574,6 @@ class _FeatureTile extends StatelessWidget {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════════════
-// Amenities
-// ═══════════════════════════════════════════════════════════════════════
-
 class _PropertyAmenitiesSection extends StatelessWidget {
   final ThemeData theme;
   final List<String> amenities;
@@ -581,8 +588,7 @@ class _PropertyAmenitiesSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Amenities',
+        Text('Amenities'.tr,
           style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.w900,
@@ -622,10 +628,6 @@ class _PropertyAmenitiesSection extends StatelessWidget {
     );
   }
 }
-
-// ═══════════════════════════════════════════════════════════════════════
-// AI Investment Analysis (powered by Gemini)
-// ═══════════════════════════════════════════════════════════════════════
 
 class _InvestmentAnalysisSection extends StatefulWidget {
   final ThemeData theme;
@@ -721,8 +723,7 @@ class _InvestmentAnalysisSectionState
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'AI Investment Analysis',
+                    Text('AI Investment Analysis'.tr,
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w900,
@@ -734,8 +735,8 @@ class _InvestmentAnalysisSectionState
                       _isLoading
                           ? 'Analyzing property data...'
                           : _source == 'gemini-ai'
-                          ? 'Powered by Gemini AI'
-                          : 'Based on market trends and location data',
+                              ? 'Powered by Gemini AI'
+                              : 'Based on market trends and location data',
                       style: TextStyle(
                         color: subColor,
                         fontSize: 13,
@@ -812,30 +813,26 @@ class _MetricTile extends StatelessWidget {
         Text(
           label,
           style: TextStyle(
+            fontSize: 13,
             color: theme.brightness == Brightness.dark
                 ? Colors.white70
-                : const Color(0xFF1D2330),
-            fontSize: 14,
+                : const Color(0xFF9AA0AF),
             fontWeight: FontWeight.w500,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 4),
         Text(
           value,
           style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w900,
             color: color,
-            fontSize: 22,
-            fontWeight: FontWeight.w500,
           ),
         ),
       ],
     );
   }
 }
-
-// ═══════════════════════════════════════════════════════════════════════
-// About / Description
-// ═══════════════════════════════════════════════════════════════════════
 
 class _AboutSection extends StatelessWidget {
   final ThemeData theme;
@@ -848,8 +845,7 @@ class _AboutSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'About',
+        Text('About This Property'.tr,
           style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.w900,
@@ -862,22 +858,18 @@ class _AboutSection extends StatelessWidget {
         Text(
           description,
           style: TextStyle(
+            fontSize: 15,
             color: theme.brightness == Brightness.dark
                 ? Colors.white70
                 : const Color(0xFF9AA0AF),
-            fontSize: 14,
             height: 1.6,
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w500,
           ),
         ),
       ],
     );
   }
 }
-
-// ═══════════════════════════════════════════════════════════════════════
-// Neighborhood Insights
-// ═══════════════════════════════════════════════════════════════════════
 
 class _NeighborhoodInsightsSection extends StatelessWidget {
   final ThemeData theme;
@@ -893,8 +885,7 @@ class _NeighborhoodInsightsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Neighborhood Insights',
+        Text('Neighborhood Insights'.tr,
           style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.w900,
@@ -951,10 +942,10 @@ class _NeighborhoodInsightsSection extends StatelessWidget {
                           ),
                         ),
                       ),
-                      Icon(
+                      const Icon(
                         Icons.check_circle,
                         size: 20,
-                        color: const Color(0xFF2FC1BE),
+                        color: Color(0xFF2FC1BE),
                       ),
                     ],
                   ),
@@ -976,10 +967,6 @@ class _NeighborhoodInsightsSection extends StatelessWidget {
     );
   }
 }
-
-// ═══════════════════════════════════════════════════════════════════════
-// Listed By Section
-// ═══════════════════════════════════════════════════════════════════════
 
 class _ListedBySection extends StatelessWidget {
   final ThemeData theme;
@@ -1013,8 +1000,7 @@ class _ListedBySection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Listed By',
+        Text('Listed By'.tr,
           style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.w900,
@@ -1087,8 +1073,7 @@ class _ListedBySection extends StatelessWidget {
                           size: 16,
                         ),
                         const SizedBox(width: 4),
-                        Text(
-                          '4.9',
+                        Text('4.9'.tr,
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w700,
@@ -1098,8 +1083,7 @@ class _ListedBySection extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 4),
-                        Text(
-                          '(127 reviews)',
+                        Text('(127 reviews)'.tr,
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
@@ -1136,8 +1120,7 @@ class _ListedBySection extends StatelessWidget {
                           height: 12,
                         ),
                         const SizedBox(width: 4),
-                        const Text(
-                          'Verified',
+                        Text('Verified'.tr,
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 11,
@@ -1153,12 +1136,9 @@ class _ListedBySection extends StatelessWidget {
                     onTap: () {
                       final ownerId = owner['id'] as int?;
                       final ownerName =
-                          owner['fullName'] ??
-                          owner['firstName'] ??
-                          'Property Owner';
+                          owner['fullName'] ?? owner['firstName'] ?? 'Property Owner';
                       final ownerAvatar = owner['avatar'] as String?;
-                      final avatarUrl =
-                          (ownerAvatar != null && ownerAvatar.isNotEmpty)
+                      final avatarUrl = (ownerAvatar != null && ownerAvatar.isNotEmpty)
                           ? ListingService.avatarImageUrl(ownerAvatar)
                           : '';
 
@@ -1203,8 +1183,7 @@ class _ListedBySection extends StatelessWidget {
                                 : const Color(0xFF1D2330),
                           ),
                           const SizedBox(width: 6),
-                          Text(
-                            'Contact',
+                          Text('Contact'.tr,
                             style: TextStyle(
                               color: theme.brightness == Brightness.dark
                                   ? Colors.white
@@ -1227,10 +1206,6 @@ class _ListedBySection extends StatelessWidget {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════════════
-// Bottom Bar with Price and Schedule Visit Button
-// ═══════════════════════════════════════════════════════════════════════
-
 class _BottomBar extends StatelessWidget {
   final ThemeData theme;
   final Map<String, dynamic>? propertyData;
@@ -1251,38 +1226,18 @@ class _BottomBar extends StatelessWidget {
       }
 
       if (priceValue > 0) {
-        // Get user's selected currency
-        final profileController = Get.find<ProfileController>();
+        final profileController = Get.isRegistered<ProfileController>()
+            ? Get.find<ProfileController>()
+            : Get.put(ProfileController());
         final userCurrency = profileController.userCurrency.value;
-
-        // Convert from USD to user's currency
-        final convertedPrice = CurrencyService.convertFromUSD(
-          priceValue,
-          userCurrency,
-        );
+        final convertedPrice = CurrencyService.convertFromUSD(priceValue, userCurrency);
 
         if (convertedPrice >= 1000000) {
-          priceStr =
-              CurrencyService.formatAmount(
-                convertedPrice / 1000000,
-                userCurrency,
-                decimals: 1,
-              ) +
-              ' M';
+          priceStr = CurrencyService.formatAmount(convertedPrice / 1000000, userCurrency, decimals: 1) + ' M';
         } else if (convertedPrice >= 1000) {
-          priceStr =
-              CurrencyService.formatAmount(
-                convertedPrice / 1000,
-                userCurrency,
-                decimals: 0,
-              ) +
-              'K';
+          priceStr = CurrencyService.formatAmount(convertedPrice / 1000, userCurrency, decimals: 0) + ' K';
         } else {
-          priceStr = CurrencyService.formatAmount(
-            convertedPrice,
-            userCurrency,
-            decimals: 0,
-          );
+          priceStr = CurrencyService.formatAmount(convertedPrice, userCurrency, decimals: 0);
         }
       }
     }
@@ -1298,79 +1253,52 @@ class _BottomBar extends StatelessWidget {
             offset: const Offset(0, -4),
           ),
         ],
-        border: const Border(
-          top: BorderSide(color: Color(0xFF2FC1BE), width: 1.5),
-        ),
+        border: const Border(top: BorderSide(color: Color(0xFF2FC1BE), width: 1.5)),
       ),
       child: Row(
         children: [
-          // Price section
           Expanded(
             flex: 2,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Price',
+                Text('Price'.tr,
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w800,
-                    color: theme.brightness == Brightness.dark
-                        ? Colors.white
-                        : const Color(0xFF1D2330),
+                    color: theme.brightness == Brightness.dark ? Colors.white : const Color(0xFF1D2330),
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   priceStr,
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w800,
-                    color: Color(0xFF2FC1BE),
-                  ),
+                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: Color(0xFF2FC1BE)),
                 ),
               ],
             ),
           ),
           const SizedBox(width: 16),
-          // Schedule Visit button
           Expanded(
             flex: 3,
             child: SizedBox(
               height: 52,
               child: ElevatedButton(
                 onPressed: () {
-                  Get.to(
-                    () => BookingSummaryScreen(
-                      bookingType: 'property',
-                      propertyData: propertyData,
-                    ),
-                  );
+                  Get.to(() => BookingSummaryScreen(bookingType: 'property', propertyData: propertyData));
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF2FC1BE),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                   elevation: 0,
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
-                      Icons.calendar_today_outlined,
-                      color: Colors.white,
-                      size: 18,
-                    ),
+                    Icon(Icons.calendar_today_outlined, color: Colors.white, size: 18),
                     SizedBox(width: 8),
-                    Text(
-                      'Schedule Visit',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                      ),
+                    Text('Schedule Visit'.tr,
+                      style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w700),
                     ),
                   ],
                 ),

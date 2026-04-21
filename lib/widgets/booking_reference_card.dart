@@ -1,3 +1,4 @@
+import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 
 class BookingReferenceCard extends StatelessWidget {
@@ -18,8 +19,7 @@ class BookingReferenceCard extends StatelessWidget {
 
       child: Column(
         children: [
-          const Text(
-            'Booking Reference',
+          Text('Booking Reference'.tr,
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w500,

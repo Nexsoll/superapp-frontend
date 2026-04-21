@@ -1,3 +1,4 @@
+import 'package:get/get.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
@@ -480,6 +481,28 @@ class ListingService {
       return jsonDecode(response.body);
     } else {
       throw Exception('Failed to get property analysis: ${response.body}');
+    }
+  }
+
+  Future<Map<String, dynamic>> getHotelById(int hotelId) async {
+    final uri = Uri.parse('$baseUrl/listing/hotel/$hotelId');
+    final response = await http.get(uri);
+
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Failed to get hotel: ${response.body}');
+    }
+  }
+
+  Future<Map<String, dynamic>> getPropertyById(int propertyId) async {
+    final uri = Uri.parse('$baseUrl/listing/property/$propertyId');
+    final response = await http.get(uri);
+
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Failed to get property: ${response.body}');
     }
   }
 }

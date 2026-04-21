@@ -56,16 +56,16 @@ class _ManageForumScreenState extends State<ManageForumScreen> {
   Future<void> _deleteForum(int forumId) async {
     final confirmed = await Get.dialog<bool>(
       AlertDialog(
-        title: const Text('Delete Forum'),
-        content: const Text('Are you sure you want to delete this forum?'),
+        title: Text('Delete Forum'.tr),
+        content: Text('Are you sure you want to delete this forum?'.tr),
         actions: [
           TextButton(
             onPressed: () => Get.back(result: false),
-            child: const Text('Cancel'),
+            child: Text('Cancel'.tr),
           ),
           TextButton(
             onPressed: () => Get.back(result: true),
-            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+            child: Text('Delete'.tr, style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -102,20 +102,20 @@ class _ManageForumScreenState extends State<ManageForumScreen> {
 
     Get.dialog(
       AlertDialog(
-        title: const Text('Edit Forum'),
+        title: Text('Edit Forum'.tr),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: titleController,
-                decoration: const InputDecoration(labelText: 'Content'),
+                decoration: InputDecoration(labelText: 'Content'.tr),
                 maxLines: 3,
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: linkController,
-                decoration: const InputDecoration(labelText: 'Link (optional)'),
+                decoration: InputDecoration(labelText: 'Link (optional)'.tr),
               ),
             ],
           ),
@@ -123,11 +123,11 @@ class _ManageForumScreenState extends State<ManageForumScreen> {
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            child: const Text('Cancel'),
+            child: Text('Cancel'.tr),
           ),
           ElevatedButton(
             onPressed: () => _updateForum(forum.forumId!, titleController.text, linkController.text),
-            child: const Text('Save'),
+            child: Text('Save'.tr),
           ),
         ],
       ),
@@ -183,8 +183,7 @@ class _ManageForumScreenState extends State<ManageForumScreen> {
                           children: [
                             Icon(Icons.forum_outlined, size: 64, color: cs.onSurface.withOpacity(0.3)),
                             const SizedBox(height: 16),
-                            Text(
-                              'No forums yet',
+                            Text('No forums yet'.tr,
                               style: theme.textTheme.titleMedium?.copyWith(
                                 color: cs.onSurface.withOpacity(0.5),
                               ),
@@ -316,8 +315,7 @@ class _ManageForumScreenState extends State<ManageForumScreen> {
           const SizedBox(width: 16),
           Expanded(
             child: Center(
-              child: Text(
-                'Manage Forums',
+              child: Text('Manage Forums'.tr,
                 style: theme.textTheme.titleLarge?.copyWith(
                   color: Colors.white,
                   fontWeight: FontWeight.w600,

@@ -30,8 +30,7 @@ class PaymentInsightsScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 20),
-                    Text(
-                      'Performance',
+                    Text('Performance'.tr,
                       style: TextStyle(
                         color: isDark ? Colors.white : const Color(0xFF1E293B),
                         fontSize: 22,
@@ -39,8 +38,7 @@ class PaymentInsightsScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    Text(
-                      'Analytics & payment insights',
+                    Text('Analytics & payment insights'.tr,
                       style: TextStyle(
                         color: isDark
                             ? Colors.white70
@@ -105,8 +103,7 @@ class PaymentInsightsScreen extends StatelessWidget {
             onTap: () => Navigator.pop(context),
             child: const Icon(Icons.arrow_back, color: Colors.white, size: 24),
           ),
-          const Text(
-            'Payment Insights',
+          Text('Payment Insights'.tr,
             style: TextStyle(
               color: Colors.white,
               fontSize: 18,
@@ -168,8 +165,7 @@ class PaymentInsightsScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Monthly Revenue',
+              Text('Monthly Revenue'.tr,
                 style: TextStyle(
                   color: isDark ? Colors.white70 : const Color(0xFF64748B),
                   fontSize: 14,
@@ -211,22 +207,19 @@ class PaymentInsightsScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Prev',
+              Text('Prev'.tr,
                 style: TextStyle(
                   color: isDark ? Colors.white38 : const Color(0xFF94A3B8),
                   fontSize: 12,
                 ),
               ),
-              Text(
-                'Current Month',
+              Text('Current Month'.tr,
                 style: TextStyle(
                   color: isDark ? Colors.white38 : const Color(0xFF94A3B8),
                   fontSize: 12,
                 ),
               ),
-              Text(
-                'Next',
+              Text('Next'.tr,
                 style: TextStyle(
                   color: isDark ? Colors.white38 : const Color(0xFF94A3B8),
                   fontSize: 12,
@@ -441,16 +434,14 @@ class PaymentInsightsScreen extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              'Staff Performance',
+            Text('Staff Performance'.tr,
               style: TextStyle(
                 color: isDark ? Colors.white : const Color(0xFF1E293B),
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
               ),
             ),
-            Text(
-              'Top performers',
+            Text('Top performers'.tr,
               style: TextStyle(
                 color: const Color(0xFF38CAC7).withOpacity(0.7),
                 fontSize: 13,
@@ -461,9 +452,9 @@ class PaymentInsightsScreen extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         if (staff.isEmpty)
-          const Padding(
+          Padding(
             padding: EdgeInsets.symmetric(vertical: 20),
-            child: Text('No staff data available'),
+            child: Text('No staff data available'.tr),
           )
         else
           ...staff.map((s) {
@@ -596,8 +587,7 @@ class PaymentInsightsScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Top Properties',
+        Text('Top Properties'.tr,
           style: TextStyle(
             color: isDark ? Colors.white : const Color(0xFF1E293B),
             fontSize: 18,
@@ -621,7 +611,7 @@ class PaymentInsightsScreen extends StatelessWidget {
           child: Column(
             children: [
               if (listings.isEmpty)
-                const Text('No property data available')
+                Text('No property data available'.tr)
               else
                 ...listings.map(
                   (l) => Padding(
@@ -637,8 +627,7 @@ class PaymentInsightsScreen extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    '0',
+                  Text('0'.tr,
                     style: TextStyle(
                       color: isDark ? Colors.white38 : const Color(0xFF94A3B8),
                       fontSize: 12,

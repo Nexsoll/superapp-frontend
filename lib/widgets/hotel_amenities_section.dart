@@ -1,3 +1,4 @@
+import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 
 class HotelAmenitiesSection extends StatelessWidget {
@@ -55,8 +56,7 @@ class HotelAmenitiesSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Amenities',
+        Text('Amenities'.tr,
           style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.w900,

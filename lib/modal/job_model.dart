@@ -1,3 +1,4 @@
+import 'package:get/get.dart';
 // job_model.dart
 
 enum JobStatus {

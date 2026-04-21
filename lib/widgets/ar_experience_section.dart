@@ -49,8 +49,7 @@ class ARExperienceSection extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Experience in AR',
+                  Text('Experience in AR'.tr,
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w500,
@@ -58,8 +57,7 @@ class ARExperienceSection extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  Text(
-                    'Take a virtual 360º tour of rooms',
+                  Text('Take a virtual 360º tour of rooms'.tr,
                     style: TextStyle(
                       color: theme.brightness == Brightness.dark ? Colors.white70 : const Color(0xFF1D2330),
                       fontSize: 14,
@@ -83,8 +81,7 @@ class ARExperienceSection extends StatelessWidget {
                 ),
                 elevation: 0,
               ),
-              child: const Text(
-                'Start Tour',
+              child: Text('Start Tour'.tr,
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 18,

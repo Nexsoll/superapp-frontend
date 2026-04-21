@@ -47,16 +47,16 @@ class ExpenseDetailController extends GetxController {
 
     final confirmed = await Get.dialog<bool>(
       AlertDialog(
-        title: const Text('Delete Expense'),
-        content: const Text('Are you sure you want to delete this expense?'),
+        title: Text('Delete Expense'.tr),
+        content: Text('Are you sure you want to delete this expense?'.tr),
         actions: [
           TextButton(
             onPressed: () => Get.back(result: false),
-            child: const Text('Cancel'),
+            child: Text('Cancel'.tr),
           ),
           TextButton(
             onPressed: () => Get.back(result: true),
-            child: const Text('Delete'),
+            child: Text('Delete'.tr),
           ),
         ],
       ),
@@ -115,7 +115,7 @@ class ExpenseDetailController extends GetxController {
 
     final saved = await Get.dialog<bool>(
       AlertDialog(
-        title: const Text('Edit Expense'),
+        title: Text('Edit Expense'.tr),
         content: Obx(
           () => SingleChildScrollView(
             child: Column(
@@ -123,27 +123,27 @@ class ExpenseDetailController extends GetxController {
               children: [
                 TextField(
                   controller: titleCtrl,
-                  decoration: const InputDecoration(labelText: 'Title'),
+                  decoration: InputDecoration(labelText: 'Title'.tr),
                 ),
                 const SizedBox(height: 10),
                 TextField(
                   controller: amountCtrl,
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  decoration: const InputDecoration(labelText: 'Amount'),
+                  decoration: InputDecoration(labelText: 'Amount'.tr),
                 ),
                 const SizedBox(height: 10),
                 DropdownButtonFormField<String>(
                   value: categoryRx.value,
-                  items: const [
-                    DropdownMenuItem(value: 'MAINTENANCE', child: Text('Maintenance')),
-                    DropdownMenuItem(value: 'UTILITIES', child: Text('Utilities')),
-                    DropdownMenuItem(value: 'TAX', child: Text('Tax')),
-                    DropdownMenuItem(value: 'OTHER', child: Text('Other')),
+                  items: [
+                    DropdownMenuItem(value: 'MAINTENANCE', child: Text('Maintenance'.tr)),
+                    DropdownMenuItem(value: 'UTILITIES', child: Text('Utilities'.tr)),
+                    DropdownMenuItem(value: 'TAX', child: Text('Tax'.tr)),
+                    DropdownMenuItem(value: 'OTHER', child: Text('Other'.tr)),
                   ],
                   onChanged: (v) {
                     if (v != null) categoryRx.value = v;
                   },
-                  decoration: const InputDecoration(labelText: 'Category'),
+                  decoration: InputDecoration(labelText: 'Category'.tr),
                 ),
                 const SizedBox(height: 10),
                 // Date picker
@@ -160,8 +160,8 @@ class ExpenseDetailController extends GetxController {
                     }
                   },
                   child: InputDecorator(
-                    decoration: const InputDecoration(
-                      labelText: 'Date',
+                    decoration: InputDecoration(
+                      labelText: 'Date'.tr,
                       suffixIcon: Icon(Icons.calendar_today),
                     ),
                     child: Text(
@@ -173,8 +173,7 @@ class ExpenseDetailController extends GetxController {
                 // Receipt picker
                 Align(
                   alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Receipt',
+                  child: Text('Receipt'.tr,
                     style: context.textTheme.labelLarge?.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
@@ -240,7 +239,7 @@ class ExpenseDetailController extends GetxController {
                                 children: [
                                   ListTile(
                                     leading: Icon(Icons.camera_alt, color: Get.theme.colorScheme.primary),
-                                    title: const Text('Take a Photo'),
+                                    title: Text('Take a Photo'.tr),
                                     onTap: () {
                                       Get.back();
                                       pickReceipt(ImageSource.camera);
@@ -248,7 +247,7 @@ class ExpenseDetailController extends GetxController {
                                   ),
                                   ListTile(
                                     leading: Icon(Icons.photo_library, color: Get.theme.colorScheme.primary),
-                                    title: const Text('Choose from Gallery'),
+                                    title: Text('Choose from Gallery'.tr),
                                     onTap: () {
                                       Get.back();
                                       pickReceipt(ImageSource.gallery);
@@ -260,7 +259,7 @@ class ExpenseDetailController extends GetxController {
                           ),
                         ),
                         icon: const Icon(Icons.edit),
-                        label: const Text('Change Receipt'),
+                        label: Text('Change Receipt'.tr),
                       ),
                     ],
                   )
@@ -279,7 +278,7 @@ class ExpenseDetailController extends GetxController {
                             children: [
                               ListTile(
                                 leading: Icon(Icons.camera_alt, color: Get.theme.colorScheme.primary),
-                                title: const Text('Take a Photo'),
+                                title: Text('Take a Photo'.tr),
                                 onTap: () {
                                   Get.back();
                                   pickReceipt(ImageSource.camera);
@@ -287,7 +286,7 @@ class ExpenseDetailController extends GetxController {
                               ),
                               ListTile(
                                 leading: Icon(Icons.photo_library, color: Get.theme.colorScheme.primary),
-                                title: const Text('Choose from Gallery'),
+                                title: Text('Choose from Gallery'.tr),
                                 onTap: () {
                                   Get.back();
                                   pickReceipt(ImageSource.gallery);
@@ -305,13 +304,13 @@ class ExpenseDetailController extends GetxController {
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: Colors.grey.withOpacity(0.3)),
                       ),
-                      child: const Center(
+                      child: Center(
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(Icons.add_photo_alternate, color: Colors.grey),
                             SizedBox(height: 4),
-                            Text('Add Receipt', style: TextStyle(color: Colors.grey)),
+                            Text('Add Receipt'.tr, style: TextStyle(color: Colors.grey)),
                           ],
                         ),
                       ),
@@ -324,11 +323,11 @@ class ExpenseDetailController extends GetxController {
         actions: [
           TextButton(
             onPressed: () => Get.back(result: false),
-            child: const Text('Cancel'),
+            child: Text('Cancel'.tr),
           ),
           TextButton(
             onPressed: () => Get.back(result: true),
-            child: const Text('Save'),
+            child: Text('Save'.tr),
           ),
         ],
       ),
@@ -392,7 +391,7 @@ class ExpenseDetailScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('Expense Details'),
+        title: Text('Expense Details'.tr),
         actions: [
           Obx(
             () => IconButton(
@@ -419,8 +418,7 @@ class ExpenseDetailScreen extends StatelessWidget {
           final data = controller.expense.value;
           if (data == null) {
             return Center(
-              child: Text(
-                'No expense found',
+              child: Text('No expense found'.tr,
                 style: theme.textTheme.titleMedium,
               ),
             );
@@ -452,8 +450,7 @@ class ExpenseDetailScreen extends StatelessWidget {
                 _InfoTile(label: 'Hotel/Property', value: place),
                 _InfoTile(label: 'Date', value: _prettyDate(dateStr)),
                 const SizedBox(height: 16),
-                Text(
-                  'Receipt',
+                Text('Receipt'.tr,
                   style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
                 ),
                 const SizedBox(height: 8),
@@ -466,8 +463,7 @@ class ExpenseDetailScreen extends StatelessWidget {
                       border: Border.all(color: Get.isDarkMode ? Colors.white12 : const Color(0xFFEDEFF5)),
                     ),
                     alignment: Alignment.center,
-                    child: Text(
-                      'No receipt uploaded',
+                    child: Text('No receipt uploaded'.tr,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: Get.isDarkMode ? Colors.white70 : Colors.black54,
                         fontWeight: FontWeight.w600,
@@ -505,8 +501,7 @@ class ExpenseDetailScreen extends StatelessWidget {
                             children: [
                               const Icon(Icons.broken_image, size: 40, color: Colors.grey),
                               const SizedBox(height: 8),
-                              Text(
-                                'Unable to load receipt',
+                              Text('Unable to load receipt'.tr,
                                 style: theme.textTheme.bodyMedium?.copyWith(
                                   color: Get.isDarkMode ? Colors.white70 : Colors.black54,
                                   fontWeight: FontWeight.w600,

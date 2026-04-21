@@ -69,8 +69,7 @@ class _PropertyFilterBottomSheetState extends State<PropertyFilterBottomSheet> {
                 onPressed: () => Get.back(),
                 icon: Icon(Icons.close, color: theme.brightness == Brightness.dark ? Colors.white : const Color(0xFF1D2330), size: 24),
               ),
-              Text(
-                'Filter options',
+              Text('Filter options'.tr,
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w800,
@@ -88,8 +87,7 @@ class _PropertyFilterBottomSheetState extends State<PropertyFilterBottomSheet> {
                     maxAreaController.clear();
                   });
                 },
-                child: const Text(
-                  'Reset',
+                child: Text('Reset'.tr,
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
@@ -107,8 +105,7 @@ class _PropertyFilterBottomSheetState extends State<PropertyFilterBottomSheet> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Property Type
-                  Text(
-                    'Property Type',
+                  Text('Property Type'.tr,
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w800,
@@ -171,8 +168,7 @@ class _PropertyFilterBottomSheetState extends State<PropertyFilterBottomSheet> {
                   
                   const SizedBox(height: 32),
                   // Price Range
-                  Text(
-                    'Price Range',
+                  Text('Price Range'.tr,
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w800,
@@ -216,8 +212,7 @@ class _PropertyFilterBottomSheetState extends State<PropertyFilterBottomSheet> {
 
                   const SizedBox(height: 24),
                   // Bedrooms
-                  Text(
-                    'Bedrooms',
+                  Text('Bedrooms'.tr,
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w800,
@@ -257,8 +252,7 @@ class _PropertyFilterBottomSheetState extends State<PropertyFilterBottomSheet> {
 
                   const SizedBox(height: 24),
                   // Bathrooms
-                  Text(
-                    'Bathrooms',
+                  Text('Bathrooms'.tr,
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w800,
@@ -301,16 +295,14 @@ class _PropertyFilterBottomSheetState extends State<PropertyFilterBottomSheet> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        'Living Area',
+                      Text('Living Area'.tr,
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w800,
                           color: theme.brightness == Brightness.dark ? Colors.white : const Color(0xFF1D2330),
                         ),
                       ),
-                      Text(
-                        'sqft',
+                      Text('sqft'.tr,
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -336,7 +328,7 @@ class _PropertyFilterBottomSheetState extends State<PropertyFilterBottomSheet> {
                             controller: minAreaController,
                             style: TextStyle(color: theme.brightness == Brightness.dark ? Colors.white : const Color(0xFF1D2330)),
                             decoration: InputDecoration(
-                              hintText: 'Min',
+                              hintText: 'Min'.tr,
                               border: InputBorder.none,
                               enabledBorder: InputBorder.none,
                               focusedBorder: InputBorder.none,
@@ -350,8 +342,7 @@ class _PropertyFilterBottomSheetState extends State<PropertyFilterBottomSheet> {
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 12),
-                        child: Text(
-                          '-',
+                        child: Text('-'.tr,
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.w600,
@@ -373,7 +364,7 @@ class _PropertyFilterBottomSheetState extends State<PropertyFilterBottomSheet> {
                             controller: maxAreaController,
                             style: TextStyle(color: theme.brightness == Brightness.dark ? Colors.white : const Color(0xFF1D2330)),
                             decoration: InputDecoration(
-                              hintText: 'Max',
+                              hintText: 'Max'.tr,
                               border: InputBorder.none,
                               enabledBorder: InputBorder.none,
                               focusedBorder: InputBorder.none,
@@ -417,8 +408,7 @@ class _PropertyFilterBottomSheetState extends State<PropertyFilterBottomSheet> {
                 ),
                 elevation: 0,
               ),
-              child: const Text(
-                'Apply',
+              child: Text('Apply'.tr,
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,

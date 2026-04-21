@@ -22,8 +22,7 @@ class CompleteProfileScreen extends StatelessWidget {
                 alignment: Alignment.centerLeft,
                 child: InkWell(
                   onTap: () => Navigator.of(context).maybePop(),
-                  child: Text(
-                    'Back',
+                  child: Text('Back'.tr,
                     style: theme.textTheme.titleMedium?.copyWith(
                       color: theme.colorScheme.primary,
                       fontWeight: FontWeight.w500,
@@ -32,8 +31,7 @@ class CompleteProfileScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 56),
-              Text(
-                'Complete your Profile',
+              Text('Complete your Profile'.tr,
                 textAlign: TextAlign.center,
                 style: theme.textTheme.headlineSmall?.copyWith(
                   color: theme.colorScheme.primary,
@@ -86,14 +84,14 @@ class CompleteProfileScreen extends StatelessWidget {
               TextFormField(
                 controller: controller.fullNameController,
                 textInputAction: TextInputAction.next,
-                decoration: const InputDecoration(hintText: 'Full Name'),
+                decoration: InputDecoration(hintText: 'Full Name'.tr),
               ),
               const SizedBox(height: 14),
               TextFormField(
                 controller: controller.emailController,
                 keyboardType: TextInputType.emailAddress,
                 textInputAction: TextInputAction.next,
-                decoration: const InputDecoration(hintText: 'Email'),
+                decoration: InputDecoration(hintText: 'Email'.tr),
                 readOnly:
                     true, // Email usually read-only if it came from registration
               ),
@@ -102,8 +100,7 @@ class CompleteProfileScreen extends StatelessWidget {
                 () => DropdownButtonFormField<String>(
                   value: controller.gender.value,
                   decoration: const InputDecoration(),
-                  hint: Text(
-                    'Gender',
+                  hint: Text('Gender'.tr,
                     style: theme.inputDecorationTheme.hintStyle,
                   ),
                   style: theme.textTheme.bodyLarge,
@@ -111,10 +108,10 @@ class CompleteProfileScreen extends StatelessWidget {
                     Icons.keyboard_arrow_down_rounded,
                     color: Color(0xFFB6BAC5),
                   ),
-                  items: const [
-                    DropdownMenuItem(value: 'Male', child: Text('Male')),
-                    DropdownMenuItem(value: 'Female', child: Text('Female')),
-                    DropdownMenuItem(value: 'Other', child: Text('Other')),
+                  items: [
+                    DropdownMenuItem(value: 'Male', child: Text('Male'.tr)),
+                    DropdownMenuItem(value: 'Female', child: Text('Female'.tr)),
+                    DropdownMenuItem(value: 'Other', child: Text('Other'.tr)),
                   ],
                   onChanged: controller.setGender,
                 ),
@@ -124,8 +121,7 @@ class CompleteProfileScreen extends StatelessWidget {
                 () => DropdownButtonFormField<String>(
                   value: controller.currency.value,
                   decoration: const InputDecoration(),
-                  hint: Text(
-                    'Currency',
+                  hint: Text('Currency'.tr,
                     style: theme.inputDecorationTheme.hintStyle,
                   ),
                   style: theme.textTheme.bodyLarge,
@@ -133,10 +129,10 @@ class CompleteProfileScreen extends StatelessWidget {
                     Icons.keyboard_arrow_down_rounded,
                     color: Color(0xFFB6BAC5),
                   ),
-                  items: const [
-                    DropdownMenuItem(value: 'USD', child: Text('USD')),
-                    DropdownMenuItem(value: 'EUR', child: Text('EUR')),
-                    DropdownMenuItem(value: 'PKR', child: Text('PKR')),
+                  items: [
+                    DropdownMenuItem(value: 'USD', child: Text('USD'.tr)),
+                    DropdownMenuItem(value: 'EUR', child: Text('EUR'.tr)),
+                    DropdownMenuItem(value: 'PKR', child: Text('PKR'.tr)),
                   ],
                   onChanged: controller.setCurrency,
                 ),
@@ -146,8 +142,7 @@ class CompleteProfileScreen extends StatelessWidget {
                 () => DropdownButtonFormField<String>(
                   value: controller.language.value,
                   decoration: const InputDecoration(),
-                  hint: Text(
-                    'Language',
+                  hint: Text('Language'.tr,
                     style: theme.inputDecorationTheme.hintStyle,
                   ),
                   style: theme.textTheme.bodyLarge,
@@ -155,10 +150,10 @@ class CompleteProfileScreen extends StatelessWidget {
                     Icons.keyboard_arrow_down_rounded,
                     color: Color(0xFFB6BAC5),
                   ),
-                  items: const [
-                    DropdownMenuItem(value: 'English', child: Text('English')),
-                    DropdownMenuItem(value: 'Urdu', child: Text('Urdu')),
-                    DropdownMenuItem(value: 'Arabic', child: Text('Arabic')),
+                  items: [
+                    DropdownMenuItem(value: 'English', child: Text('English'.tr)),
+                    DropdownMenuItem(value: 'Urdu', child: Text('Urdu'.tr)),
+                    DropdownMenuItem(value: 'Arabic', child: Text('Arabic'.tr)),
                   ],
                   onChanged: controller.setLanguage,
                 ),
@@ -169,7 +164,7 @@ class CompleteProfileScreen extends StatelessWidget {
                 height: 56,
                 child: ElevatedButton(
                   onPressed: controller.saveProfile,
-                  child: const Text('Continue'),
+                  child: Text('Continue'.tr),
                 ),
               ),
               const SizedBox(height: 16),

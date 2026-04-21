@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:superapp/controllers/profile_controller.dart';
-import 'package:superapp/screens/main_screen.dart';
+import 'package:superapp/screens/choose_location_screen.dart';
 import 'package:superapp/services/auth_service.dart';
 
 class CompleteProfileController extends GetxController {
@@ -104,8 +104,7 @@ class CompleteProfileController extends GetxController {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              'Change Profile Picture',
+            Text('Change Profile Picture'.tr,
               style: Get.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w700,
               ),
@@ -116,7 +115,7 @@ class CompleteProfileController extends GetxController {
                 Icons.camera_alt_rounded,
                 color: Get.theme.colorScheme.primary,
               ),
-              title: const Text('Take a Photo'),
+              title: Text('Take a Photo'.tr),
               onTap: () {
                 Get.back();
                 _pickImage(ImageSource.camera);
@@ -127,7 +126,7 @@ class CompleteProfileController extends GetxController {
                 Icons.photo_library_rounded,
                 color: Get.theme.colorScheme.primary,
               ),
-              title: const Text('Choose from Gallery'),
+              title: Text('Choose from Gallery'.tr),
               onTap: () {
                 Get.back();
                 _pickImage(ImageSource.gallery);
@@ -136,8 +135,7 @@ class CompleteProfileController extends GetxController {
             if (photoUrl.value.isNotEmpty || localPhotoPath.value.isNotEmpty)
               ListTile(
                 leading: const Icon(Icons.delete_rounded, color: Colors.red),
-                title: const Text(
-                  'Remove Photo',
+                title: Text('Remove Photo'.tr,
                   style: TextStyle(color: Colors.red),
                 ),
                 onTap: () {
@@ -237,7 +235,7 @@ class CompleteProfileController extends GetxController {
         currency: currency.value.toUpperCase(),
       );
 
-      Get.offAll(() => const MainScreen());
+      Get.offAll(() => const ChooseLocationScreen());
     } catch (e) {
       Get.snackbar('Error', e.toString().replaceFirst('Exception: ', ''));
     } finally {

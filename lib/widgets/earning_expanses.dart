@@ -80,8 +80,7 @@ class EarningExpansesWidget extends StatelessWidget {
                 padding: EdgeInsetsGeometry.symmetric(horizontal: 10),
                 child: Row(
                   children: [
-                    Text(
-                      "Recent Transactions",
+                    Text("Recent Transactions".tr,
                       style: theme.textTheme.titleSmall?.copyWith(
                         color: Get.isDarkMode
                             ? Colors.white
@@ -97,8 +96,7 @@ class EarningExpansesWidget extends StatelessWidget {
                         minimumSize: const Size(0, 0),
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       ),
-                      child: Text(
-                        "View All",
+                      child: Text("View All".tr,
                         style: theme.textTheme.labelLarge?.copyWith(
                           color: theme.colorScheme.primary,
                           fontWeight: FontWeight.w600,
@@ -155,8 +153,7 @@ class EarningExpansesWidget extends StatelessWidget {
                     size: 18,
                     color: theme.iconTheme.color,
                   ),
-                  label: Text(
-                    "Export Full Report",
+                  label: Text("Export Full Report".tr,
                     style: theme.textTheme.titleSmall?.copyWith(
                       color: Colors.white,
                       fontWeight: FontWeight.w800,

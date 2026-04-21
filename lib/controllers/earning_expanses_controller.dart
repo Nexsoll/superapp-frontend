@@ -285,15 +285,13 @@ class _ExportDialog extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            Text(
-              'Export Report',
+            Text('Export Report'.tr,
               style: theme.textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 8),
-            Text(
-              'Choose your preferred format',
+            Text('Choose your preferred format'.tr,
               style: theme.textTheme.bodyMedium?.copyWith(color: Colors.grey),
             ),
             const SizedBox(height: 24),
@@ -337,7 +335,7 @@ class _ExportDialog extends StatelessWidget {
             const SizedBox(height: 16),
             TextButton(
               onPressed: () => Get.back(),
-              child: const Text('Cancel'),
+              child: Text('Cancel'.tr),
             ),
           ],
         ),

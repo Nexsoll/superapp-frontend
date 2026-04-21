@@ -35,8 +35,7 @@ class WellcomeScreen extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Column(
                   children: [
-                    Text(
-                      'Welcome',
+                    Text('Welcome'.tr,
                       textAlign: TextAlign.center,
                       style: theme.textTheme.titleLarge?.copyWith(
                         color: theme.colorScheme.primary,
@@ -44,8 +43,7 @@ class WellcomeScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 6),
-                    Text(
-                      'Have a better sharing experience',
+                    Text('Have a better sharing experience'.tr,
                       textAlign: TextAlign.center,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: theme.brightness == Brightness.dark
@@ -78,8 +76,7 @@ class WellcomeScreen extends StatelessWidget {
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
-                        child: Text(
-                          'Create an account',
+                        child: Text('Create an account'.tr,
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: Colors.white,
                             fontWeight: FontWeight.w700,
@@ -104,8 +101,7 @@ class WellcomeScreen extends StatelessWidget {
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
-                        child: Text(
-                          'Log In',
+                        child: Text('Log In'.tr,
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: theme.colorScheme.primary,
                             fontWeight: FontWeight.w700,

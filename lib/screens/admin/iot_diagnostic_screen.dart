@@ -64,12 +64,12 @@ class IoTDiagnosticScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Remove Device'),
-        content: const Text('Are you sure you want to remove this device?'),
+        title: Text('Remove Device'.tr),
+        content: Text('Are you sure you want to remove this device?'.tr),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text('Cancel'.tr),
           ),
           TextButton(
             onPressed: () {
@@ -79,7 +79,7 @@ class IoTDiagnosticScreen extends StatelessWidget {
               }
               Navigator.pop(context);
             },
-            child: const Text('Remove', style: TextStyle(color: Colors.red)),
+            child: Text('Remove'.tr, style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -118,8 +118,7 @@ class IoTDiagnosticScreen extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    'Add New Device',
+                  Text('Add New Device'.tr,
                     style: TextStyle(
                       color: isDark ? Colors.white : const Color(0xFF1E293B),
                       fontSize: 20,
@@ -143,8 +142,7 @@ class IoTDiagnosticScreen extends StatelessWidget {
                 isDark,
               ),
               const SizedBox(height: 16),
-              const Text(
-                'Select Property or Hotel',
+              Text('Select Property or Hotel'.tr,
                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 8),
@@ -182,9 +180,9 @@ class IoTDiagnosticScreen extends StatelessWidget {
                         color: isDark ? Colors.white : Colors.black,
                       ),
                       items: [
-                        const DropdownMenuItem(
+                        DropdownMenuItem(
                           value: null,
-                          child: Text('None'),
+                          child: Text('None'.tr),
                         ),
                         ...controller.properties.map(
                           (p) => DropdownMenuItem(
@@ -206,8 +204,7 @@ class IoTDiagnosticScreen extends StatelessWidget {
                 );
               }),
               const SizedBox(height: 16),
-              const Text(
-                'Status',
+              Text('Status'.tr,
                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 8),
@@ -258,8 +255,7 @@ class IoTDiagnosticScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(16),
                     ),
                   ),
-                  child: const Text(
-                    'Add Device',
+                  child: Text('Add Device'.tr,
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -322,8 +318,7 @@ class IoTDiagnosticScreen extends StatelessWidget {
             onTap: () => Navigator.pop(context),
             child: const Icon(Icons.arrow_back, color: Colors.white, size: 24),
           ),
-          const Text(
-            'IoT Diagnostic',
+          Text('IoT Diagnostic'.tr,
             style: TextStyle(
               color: Colors.white,
               fontSize: 18,
@@ -461,9 +456,9 @@ class IoTDiagnosticScreen extends StatelessWidget {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    const Padding(
+                    Padding(
                       padding: EdgeInsets.symmetric(horizontal: 6),
-                      child: Text('•', style: TextStyle(color: Colors.grey)),
+                      child: Text('•'.tr, style: TextStyle(color: Colors.grey)),
                     ),
                     Text(
                       device.timeAgo,
@@ -537,7 +532,7 @@ class _StatusChipState extends State<_StatusChip> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: _selected ? const Color(0xFF38CAC7) : Colors.transparent,
+          color: _selected ? Color(0xFF38CAC7) : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: _selected

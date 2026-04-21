@@ -114,21 +114,21 @@ class _PropertySearchScreenState extends State<PropertySearchScreen> {
                 ],
               ),
               itemBuilder: (context) => [
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: 'recommended',
-                  child: Text('Recommended'),
+                  child: Text('Recommended'.tr),
                 ),
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: 'price_low',
-                  child: Text('Price: Low to High'),
+                  child: Text('Price: Low to High'.tr),
                 ),
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: 'price_high',
-                  child: Text('Price: High to Low'),
+                  child: Text('Price: High to Low'.tr),
                 ),
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: 'rating',
-                  child: Text('Rating'),
+                  child: Text('Rating'.tr),
                 ),
               ],
             ),
@@ -145,8 +145,7 @@ class _PropertySearchScreenState extends State<PropertySearchScreen> {
   }) {
     if (properties.isEmpty) {
       return Center(
-        child: Text(
-          'No properties found',
+        child: Text('No properties found'.tr,
           style: TextStyle(
             fontSize: 16,
             color: theme.brightness == Brightness.dark
@@ -338,8 +337,7 @@ class _PropertySearchScreenState extends State<PropertySearchScreen> {
                       size: 28,
                     ),
                   ),
-                  const Text(
-                    'Featured Properties',
+                  Text('Featured Properties'.tr,
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.w700,
@@ -353,8 +351,7 @@ class _PropertySearchScreenState extends State<PropertySearchScreen> {
               padding: const EdgeInsets.only(left: 56, right: 24),
               child: Align(
                 alignment: Alignment.centerLeft,
-                child: Text(
-                  'Discover exclusive properties',
+                child: Text('Discover exclusive properties'.tr,
                   style: TextStyle(
                     fontSize: 16,
                     color: theme.brightness == Brightness.dark
@@ -410,8 +407,8 @@ class _PropertySearchScreenState extends State<PropertySearchScreen> {
                           },
                           cursorColor: theme.colorScheme.primary,
                           selectionControls: materialTextSelectionControls,
-                          decoration: const InputDecoration(
-                            hintText: 'Search Properties...',
+                          decoration: InputDecoration(
+                            hintText: 'Search Properties...'.tr,
                             hintStyle: TextStyle(
                               color: Color(0xFF9AA0AF),
                               fontSize: 18,
@@ -496,8 +493,7 @@ class _PropertySearchScreenState extends State<PropertySearchScreen> {
                                 : null,
                           ),
                           alignment: Alignment.center,
-                          child: Text(
-                            'Buy',
+                          child: Text('Buy'.tr,
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
@@ -532,8 +528,7 @@ class _PropertySearchScreenState extends State<PropertySearchScreen> {
                                 : null,
                           ),
                           alignment: Alignment.center,
-                          child: Text(
-                            'Rent',
+                          child: Text('Rent'.tr,
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,

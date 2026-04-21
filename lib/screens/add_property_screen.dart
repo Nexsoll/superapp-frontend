@@ -351,8 +351,7 @@ class _AddPropertyScreenState extends State<AddPropertyScreen> {
                 ),
               ),
               const SizedBox(height: 12),
-              Text(
-                'Add new images below (existing images are preserved)',
+              Text('Add new images below (existing images are preserved)'.tr,
                 style: GoogleFonts.outfit(
                   fontSize: 12,
                   color: isDark ? Colors.white54 : const Color(0xFF9CA3AF),
@@ -382,8 +381,7 @@ class _AddPropertyScreenState extends State<AddPropertyScreen> {
                         size: 28,
                       ),
                       const SizedBox(height: 8),
-                      Text(
-                        'Add Photo',
+                      Text('Add Photo'.tr,
                         style: GoogleFonts.outfit(
                           color: isDark
                               ? Colors.white54
@@ -554,8 +552,7 @@ class _AddPropertyScreenState extends State<AddPropertyScreen> {
                                     : const Color(0xFFE5E7EB),
                               ),
                       ),
-                      child: Text(
-                        'For Sale',
+                      child: Text('For Sale'.tr,
                         style: GoogleFonts.outfit(
                           color: _listingType == 'For Sale'
                               ? Colors.white
@@ -589,8 +586,7 @@ class _AddPropertyScreenState extends State<AddPropertyScreen> {
                                     : const Color(0xFFE5E7EB),
                               ),
                       ),
-                      child: Text(
-                        'For Rent',
+                      child: Text('For Rent'.tr,
                         style: GoogleFonts.outfit(
                           color: _listingType == 'For Rent'
                               ? Colors.white
@@ -625,7 +621,7 @@ class _AddPropertyScreenState extends State<AddPropertyScreen> {
               theme: theme,
               isDark: isDark,
               controller: _locationController,
-              hintText: 'Enter address',
+              hintText: 'Enter address'.tr,
             ),
             const SizedBox(height: 24),
 
@@ -718,8 +714,7 @@ class _AddPropertyScreenState extends State<AddPropertyScreen> {
             // Neighborhood Insights
             _SectionLabel('Neighborhood Insights'),
             const SizedBox(height: 4),
-            Text(
-              'What\'s nearby? Help buyers know the area.',
+            Text('What\'s nearby? Help buyers know the area.'.tr,
               style: GoogleFonts.outfit(
                 fontSize: 12,
                 color: isDark ? Colors.white38 : const Color(0xFF9CA3AF),

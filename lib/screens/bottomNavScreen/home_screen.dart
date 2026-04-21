@@ -36,54 +36,56 @@ class HomeScreen extends StatelessWidget {
               child: SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
                 child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const _RecommendationCard(),
-                  const SizedBox(height: 18),
-                  Obx(() {
-                    final isProperty = controller.categoryIndex.value == 1;
-                    return _SectionHeader(
-                      title: isProperty
-                          ? 'Featured Properties'
-                          : 'Featured Hotels',
-                      actionText: 'See All',
-                      onActionTap: () {
-                        if (controller.categoryIndex.value == 1) {
-                          Get.to(() => const PropertySearchScreen());
-                        } else {
-                          Get.to(() => const HotelSearchScreen());
-                        }
-                      },
-                    );
-                  }),
-                  const SizedBox(height: 10),
-                  const _FeaturedHotelsList(),
-                  Obx(() {
-                    if (controller.categoryIndex.value == 1) {
-                      return Column(
-                        children: const [
-                          SizedBox(height: 18),
-                          _PropertyQuickActions(),
-                        ],
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const _LocationDropdown(),
+                    const SizedBox(height: 14),
+                    const _RecommendationCard(),
+                    const SizedBox(height: 18),
+                    Obx(() {
+                      final isProperty = controller.categoryIndex.value == 1;
+                      return _SectionHeader(
+                        title: isProperty
+                            ? 'Featured Properties'
+                            : 'Featured Hotels',
+                        actionText: 'See All',
+                        onActionTap: () {
+                          if (controller.categoryIndex.value == 1) {
+                            Get.to(() => const PropertySearchScreen());
+                          } else {
+                            Get.to(() => const HotelSearchScreen());
+                          }
+                        },
                       );
-                    }
+                    }),
+                    const SizedBox(height: 10),
+                    const _FeaturedHotelsList(),
+                    Obx(() {
+                      if (controller.categoryIndex.value == 1) {
+                        return Column(
+                          children: const [
+                            SizedBox(height: 18),
+                            _PropertyQuickActions(),
+                          ],
+                        );
+                      }
 
-                    if (controller.categoryIndex.value == 0) {
-                      return Column(
-                        children: const [
-                          SizedBox(height: 18),
-                          _HotelQuickActions(),
-                        ],
-                      );
-                    }
+                      if (controller.categoryIndex.value == 0) {
+                        return Column(
+                          children: const [
+                            SizedBox(height: 18),
+                            _HotelQuickActions(),
+                          ],
+                        );
+                      }
 
-                    return const SizedBox.shrink();
-                  }),
-                  const SizedBox(height: 18),
-                  const _AnnouncementCard(),
-                ],
+                      return const SizedBox.shrink();
+                    }),
+                    const SizedBox(height: 18),
+                    const _AnnouncementCard(),
+                  ],
+                ),
               ),
-            ),
             ),
           ),
         ],
@@ -164,7 +166,7 @@ class _MainHeader extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Welcome Back',
+                      'Welcome Back'.tr,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: theme.textTheme.bodySmall?.copyWith(
@@ -231,11 +233,13 @@ class _MainHeader extends StatelessWidget {
                           color: Colors.white,
                         ),
                         const SizedBox(width: 8),
-                        Text(
-                          '\$2,455.00',
-                          style: theme.textTheme.labelLarge?.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
+                        Obx(
+                          () => Text(
+                            '\$${profileController.balance.value.toStringAsFixed(2)}',
+                            style: theme.textTheme.labelLarge?.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
                       ],
@@ -457,12 +461,90 @@ class _SearchBar extends StatelessWidget {
   }
 }
 
-class _RecommendationCard extends StatelessWidget {
+class _LocationDropdown extends StatelessWidget {
+  const _LocationDropdown();
+
+  @override
+  Widget build(BuildContext context) {
+    final profileController = Get.find<ProfileController>();
+    final theme = Theme.of(context);
+
+    final locations = [
+      'Montenegro',
+      'Serbia',
+      'Bosnia',
+      'Croatia',
+      'Albania',
+      'Slovenia',
+    ];
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Obx(
+        () => DropdownButtonHideUnderline(
+          child: DropdownButton<String>(
+            value: profileController.selectedLocation.value,
+            isExpanded: true,
+            icon: Icon(
+              Icons.location_on_rounded,
+              color: theme.colorScheme.primary,
+            ),
+            items: locations.map((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(
+                  value,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                  ),
+                ),
+              );
+            }).toList(),
+            onChanged: (newValue) {
+              if (newValue != null) {
+                profileController.saveUserData(location: newValue);
+              }
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _RecommendationCard extends StatefulWidget {
   const _RecommendationCard();
+
+  @override
+  State<_RecommendationCard> createState() => _RecommendationCardState();
+}
+
+class _RecommendationCardState extends State<_RecommendationCard> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final controller = Get.find<MainScreenController>();
+      controller.fetchAiRecommendations();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final controller = Get.find<MainScreenController>();
 
     return Container(
       width: double.infinity,
@@ -502,7 +584,7 @@ class _RecommendationCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'AI Recommendations Ready',
+                  'AI Recommendations Ready'.tr,
                   style: theme.textTheme.titleMedium?.copyWith(
                     color: theme.brightness == Brightness.dark
                         ? Colors.white
@@ -512,22 +594,60 @@ class _RecommendationCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 4),
-                Text(
-                  'We found 12 perfect matches based\non your preferences',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.brightness == Brightness.dark
-                        ? Colors.white.withOpacity(0.7)
-                        : const Color(0xFF747477),
-                    height: 1.25,
-                    fontWeight: FontWeight.w500,
-                    fontSize: 14,
-                  ),
-                ),
+                Obx(() {
+                  final count = controller.aiRecommendationCount.value;
+                  final isLoading = controller.isFetchingRecommendations.value;
+                  if (isLoading) {
+                    return Text(
+                      'Loading recommendations...',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.brightness == Brightness.dark
+                            ? Colors.white.withOpacity(0.7)
+                            : const Color(0xFF747477),
+                        height: 1.25,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                      ),
+                    );
+                  }
+                  if (count == 0) {
+                    return Text(
+                      'No recommendations found.\nPull to refresh.',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.brightness == Brightness.dark
+                            ? Colors.white.withOpacity(0.7)
+                            : const Color(0xFF747477),
+                        height: 1.25,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                      ),
+                    );
+                  }
+                  return Text(
+                    'We found $count perfect matches based\non your preferences'
+                        .tr,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.brightness == Brightness.dark
+                          ? Colors.white.withOpacity(0.7)
+                          : const Color(0xFF747477),
+                      height: 1.25,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 14,
+                    ),
+                  );
+                }),
                 const SizedBox(height: 10),
                 SizedBox(
                   height: 34,
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () async {
+                      final ctrl = Get.find<MainScreenController>();
+                      // Always fetch fresh recommendations based on current category
+                      await ctrl.fetchAiRecommendations();
+                      if (ctrl.aiRecommendations.isNotEmpty) {
+                        _showRecommendationsSheet(context);
+                      }
+                    },
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(horizontal: 14),
                       shape: RoundedRectangleBorder(
@@ -535,7 +655,7 @@ class _RecommendationCard extends StatelessWidget {
                       ),
                     ),
                     child: Text(
-                      'View Suggestions',
+                      'View Suggestions'.tr,
                       style: theme.textTheme.labelLarge?.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.w700,
@@ -548,6 +668,153 @@ class _RecommendationCard extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  void _showRecommendationsSheet(BuildContext context) {
+    final controller = Get.find<MainScreenController>();
+    final recommendations = controller.aiRecommendations;
+    if (recommendations.isEmpty) return;
+
+    final theme = Theme.of(context);
+    final isProperty = controller.categoryIndex.value == 1;
+
+    Get.bottomSheet(
+      Container(
+        height: MediaQuery.of(context).size.height * 0.7,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: theme.scaffoldBackgroundColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              isProperty
+                  ? 'AI Property Recommendations'
+                  : 'AI Hotel Recommendations',
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              '${controller.aiRecommendationCount.value} properties found',
+              style: theme.textTheme.bodyMedium?.copyWith(color: Colors.grey),
+            ),
+            const SizedBox(height: 16),
+            Expanded(
+              child: ListView.separated(
+                itemCount: recommendations.length,
+                separatorBuilder: (_, __) => const SizedBox(height: 12),
+                itemBuilder: (context, index) {
+                  final item = recommendations[index];
+                  final title = item['title'] ?? item['name'] ?? 'Unknown';
+                  final address = item['address'] ?? item['location'] ?? '';
+                  final price = item['price'] ?? 0;
+                  final id = item['id'] as int?;
+
+                  // Use ListingService to get proper proxied image URL
+                  final String? imageUrl = (id != null && !isProperty)
+                      ? ListingService.hotelImageUrl(id, 0)
+                      : (id != null && isProperty)
+                      ? ListingService.propertyImageUrl(id, 0)
+                      : null;
+
+                  return InkWell(
+                    onTap: () {
+                      Get.back();
+                      if (isProperty) {
+                        Get.to(() => PropertyDetailScreen(propertyData: item));
+                      } else {
+                        Get.to(() => HotelDetailScreen(hotelData: item));
+                      }
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: theme.cardColor,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Row(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: imageUrl != null
+                                ? Image.network(
+                                    imageUrl.toString(),
+                                    width: 80,
+                                    height: 80,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (_, __, ___) => Container(
+                                      width: 80,
+                                      height: 80,
+                                      color: Colors.grey[300],
+                                      child: const Icon(Icons.image),
+                                    ),
+                                  )
+                                : Container(
+                                    width: 80,
+                                    height: 80,
+                                    color: Colors.grey[300],
+                                    child: const Icon(Icons.image),
+                                  ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  title,
+                                  style: theme.textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  address,
+                                  style: theme.textTheme.bodySmall,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  '\$$price',
+                                  style: theme.textTheme.titleMedium?.copyWith(
+                                    color: theme.colorScheme.primary,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Icon(Icons.chevron_right, color: Colors.grey),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+      isScrollControlled: true,
     );
   }
 }
@@ -629,7 +896,7 @@ class _FeaturedHotelsList extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    'No featured properties yet',
+                    'No featured properties yet'.tr,
                     style: TextStyle(
                       color: isDark ? Colors.white54 : Colors.grey[500],
                       fontSize: 14,
@@ -692,7 +959,7 @@ class _FeaturedHotelsList extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'No featured hotels yet',
+                  'No featured hotels yet'.tr,
                   style: TextStyle(
                     color: isDark ? Colors.white54 : Colors.grey[500],
                     fontSize: 14,
@@ -1112,8 +1379,34 @@ class _AnnouncementCard extends StatelessWidget {
     return Obx(() {
       final isProperty = controller.categoryIndex.value == 1;
       final announcement = isProperty
-          ? controller.propertyAnnouncement
-          : controller.announcement;
+        ? controller.propertyAnnouncement
+        : controller.announcement;
+
+      final recommendation = controller.investmentRecommendation;
+      final isLoadingInvestment =
+        isProperty &&
+        controller.isFetchingInvestmentAnnouncement.value &&
+        recommendation == null;
+
+      final title = isProperty
+        ? controller.investmentAnnouncementTitle
+        : announcement.title;
+
+      final description = isProperty
+        ? (isLoadingInvestment
+          ? 'Analyzing today market with Gemini AI...'
+          : controller.investmentAnnouncementDescription)
+        : announcement.description;
+
+      final buttonText = isProperty
+        ? controller.investmentAnnouncementButtonText
+        : announcement.buttonText;
+
+      final chance = (recommendation?['investmentChancePercent'] as num?)
+        ?.round();
+      final roi = (recommendation?['expectedRoiPercent'] as num?)?.toDouble();
+      final profitUsd =
+        (recommendation?['estimatedProfit12MonthsUsd'] as num?)?.toDouble();
 
       return Container(
         width: double.infinity,
@@ -1143,7 +1436,7 @@ class _AnnouncementCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              announcement.title,
+              title,
               style: theme.textTheme.titleLarge?.copyWith(
                 color: Colors.white,
                 fontWeight: FontWeight.w800,
@@ -1151,17 +1444,55 @@ class _AnnouncementCard extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              announcement.description,
+              description,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: Colors.white.withOpacity(0.9),
                 height: 1.4,
               ),
             ),
+            if (isProperty &&
+                chance != null &&
+                roi != null &&
+                profitUsd != null) ...[
+              const SizedBox(height: 12),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.14),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.2),
+                    width: 1,
+                  ),
+                ),
+                child: Text(
+                  'Chance: $chance%  •  Profit: ${controller.formatProjectedProfit(profitUsd)}  •  ROI: ${roi.toStringAsFixed(1)}%',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ],
             const SizedBox(height: 22),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  if (isProperty) {
+                    final propertyData = controller.recommendedInvestmentProperty;
+                    if (propertyData != null) {
+                      Get.to(() => PropertyDetailScreen(propertyData: propertyData));
+                    } else {
+                      Get.to(() => const PropertySearchScreen());
+                    }
+                    return;
+                  }
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF2FC1BE),
                   foregroundColor: Colors.white,
@@ -1175,7 +1506,7 @@ class _AnnouncementCard extends StatelessWidget {
                   elevation: 0,
                 ),
                 child: Text(
-                  announcement.buttonText,
+                  buttonText,
                   style: const TextStyle(fontWeight: FontWeight.w700),
                 ),
               ),

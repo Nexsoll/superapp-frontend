@@ -50,8 +50,7 @@ class ExpenseTrackingScreen extends StatelessWidget {
                   ),
                   const SizedBox(width: 2),
                   Expanded(
-                    child: Text(
-                      "Expense Tracking",
+                    child: Text("Expense Tracking".tr,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: theme.textTheme.titleMedium?.copyWith(
@@ -65,8 +64,7 @@ class ExpenseTrackingScreen extends StatelessWidget {
                       await Get.to(() => const ExpensesScreen());
                       await controller.ensureFresh();
                     },
-                    child: Text(
-                      'Details',
+                    child: Text('Details'.tr,
                       style: theme.textTheme.labelLarge?.copyWith(
                         color: theme.colorScheme.primary,
                         fontWeight: FontWeight.w600,
@@ -110,8 +108,7 @@ class ExpenseTrackingScreen extends StatelessWidget {
                       padding: EdgeInsetsGeometry.symmetric(horizontal: 10),
                       child: Row(
                         children: [
-                          Text(
-                            "Transactions",
+                          Text("Transactions".tr,
                             style: theme.textTheme.titleSmall?.copyWith(
                               color: Get.isDarkMode ? Colors.white : const Color(0xFF1D2330),
                               fontWeight: FontWeight.w900,
@@ -128,8 +125,7 @@ class ExpenseTrackingScreen extends StatelessWidget {
                               ),
                               child: Row(
                                 children: [
-                                  Text(
-                                    "Sort by Date",
+                                  Text("Sort by Date".tr,
                                     style: theme.textTheme.labelMedium
                                         ?.copyWith(
                                           color: Get.isDarkMode ? Colors.white70 : const Color(0xFF9AA0AF),
@@ -292,8 +288,7 @@ class _TotalExpenseCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Text(
-                "Total Expenses (This Month)",
+              Text("Total Expenses (This Month)".tr,
                 style: theme.textTheme.labelMedium?.copyWith(
                   color: Colors.white.withOpacity(0.92),
                   fontWeight: FontWeight.w700,
@@ -417,8 +412,7 @@ class _InsightCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    "AI Insight",
+                  Text("AI Insight".tr,
                     style: theme.textTheme.titleSmall?.copyWith(
                       color: isDark ? Colors.white : const Color(0xFF1D2330),
                       fontWeight: FontWeight.w900,

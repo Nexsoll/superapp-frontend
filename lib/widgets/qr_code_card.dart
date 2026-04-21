@@ -1,11 +1,19 @@
+import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 class QrCodeCard extends StatelessWidget {
+  final String qrData;
   final VoidCallback? onDownload;
   final VoidCallback? onShare;
 
-  const QrCodeCard({super.key, this.onDownload, this.onShare});
+  const QrCodeCard({
+    super.key,
+    required this.qrData,
+    this.onDownload,
+    this.onShare,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -33,15 +41,24 @@ class QrCodeCard extends StatelessWidget {
                 color: const Color(0xFF2FC1BE).withOpacity(0.3),
               ),
             ),
-            child: CustomPaint(
-              size: const Size(140, 140),
-              painter: _QrCodePainter(),
+            child: QrImageView(
+              data: qrData,
+              version: QrVersions.auto,
+              size: 140,
+              backgroundColor: Colors.white,
+              eyeStyle: const QrEyeStyle(
+                eyeShape: QrEyeShape.square,
+                color: Color(0xFF2FC1BE),
+              ),
+              dataModuleStyle: const QrDataModuleStyle(
+                dataModuleShape: QrDataModuleShape.square,
+                color: Color(0xFF2FC1BE),
+              ),
             ),
           ),
 
           const SizedBox(height: 16),
-          Text(
-            'Your Check-in QR Code',
+          Text('Your Check-in QR Code'.tr,
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
@@ -49,8 +66,7 @@ class QrCodeCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          Text(
-            'Show this code at the hotel reception',
+          Text('Show this code at the hotel reception'.tr,
             style: TextStyle(fontSize: 13, color: theme.brightness == Brightness.dark ? Colors.white70 : const Color(0xFF9CA3AF)),
           ),
           const SizedBox(height: 20),
@@ -132,47 +148,4 @@ class _ActionButton extends StatelessWidget {
       ),
     );
   }
-}
-
-class _QrCodePainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = const Color(0xFF2FC1BE)
-      ..style = PaintingStyle.fill;
-
-    final borderRadius = 8.0;
-    final cellSize = size.width / 7;
-
-    // Draw QR-like pattern
-    final pattern = [
-      [1, 1, 1, 0, 1, 1, 1],
-      [1, 0, 1, 0, 1, 0, 1],
-      [1, 1, 1, 0, 1, 1, 1],
-      [0, 0, 0, 0, 0, 0, 0],
-      [1, 1, 1, 0, 1, 0, 0],
-      [1, 0, 0, 0, 0, 1, 0],
-      [1, 0, 1, 0, 1, 1, 1],
-    ];
-
-    for (int row = 0; row < pattern.length; row++) {
-      for (int col = 0; col < pattern[row].length; col++) {
-        if (pattern[row][col] == 1) {
-          final rect = RRect.fromRectAndRadius(
-            Rect.fromLTWH(
-              col * cellSize + 2,
-              row * cellSize + 2,
-              cellSize - 4,
-              cellSize - 4,
-            ),
-            Radius.circular(borderRadius),
-          );
-          canvas.drawRRect(rect, paint);
-        }
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

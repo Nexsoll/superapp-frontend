@@ -32,8 +32,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Text(
-              'Chats',
+            child: Text('Chats'.tr,
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.w800,
                 letterSpacing: -0.2,
@@ -52,8 +51,8 @@ class _ChatScreenState extends State<ChatScreen> {
                 controller: _searchController,
                 onChanged: controller.onSearchChanged,
                 textInputAction: TextInputAction.search,
-                decoration: const InputDecoration(
-                  hintText: 'Search peoples...',
+                decoration: InputDecoration(
+                  hintText: 'Search peoples...'.tr,
                   prefixIcon: Icon(Icons.search, size: 20),
                 ),
               ),

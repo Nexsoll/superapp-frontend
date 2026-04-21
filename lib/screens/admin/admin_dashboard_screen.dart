@@ -209,8 +209,7 @@ class _AdminDashboardBody extends StatelessWidget {
               minimumSize: Size.zero,
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
-            child: const Text(
-              'See all',
+            child: Text('See all'.tr,
               style: TextStyle(
                 color: Color(0xFF38CAC7),
                 fontSize: 14,
@@ -227,8 +226,7 @@ class _AdminDashboardBody extends StatelessWidget {
       return Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 20),
-          child: Text(
-            'No tasks for today',
+          child: Text('No tasks for today'.tr,
             style: TextStyle(
               color: isDark ? Colors.white54 : Colors.grey,
               fontSize: 14,
@@ -326,8 +324,7 @@ class _AdminDashboardBody extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'IoT Diagnostic',
+                  Text('IoT Diagnostic'.tr,
                     style: TextStyle(
                       color: isDark ? Colors.white : const Color(0xFF1F2937),
                       fontSize: 16,
@@ -335,8 +332,7 @@ class _AdminDashboardBody extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  Text(
-                    'Monitor\nconnected devices',
+                  Text('Monitor\nconnected devices'.tr,
                     style: TextStyle(
                       color: isDark
                           ? Colors.white70
@@ -454,8 +450,7 @@ class _AdminDashboardBody extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Job Assignment',
+                  Text('Job Assignment'.tr,
                     style: TextStyle(
                       color: isDark ? Colors.white : const Color(0xFF1F2937),
                       fontSize: 16,
@@ -463,8 +458,7 @@ class _AdminDashboardBody extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  Text(
-                    'Ai & Manual Assign',
+                  Text('Ai & Manual Assign'.tr,
                     style: TextStyle(
                       color: isDark
                           ? Colors.white70
@@ -560,8 +554,7 @@ class _AdminDashboardBody extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Welcome back',
+              Text('Welcome back'.tr,
                 style: TextStyle(
                   color: Colors.white.withOpacity(0.9),
                   fontSize: 16,
@@ -570,8 +563,7 @@ class _AdminDashboardBody extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 4),
-              const Text(
-                'Admin Dashboard',
+              Text('Admin Dashboard'.tr,
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 26,
@@ -667,8 +659,7 @@ class _AdminDashboardBody extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        'Notifications',
+                      Text('Notifications'.tr,
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -690,8 +681,7 @@ class _AdminDashboardBody extends StatelessWidget {
                     final notifications = controller.notifications;
                     if (notifications.isEmpty) {
                       return Center(
-                        child: Text(
-                          'No notifications',
+                        child: Text('No notifications'.tr,
                           style: TextStyle(
                             color: isDark ? Colors.white54 : Colors.black54,
                             fontSize: 16,
@@ -790,8 +780,7 @@ class _AdminDashboardBody extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Ask anything...',
+                  Text('Ask anything...'.tr,
                     style: TextStyle(
                       color: isDark ? Colors.white : const Color(0xFF1F2937),
                       fontSize: 15,
@@ -799,8 +788,7 @@ class _AdminDashboardBody extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 2),
-                  Text(
-                    'Search tasks, staff, properties',
+                  Text('Search tasks, staff, properties'.tr,
                     style: TextStyle(
                       color: isDark ? Colors.white70 : const Color(0xFF9CA3AF),
                       fontSize: 12,
@@ -818,8 +806,7 @@ class _AdminDashboardBody extends StatelessWidget {
                     : const Color(0xFFE0F2FE),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Text(
-                'AI',
+              child: Text('AI'.tr,
                 style: TextStyle(
                   color: Color(0xFF38CAC7),
                   fontSize: 12,
@@ -967,8 +954,7 @@ class _AdminDashboardBody extends StatelessWidget {
         Row(
           children: [
             Expanded(
-              child: Text(
-                'Staff Members',
+              child: Text('Staff Members'.tr,
                 style: TextStyle(
                   color: isDark ? Colors.white : const Color(0xFF1F2937),
                   fontSize: 18,
@@ -1027,8 +1013,7 @@ class _AdminDashboardBody extends StatelessWidget {
                       color: isDark ? Colors.white24 : const Color(0xFFCBD5E1),
                     ),
                     const SizedBox(height: 10),
-                    Text(
-                      'No staff yet — tap + to add',
+                    Text('No staff yet — tap + to add'.tr,
                       style: TextStyle(
                         color: isDark
                             ? Colors.white38
@@ -1138,8 +1123,7 @@ class _AdminDashboardBody extends StatelessWidget {
           );
         }),
         const SizedBox(height: 6),
-        Text(
-          'Long-press a member to remove',
+        Text('Long-press a member to remove'.tr,
           style: TextStyle(
             color: isDark ? Colors.white30 : const Color(0xFFCBD5E1),
             fontSize: 11,
@@ -1178,8 +1162,7 @@ class _AdminDashboardBody extends StatelessWidget {
       builder: (_) => AlertDialog(
         backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(
-          'Remove Staff',
+        title: Text('Remove Staff'.tr,
           style: TextStyle(
             color: isDark ? Colors.white : const Color(0xFF1E293B),
             fontWeight: FontWeight.w700,
@@ -1194,7 +1177,7 @@ class _AdminDashboardBody extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text('Cancel'.tr),
           ),
           ElevatedButton(
             onPressed: () {
@@ -1208,7 +1191,7 @@ class _AdminDashboardBody extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
-            child: const Text('Remove'),
+            child: Text('Remove'.tr),
           ),
         ],
       ),
@@ -1736,8 +1719,7 @@ class _AddStaffSheetState extends State<_AddStaffSheet> {
               child: Row(
                 children: [
                   Expanded(
-                    child: Text(
-                      'Add Staff Member',
+                    child: Text('Add Staff Member'.tr,
                       style: widget.theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w800,
                         color: widget.isDark
@@ -1784,7 +1766,7 @@ class _AddStaffSheetState extends State<_AddStaffSheet> {
                     fontSize: 15,
                   ),
                   decoration: InputDecoration(
-                    hintText: 'Search by name or email...',
+                    hintText: 'Search by name or email...'.tr,
                     hintStyle: TextStyle(
                       color: widget.isDark
                           ? Colors.white30
@@ -1839,8 +1821,7 @@ class _AddStaffSheetState extends State<_AddStaffSheet> {
                               : const Color(0xFFCBD5E1),
                         ),
                         const SizedBox(height: 12),
-                        Text(
-                          'No users found',
+                        Text('No users found'.tr,
                           style: TextStyle(
                             color: widget.isDark
                                 ? Colors.white38
@@ -1948,8 +1929,7 @@ class _AddStaffSheetState extends State<_AddStaffSheet> {
                                 color: widget.theme.colorScheme.primary,
                                 borderRadius: BorderRadius.circular(10),
                               ),
-                              child: const Text(
-                                'Add',
+                              child: Text('Add'.tr,
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 12,

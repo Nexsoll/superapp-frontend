@@ -26,6 +26,7 @@ class HotelDetailScreen extends StatefulWidget {
 }
 
 class _HotelDetailScreenState extends State<HotelDetailScreen> {
+  late Map<String, dynamic> _hotelData;
   final Map<int, int> _selectedRoomQuantities = <int, int>{};
   DateTime? _checkInDate;
   DateTime? _checkOutDate;
@@ -33,9 +34,27 @@ class _HotelDetailScreenState extends State<HotelDetailScreen> {
   @override
   void initState() {
     super.initState();
+    _hotelData = widget.hotelData ?? {};
     final now = DateTime.now();
     _checkInDate = now;
     _checkOutDate = now.add(const Duration(days: 2));
+    _loadHotelData();
+  }
+
+  Future<void> _loadHotelData() async {
+    final id = _toInt(widget.hotelData?['id']);
+    if (id == null) return;
+
+    try {
+      final updatedData = await ListingService().getHotelById(id);
+      if (mounted) {
+        setState(() {
+          _hotelData = updatedData;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loading hotel data: $e');
+    }
   }
 
   int? _toInt(dynamic value) {
@@ -101,6 +120,8 @@ class _HotelDetailScreenState extends State<HotelDetailScreen> {
     required bool createBookingOnContinue,
     required int? hotelId,
     required String hotelTitle,
+    required String hotelAddress,
+    required String? hotelImageUrl,
     required List<dynamic> rooms,
   }) async {
     final result = await Get.to<Map<String, dynamic>>(
@@ -110,6 +131,8 @@ class _HotelDetailScreenState extends State<HotelDetailScreen> {
         initialCheckOut: _checkOutDate,
         hotelId: hotelId,
         hotelTitle: hotelTitle,
+        hotelAddress: hotelAddress,
+        hotelImageUrl: hotelImageUrl,
         rooms: rooms,
         selectedRoomQuantities: _selectedRoomQuantities,
         createBookingOnContinue: createBookingOnContinue,
@@ -140,15 +163,19 @@ class _HotelDetailScreenState extends State<HotelDetailScreen> {
     final theme = Theme.of(context);
 
     // Extract data
-    final title = widget.hotelData?['title'] ?? 'Grand Plaza Hotel';
-    final address = widget.hotelData?['address'] ?? 'London';
-    final description = widget.hotelData?['description'] ?? '';
+    final title = _hotelData['title'] ?? 'Grand Plaza Hotel';
+    final address = _hotelData['address'] ?? 'London';
+    final description = _hotelData['description'] ?? '';
     final amenities =
-        (widget.hotelData?['amenities'] as List<dynamic>?)?.cast<String>() ?? [];
-    final rooms = (widget.hotelData?['rooms'] as List<dynamic>?) ?? [];
-    final reviews = (widget.hotelData?['reviews'] as List<dynamic>?) ?? [];
-    final images = (widget.hotelData?['images'] as List<dynamic>?) ?? [];
-    final hotelId = _toInt(widget.hotelData?['id']);
+        (_hotelData['amenities'] as List<dynamic>?)?.cast<String>() ?? [];
+    final rooms = (_hotelData['rooms'] as List<dynamic>?) ?? [];
+    final reviews = (_hotelData['reviews'] as List<dynamic>?) ?? [];
+    final images = (_hotelData['images'] as List<dynamic>?) ?? [];
+    final hotelId = _toInt(_hotelData['id']);
+    final heroHotelImageUrl =
+        images.isNotEmpty && hotelId != null
+            ? ListingService.hotelImageUrl(hotelId, 0)
+            : null;
     final selectedRoomsCount = _selectedRoomsCount();
     final selectedNightlyTotal = _selectedNightlyTotal(rooms);
 
@@ -213,6 +240,8 @@ class _HotelDetailScreenState extends State<HotelDetailScreen> {
                       createBookingOnContinue: false,
                       hotelId: hotelId,
                       hotelTitle: title,
+                      hotelAddress: address,
+                      hotelImageUrl: heroHotelImageUrl,
                       rooms: rooms,
                     ),
                     onCheckOutTap: () => _openDatesSelection(
@@ -220,6 +249,8 @@ class _HotelDetailScreenState extends State<HotelDetailScreen> {
                       createBookingOnContinue: false,
                       hotelId: hotelId,
                       hotelTitle: title,
+                      hotelAddress: address,
+                      hotelImageUrl: heroHotelImageUrl,
                       rooms: rooms,
                     ),
                   ),
@@ -236,7 +267,10 @@ class _HotelDetailScreenState extends State<HotelDetailScreen> {
                     onQuantityChanged: _onQuantityChanged,
                   ),
                   const SizedBox(height: 24),
-                  const HotelReviewsSection(),
+                  HotelReviewsSection(
+                    reviews: reviews,
+                    hotelId: hotelId,
+                  ),
                   const SizedBox(height: 100),
                 ],
               ),
@@ -254,6 +288,8 @@ class _HotelDetailScreenState extends State<HotelDetailScreen> {
                 createBookingOnContinue: true,
                 hotelId: hotelId,
                 hotelTitle: title,
+                hotelAddress: address,
+                hotelImageUrl: heroHotelImageUrl,
                 rooms: rooms,
               ),
             )
@@ -346,7 +382,7 @@ class _HotelBookingBottomBar extends StatelessWidget {
                   ),
                   elevation: 0,
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
@@ -355,8 +391,7 @@ class _HotelBookingBottomBar extends StatelessWidget {
                       size: 18,
                     ),
                     SizedBox(width: 8),
-                    Text(
-                      'Check In',
+                    Text('Check In'.tr,
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 15,

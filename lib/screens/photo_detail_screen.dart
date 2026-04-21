@@ -89,8 +89,7 @@ class PhotoDetailsScreen extends StatelessWidget {
 
                           const SizedBox(height: 16),
 
-                          Text(
-                            'Photos for Review',
+                          Text('Photos for Review'.tr,
                             style: theme.textTheme.titleSmall?.copyWith(
                               fontWeight: FontWeight.w800,
                             ),
@@ -121,8 +120,7 @@ class PhotoDetailsScreen extends StatelessWidget {
 
                           const SizedBox(height: 16),
 
-                          Text(
-                            'Timeline',
+                          Text('Timeline'.tr,
                             style: theme.textTheme.titleSmall?.copyWith(
                               fontWeight: FontWeight.w800,
                             ),
@@ -175,7 +173,7 @@ class PhotoDetailsScreen extends StatelessWidget {
                                       ),
                                     )
                                   : const Icon(Icons.close),
-                              label: const Text('Reject'),
+                              label: Text('Reject'.tr),
                               style: OutlinedButton.styleFrom(
                                 padding: const EdgeInsets.symmetric(vertical: 14),
                                 shape: RoundedRectangleBorder(
@@ -212,7 +210,7 @@ class PhotoDetailsScreen extends StatelessWidget {
                                       ),
                                     )
                                   : const Icon(Icons.check),
-                              label: const Text('Approve'),
+                              label: Text('Approve'.tr),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFF10B981),
                                 foregroundColor: Colors.white,
@@ -262,8 +260,7 @@ class PhotoDetailsScreen extends StatelessWidget {
           ),
           Expanded(
             child: Center(
-              child: Text(
-                'Photo Detail',
+              child: Text('Photo Detail'.tr,
                 style: theme.textTheme.titleLarge?.copyWith(
                   color: Colors.white,
                   fontWeight: FontWeight.w600,

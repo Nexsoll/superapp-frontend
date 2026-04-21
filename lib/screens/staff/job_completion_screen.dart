@@ -32,8 +32,7 @@ class _JobCompletionScreenState extends State<JobCompletionScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
-                'Select Photo Source',
+              Text('Select Photo Source'.tr,
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
               ),
               const SizedBox(height: 20),
@@ -121,7 +120,7 @@ class _JobCompletionScreenState extends State<JobCompletionScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Job Completion'), centerTitle: true),
+      appBar: AppBar(title: Text('Job Completion'.tr), centerTitle: true),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Column(
@@ -129,8 +128,7 @@ class _JobCompletionScreenState extends State<JobCompletionScreen> {
           children: [
             _buildJobHeader(theme),
             const SizedBox(height: 32),
-            const Text(
-              'Photos for Review',
+            Text('Photos for Review'.tr,
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 16),
@@ -154,8 +152,7 @@ class _JobCompletionScreenState extends State<JobCompletionScreen> {
               ],
             ),
             const SizedBox(height: 32),
-            const Text(
-              'Timeline',
+            Text('Timeline'.tr,
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 16),
@@ -175,8 +172,7 @@ class _JobCompletionScreenState extends State<JobCompletionScreen> {
                 ),
                 child: isSubmitting
                     ? const CircularProgressIndicator(color: Colors.white)
-                    : const Text(
-                        'Submit for Review',
+                    : Text('Submit for Review'.tr,
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,

@@ -15,7 +15,7 @@ class PhotoReviewScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('Photo Review'),
+        title: Text('Photo Review'.tr),
         centerTitle: true,
         actions: [
           Obx(() {
@@ -44,8 +44,7 @@ class PhotoReviewScreen extends StatelessWidget {
                   color: Colors.grey.shade300,
                 ),
                 const SizedBox(height: 16),
-                Text(
-                  'No pending photo reviews',
+                Text('No pending photo reviews'.tr,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: Colors.grey.shade500,
                     fontWeight: FontWeight.w600,
@@ -82,17 +81,17 @@ class _ReviewCard extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Reject Submission'),
+        title: Text('Reject Submission'.tr),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('Please provide a reason for rejection:'),
+            Text('Please provide a reason for rejection:'.tr),
             const SizedBox(height: 16),
             TextField(
               controller: reasonController,
               maxLines: 3,
-              decoration: const InputDecoration(
-                hintText: 'e.g. After photo is blurry or work incomplete',
+              decoration: InputDecoration(
+                hintText: 'e.g. After photo is blurry or work incomplete'.tr,
                 border: OutlineInputBorder(),
               ),
             ),
@@ -101,7 +100,7 @@ class _ReviewCard extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text('Cancel'.tr),
           ),
           ElevatedButton(
             onPressed: () {
@@ -114,7 +113,7 @@ class _ReviewCard extends StatelessWidget {
               Navigator.pop(context);
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Reject', style: TextStyle(color: Colors.white)),
+            child: Text('Reject'.tr, style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -256,8 +255,7 @@ class _ReviewCard extends StatelessWidget {
                 ),
                 padding: const EdgeInsets.symmetric(vertical: 14),
               ),
-              child: const Text(
-                'Reject',
+              child: Text('Reject'.tr,
                 style: TextStyle(fontWeight: FontWeight.w700),
               ),
             ),
@@ -275,8 +273,7 @@ class _ReviewCard extends StatelessWidget {
                 ),
                 padding: const EdgeInsets.symmetric(vertical: 14),
               ),
-              child: const Text(
-                'Approve',
+              child: Text('Approve'.tr,
                 style: TextStyle(fontWeight: FontWeight.w700),
               ),
             ),

@@ -26,8 +26,7 @@ class EditProfileScreen extends StatelessWidget {
                     icon: const Icon(Icons.chevron_left, size: 30),
                     color: Colors.white,
                   ),
-                  Text(
-                    'Edit Profile',
+                  Text('Edit Profile'.tr,
                     style: theme.textTheme.titleMedium?.copyWith(
                       color: Colors.white,
                       fontWeight: FontWeight.w600,
@@ -56,8 +55,7 @@ class EditProfileScreen extends StatelessWidget {
                           Center(
                             child: TextButton(
                               onPressed: controller.changePicture,
-                              child: Text(
-                                'Change Picture',
+                              child: Text('Change Picture'.tr,
                                 style: theme.textTheme.bodyMedium?.copyWith(
                                   color: const Color(0xFF9AA0AF),
                                   fontWeight: FontWeight.w600,
@@ -119,8 +117,7 @@ class EditProfileScreen extends StatelessWidget {
                                           strokeWidth: 2,
                                         ),
                                       )
-                                    : Text(
-                                        'Update',
+                                    : Text('Update'.tr,
                                         style: theme.textTheme.titleSmall
                                             ?.copyWith(
                                               color: Colors.white,

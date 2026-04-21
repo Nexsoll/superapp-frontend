@@ -1,3 +1,4 @@
+import 'package:get/get.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:csv/csv.dart';
@@ -88,8 +89,7 @@ class ReportExportService {
                 pw.Column(
                   crossAxisAlignment: pw.CrossAxisAlignment.start,
                   children: [
-                    pw.Text(
-                      'Expense Report',
+                    pw.Text('Expense Report'.tr,
                       style: pw.TextStyle(
                         font: fontBold,
                         fontSize: 24,
@@ -141,8 +141,7 @@ class ReportExportService {
               child: pw.Column(
                 crossAxisAlignment: pw.CrossAxisAlignment.center,
                 children: [
-                  pw.Text(
-                    'TOTAL EXPENSES',
+                  pw.Text('TOTAL EXPENSES'.tr,
                     style: pw.TextStyle(
                       font: fontBold,
                       fontSize: 12,
@@ -176,8 +175,7 @@ class ReportExportService {
             pw.SizedBox(height: 30),
 
             if (trendBars.isNotEmpty) ...[
-              pw.Text(
-                'Expense Trend',
+              pw.Text('Expense Trend'.tr,
                 style: pw.TextStyle(
                   font: fontBold,
                   fontSize: 18,
@@ -240,8 +238,7 @@ class ReportExportService {
             ],
 
             // Transactions Header
-            pw.Text(
-              'Transaction Details',
+            pw.Text('Transaction Details'.tr,
               style: pw.TextStyle(
                 font: fontBold,
                 fontSize: 18,

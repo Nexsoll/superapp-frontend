@@ -1,9 +1,11 @@
+import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 
 class BookingDetailsCard extends StatelessWidget {
   final String hotelName;
   final String location;
   final String imageUrl;
+  final String detailLabel;
   final String roomType1;
   final String roomType2;
   final String checkIn;
@@ -11,12 +13,14 @@ class BookingDetailsCard extends StatelessWidget {
   final int guests;
   final String totalPaid;
   final String? paymentMethod;
+  final String bookingType;
 
   const BookingDetailsCard({
     super.key,
     required this.hotelName,
     required this.location,
     required this.imageUrl,
+    this.detailLabel = 'Room Type',
     required this.roomType1,
     required this.roomType2,
     required this.checkIn,
@@ -24,11 +28,20 @@ class BookingDetailsCard extends StatelessWidget {
     required this.guests,
     required this.totalPaid,
     this.paymentMethod,
+    this.bookingType = 'hotel',
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
+    final String effectiveDetailLabel = bookingType == 'property' ? 'Visit Type' : detailLabel;
+    final String effectiveCheckInLabel = bookingType == 'property' ? 'Visit Date' : 'Check-In';
+
+    final detailValue = [
+      if (roomType1.trim().isNotEmpty) roomType1,
+      if (roomType2.trim().isNotEmpty) roomType2,
+    ].join('\n');
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -89,8 +102,7 @@ class BookingDetailsCard extends StatelessWidget {
                         color: const Color(0xFF22C55E),
                         borderRadius: BorderRadius.circular(16),
                       ),
-                      child: const Text(
-                        'Confirmed',
+                      child: Text('Confirmed'.tr,
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
@@ -109,11 +121,15 @@ class BookingDetailsCard extends StatelessWidget {
                       color: theme.brightness == Brightness.dark ? Colors.white70 : const Color(0xFF9CA3AF),
                     ),
                     const SizedBox(width: 4),
-                    Text(
-                      location,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: theme.brightness == Brightness.dark ? Colors.white70 : const Color(0xFF9CA3AF),
+                    Expanded(
+                      child: Text(
+                        location,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: theme.brightness == Brightness.dark ? Colors.white70 : const Color(0xFF9CA3AF),
+                        ),
                       ),
                     ),
                   ],
@@ -122,25 +138,25 @@ class BookingDetailsCard extends StatelessWidget {
                 const SizedBox(height: 16),
                 Divider(height: 1, color: theme.brightness == Brightness.dark ? Colors.white24 : const Color(0xFFE0E0E0)),
                 const SizedBox(height: 16),
-                // Booking Details
                 _DetailRow(
-                  label: 'Room Type',
-                  value: '1x  $roomType1\n1x  $roomType2',
+                  label: effectiveDetailLabel,
+                  value: detailValue.isNotEmpty ? detailValue : '--',
                 ),
                 const SizedBox(height: 12),
-                _DetailRow(label: 'Check-In', value: checkIn),
+                _DetailRow(label: effectiveCheckInLabel, value: checkIn),
                 const SizedBox(height: 8),
-                _DetailRow(label: 'Check-Out', value: checkOut),
-                const SizedBox(height: 8),
-                _DetailRow(label: 'Guests', value: guests.toString()),
+                if (bookingType != 'property') ...[
+                  _DetailRow(label: 'Check-Out', value: checkOut),
+                  const SizedBox(height: 8),
+                  _DetailRow(label: 'Guests', value: guests.toString()),
+                ],
                 const SizedBox(height: 16),
                 Divider(height: 1, color: theme.brightness == Brightness.dark ? Colors.white24 : const Color(0xFFE0E0E0)),
                 const SizedBox(height: 16),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      'Total Paid',
+                    Text('Total Paid'.tr,
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,

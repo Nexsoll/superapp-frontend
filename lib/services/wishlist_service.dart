@@ -80,6 +80,19 @@ class WishlistService {
     }
   }
 
+  Future<Map<String, dynamic>> getPropertyCostBreakdown({
+    required String token,
+    required int propertyId,
+  }) async {
+    final url = Uri.parse('$baseUrl/property-cost-breakdown/$propertyId');
+    try {
+      final response = await http.get(url, headers: _headers(token: token));
+      return _handleResponse(response, 'get property cost breakdown');
+    } catch (e) {
+      throw Exception('Error connecting to server: $e');
+    }
+  }
+
   Future<bool> isPropertyInWishlist({
     required String token,
     required int propertyId,

@@ -183,8 +183,7 @@ class _CreateJobScreenState extends State<CreateJobScreen> {
                         child: CircularProgressIndicator(),
                       )
                     else if (_properties.isEmpty && _hotels.isEmpty)
-                      Text(
-                        'No properties or hotels found',
+                      Text('No properties or hotels found'.tr,
                         style: TextStyle(
                           color: isDark
                               ? Colors.white54
@@ -210,8 +209,7 @@ class _CreateJobScreenState extends State<CreateJobScreen> {
                                 ? theme.cardColor
                                 : Colors.white,
                             value: _selectedListingId,
-                            hint: Text(
-                              'Select Property or Hotel',
+                            hint: Text('Select Property or Hotel'.tr,
                               style: TextStyle(
                                 color: isDark
                                     ? Colors.white30
@@ -219,9 +217,9 @@ class _CreateJobScreenState extends State<CreateJobScreen> {
                               ),
                             ),
                             items: [
-                              const DropdownMenuItem<String>(
+                              DropdownMenuItem<String>(
                                 value: null,
-                                child: Text('None'),
+                                child: Text('None'.tr),
                               ),
                               if (_properties.isNotEmpty)
                                 ..._properties.map(
@@ -386,8 +384,7 @@ class _CreateJobScreenState extends State<CreateJobScreen> {
                                   strokeWidth: 2,
                                 ),
                               )
-                            : const Text(
-                                'Create Job',
+                            : Text('Create Job'.tr,
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w700,
@@ -429,9 +426,8 @@ class _CreateJobScreenState extends State<CreateJobScreen> {
             onPressed: () => Get.back(),
             icon: const Icon(Icons.arrow_back, color: Colors.white),
           ),
-          const Expanded(
-            child: Text(
-              'Create New Job',
+          Expanded(
+            child: Text('Create New Job'.tr,
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 18,

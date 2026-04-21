@@ -20,8 +20,7 @@ class OnboardingScreen extends StatelessWidget {
                 const Spacer(),
                 TextButton(
                   onPressed: controller.skip,
-                  child: Text(
-                    'Skip',
+                  child: Text('Skip'.tr,
                     style: theme.textTheme.titleSmall?.copyWith(
                       color: theme.colorScheme.primary,
                       fontWeight: FontWeight.w500,

@@ -33,8 +33,7 @@ class SignInScreen extends StatelessWidget {
 
               const SizedBox(height: 12),
 
-              Text(
-                'Sign in with your email',
+              Text('Sign in with your email'.tr,
                 style: theme.textTheme.titleMedium?.copyWith(
                   color: theme.colorScheme.primary,
                   fontWeight: FontWeight.w700,
@@ -75,8 +74,7 @@ class SignInScreen extends StatelessWidget {
                   onTap: controller.forgotPassword,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 6),
-                    child: Text(
-                      'Forgot password?',
+                    child: Text('Forgot password?'.tr,
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.primary,
                         fontWeight: FontWeight.w700,
@@ -112,8 +110,7 @@ class SignInScreen extends StatelessWidget {
                               strokeWidth: 2,
                             ),
                           )
-                        : Text(
-                            'Sign In',
+                        : Text('Sign In'.tr,
                             style: theme.textTheme.bodyMedium?.copyWith(
                               color: Colors.white,
                               fontWeight: FontWeight.w700,
@@ -126,12 +123,11 @@ class SignInScreen extends StatelessWidget {
               const SizedBox(height: 12),
 
               Row(
-                children: const [
+                children: [
                   Expanded(child: Divider(color: Color(0xFF6B7280))),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 10),
-                    child: Text(
-                      'or',
+                    child: Text('or'.tr,
                       style: TextStyle(
                         color: Color(0xFF6B7280),
                         fontWeight: FontWeight.w500,
@@ -161,8 +157,7 @@ class SignInScreen extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    "Don't have an account? ",
+                  Text("Don't have an account?".tr,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: const Color(0xFF6B7280),
                       fontWeight: FontWeight.w500,
@@ -170,8 +165,7 @@ class SignInScreen extends StatelessWidget {
                   ),
                   TextButton(
                     onPressed: controller.goToSignup,
-                    child: Text(
-                      'Sign Up',
+                    child: Text('Sign Up'.tr,
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.primary,
                         fontWeight: FontWeight.w900,

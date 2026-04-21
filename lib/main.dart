@@ -22,7 +22,11 @@ Future<void> main() async {
     final mapsImplementation = GoogleMapsFlutterPlatform.instance;
     if (mapsImplementation is GoogleMapsFlutterAndroid) {
       mapsImplementation.useAndroidViewSurface = true;
-      await mapsImplementation.initializeWithRenderer(AndroidMapRenderer.latest);
+      try {
+        await mapsImplementation.initializeWithRenderer(AndroidMapRenderer.latest);
+      } catch (e) {
+        debugPrint('Google Maps Renderer already initialized: $e');
+      }
     }
   }
 
@@ -188,7 +192,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text('You have pushed the button this many times:'),
+            Text('You have pushed the button this many times:'.tr),
             Text(
               '$_counter',
               style: Theme.of(context).textTheme.headlineMedium,

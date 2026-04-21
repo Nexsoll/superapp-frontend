@@ -106,16 +106,14 @@ class AiAssistantScreen extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'AI Assistant',
+              Text('AI Assistant'.tr,
                 style: GoogleFonts.outfit(
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
                   color: Colors.white,
                 ),
               ),
-              Text(
-                'Powered by machine learning',
+              Text('Powered by machine learning'.tr,
                 style: GoogleFonts.outfit(
                   fontSize: 12,
                   fontWeight: FontWeight.w400,
@@ -153,7 +151,7 @@ class AiAssistantScreen extends StatelessWidget {
                 child: TextField(
                   controller: controller.messageController,
                   decoration: InputDecoration(
-                    hintText: 'Ask about hotels, prices, rooms...',
+                    hintText: 'Ask about hotels, prices, rooms...'.tr,
                     hintStyle: GoogleFonts.outfit(
                       fontSize: 14,
                       color: theme.brightness == Brightness.dark
@@ -305,8 +303,7 @@ class _AiMessage extends StatelessWidget {
                 color: const Color(0xFF1CB5B3),
               ),
               const SizedBox(width: 8),
-              Text(
-                'AI Assistant',
+              Text('AI Assistant'.tr,
                 style: GoogleFonts.outfit(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
@@ -647,8 +644,7 @@ class _PricePredictionCard extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Current Price',
+                  Text('Current Price'.tr,
                     style: GoogleFonts.outfit(
                       fontSize: 12,
                       color: const Color(0xFF6B7280),
@@ -672,8 +668,7 @@ class _PricePredictionCard extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text(
-                    'Best Price',
+                  Text('Best Price'.tr,
                     style: GoogleFonts.outfit(
                       fontSize: 12,
                       color: const Color(0xFF6B7280),

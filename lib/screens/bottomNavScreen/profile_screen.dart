@@ -40,7 +40,7 @@ class ProfileScreen extends StatelessWidget {
                     Row(
                       children: [
                         Text(
-                          'Profile',
+                          'Profile'.tr,
                           style: theme.textTheme.titleMedium?.copyWith(
                             color: Colors.white,
                             fontWeight: FontWeight.w700,

@@ -5,7 +5,8 @@ import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter/material.dart' show TextEditingController, ScrollController, Curves;
+import 'package:flutter/material.dart'
+    show TextEditingController, ScrollController, Curves;
 import 'package:permission_handler/permission_handler.dart';
 import '../services/api_service.dart';
 import 'package:superapp/modal/ai_chat_message.dart';
@@ -32,6 +33,13 @@ class AiAssistantController extends GetxController {
         isUser: false,
       ),
     );
+
+    // Check for initial message from navigation arguments
+    final args = Get.arguments;
+    if (args != null && args['message'] != null) {
+      messageController.text = args['message'];
+      sendMessage();
+    }
   }
 
   Future<void> toggleRecording() async {
@@ -56,7 +64,8 @@ class AiAssistantController extends GetxController {
     }
 
     final dir = await getTemporaryDirectory();
-    final path = '${dir.path}/ai_voice_${DateTime.now().millisecondsSinceEpoch}.wav';
+    final path =
+        '${dir.path}/ai_voice_${DateTime.now().millisecondsSinceEpoch}.wav';
 
     await _recorder.start(
       const RecordConfig(
@@ -72,7 +81,7 @@ class AiAssistantController extends GetxController {
   Future<void> _stopAndTranscribe() async {
     // Enforce minimum recording time (1 second)
     await Future.delayed(const Duration(seconds: 1));
-    
+
     String? path;
     try {
       path = await _recorder.stop();
@@ -93,9 +102,12 @@ class AiAssistantController extends GetxController {
     final file = File(path);
     final fileSize = await file.length();
     print('DEBUG: Recorded audio file size: $fileSize bytes');
-    
+
     if (fileSize < 1000) {
-      Get.snackbar('Speech', 'Recording too short or no audio detected. Try speaking louder or check microphone permissions.');
+      Get.snackbar(
+        'Speech',
+        'Recording too short or no audio detected. Try speaking louder or check microphone permissions.',
+      );
       return;
     }
 
@@ -204,12 +216,10 @@ class AiAssistantController extends GetxController {
             );
           } else if (msg['type'] == 'hotel_list') {
             print('DEBUG: Received hotel_list data: ${msg['data']}');
-            final hotels = (msg['data'] as List)
-                .map((h) {
-                  print('DEBUG: Individual hotel JSON: $h');
-                  return AiHotel.fromJson(h);
-                })
-                .toList();
+            final hotels = (msg['data'] as List).map((h) {
+              print('DEBUG: Individual hotel JSON: $h');
+              return AiHotel.fromJson(h);
+            }).toList();
             messages.add(
               AiChatMessage(
                 type: AiMessageType.hotelList,

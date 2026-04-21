@@ -187,8 +187,7 @@ class _MyListingScreenState extends State<MyListingScreen> {
             children: [
               Icon(Icons.error_outline, size: 48, color: Colors.grey[400]),
               const SizedBox(height: 16),
-              Text(
-                'Failed to load hotels',
+              Text('Failed to load hotels'.tr,
                 style: GoogleFonts.outfit(
                   fontSize: 16,
                   color: Colors.grey[600],
@@ -200,8 +199,7 @@ class _MyListingScreenState extends State<MyListingScreen> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF2FC1BE),
                 ),
-                child: const Text(
-                  'Retry',
+                child: Text('Retry'.tr,
                   style: TextStyle(color: Colors.white),
                 ),
               ),
@@ -343,8 +341,7 @@ class _MyListingScreenState extends State<MyListingScreen> {
                       color: Colors.grey[400],
                     ),
                     const SizedBox(height: 16),
-                    Text(
-                      'Failed to load properties',
+                    Text('Failed to load properties'.tr,
                       style: GoogleFonts.outfit(
                         fontSize: 16,
                         color: Colors.grey[600],
@@ -356,8 +353,7 @@ class _MyListingScreenState extends State<MyListingScreen> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF2FC1BE),
                       ),
-                      child: const Text(
-                        'Retry',
+                      child: Text('Retry'.tr,
                         style: TextStyle(color: Colors.white),
                       ),
                     ),
@@ -550,8 +546,7 @@ class _MyListingScreenState extends State<MyListingScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(
-              'Cancel',
+            child: Text('Cancel'.tr,
               style: GoogleFonts.outfit(
                 color: isDark ? Colors.white70 : const Color(0xFF6B7280),
                 fontWeight: FontWeight.w600,
@@ -581,8 +576,7 @@ class _MyListingScreenState extends State<MyListingScreen> {
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child: Text(
-              'Delete',
+            child: Text('Delete'.tr,
               style: GoogleFonts.outfit(
                 color: Colors.white,
                 fontWeight: FontWeight.w600,
@@ -820,7 +814,7 @@ class ListingCard extends StatelessWidget {
                     child: ElevatedButton.icon(
                       onPressed: onActivate,
                       icon: const Icon(Icons.visibility, size: 18),
-                      label: const Text('Activate'),
+                      label: Text('Activate'.tr),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF2FC1BE),
                         foregroundColor: Colors.white,
@@ -844,7 +838,7 @@ class ListingCard extends StatelessWidget {
                       child: OutlinedButton.icon(
                         onPressed: onEdit,
                         icon: const Icon(Icons.edit_outlined, size: 18),
-                        label: const Text('Edit'),
+                        label: Text('Edit'.tr),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: isDark
                               ? Colors.white
@@ -888,7 +882,7 @@ class ListingCard extends StatelessWidget {
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
-                              child: const Text('View Details'),
+                              child: Text('View Details'.tr),
                             )
                           : ElevatedButton(
                               onPressed: onViewDetails,
@@ -906,7 +900,7 @@ class ListingCard extends StatelessWidget {
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
-                              child: const Text('View Details'),
+                              child: Text('View Details'.tr),
                             ),
                     ),
                   ],
@@ -926,8 +920,7 @@ class ListingCard extends StatelessWidget {
                         size: 18,
                         color: Color(0xFFEF4444),
                       ),
-                      label: Text(
-                        'Deactivate',
+                      label: Text('Deactivate'.tr,
                         style: GoogleFonts.outfit(
                           color: const Color(0xFFEF4444),
                           fontWeight: FontWeight.w600,

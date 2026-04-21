@@ -13,6 +13,8 @@ class SelectDatesScreen extends StatefulWidget {
     this.initialCheckOut,
     this.hotelId,
     this.hotelTitle = '',
+    this.hotelAddress = '',
+    this.hotelImageUrl,
     this.rooms = const [],
     this.selectedRoomQuantities = const {},
     this.createBookingOnContinue = false,
@@ -23,6 +25,8 @@ class SelectDatesScreen extends StatefulWidget {
   final DateTime? initialCheckOut;
   final int? hotelId;
   final String hotelTitle;
+  final String hotelAddress;
+  final String? hotelImageUrl;
   final List<dynamic> rooms;
   final Map<int, int> selectedRoomQuantities;
   final bool createBookingOnContinue;
@@ -75,8 +79,7 @@ class _SelectDatesScreenState extends State<SelectDatesScreen> {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  const Text(
-                    'Select Dates',
+                  Text('Select Dates'.tr,
                     style: TextStyle(
                       color: Color(0xFF2FC1BE),
                       fontSize: 18,
@@ -251,7 +254,7 @@ class _SelectDatesScreenState extends State<SelectDatesScreen> {
           color: bg,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isActive ? const Color(0xFF2FC1BE) : Colors.transparent,
+            color: isActive ? Color(0xFF2FC1BE) : Colors.transparent,
             width: 1.5,
           ),
           boxShadow: [
@@ -516,6 +519,8 @@ class _SelectDatesScreenState extends State<SelectDatesScreen> {
         () => BookingSummaryScreen(
           bookingType: 'hotel',
           hotelTitle: widget.hotelTitle,
+          hotelAddress: widget.hotelAddress,
+          hotelImageUrl: widget.hotelImageUrl,
           checkIn: checkIn,
           checkOut: checkOut,
           nights: nights > 0 ? nights : 1,

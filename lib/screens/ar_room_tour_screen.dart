@@ -86,10 +86,9 @@ class ArRoomTourScreen extends StatelessWidget {
                   top: 6,
                   child: _circleGlassButton(icon: Icons.refresh, onTap: () {}),
                 ),
-                const Align(
+                Align(
                   alignment: Alignment.center,
-                  child: Text(
-                    'Standard Room',
+                  child: Text('Standard Room'.tr,
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 22,
@@ -173,8 +172,7 @@ class ArRoomTourScreen extends StatelessWidget {
                 color: Colors.white,
               ),
               const SizedBox(width: 8),
-              const Text(
-                'AR Room Tour',
+              Text('AR Room Tour'.tr,
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w500,

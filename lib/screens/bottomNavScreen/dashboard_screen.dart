@@ -32,8 +32,7 @@ class DashboardScreen extends StatelessWidget {
                         minimumSize: const Size(0, 0),
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       ),
-                      child: Text(
-                        'View Report',
+                      child: Text('View Report'.tr,
                         style: theme.textTheme.labelLarge?.copyWith(
                           color: theme.colorScheme.primary,
                           fontWeight: FontWeight.w600,
@@ -85,8 +84,7 @@ class DashboardScreen extends StatelessWidget {
 
                 const SizedBox(height: 14),
 
-                Text(
-                  'Management Tools',
+                Text('Management Tools'.tr,
                   style: theme.textTheme.titleMedium?.copyWith(
                     color: Get.isDarkMode
                         ? Colors.white
@@ -187,8 +185,7 @@ class _EarningsCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 10),
-            Text(
-              'Total Earnings',
+            Text('Total Earnings'.tr,
               style: theme.textTheme.labelMedium?.copyWith(
                 color: Colors.white.withOpacity(0.9),
                 fontWeight: FontWeight.w700,
@@ -203,8 +200,7 @@ class _EarningsCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8),
-            Text(
-              'This month',
+            Text('This month'.tr,
               style: theme.textTheme.labelMedium?.copyWith(
                 color: Colors.white.withOpacity(0.85),
                 fontWeight: FontWeight.w700,
@@ -354,8 +350,7 @@ class _MiniRequestCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 6),
-                Text(
-                  'Pending\nRequests',
+                Text('Pending\nRequests'.tr,
                   style: theme.textTheme.labelMedium?.copyWith(
                     color: isDark ? Colors.white70 : const Color(0xFF9AA0AF),
                     fontWeight: FontWeight.w700,
@@ -368,8 +363,7 @@ class _MiniRequestCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        '3',
+                      Text('3'.tr,
                         style: theme.textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.w900,
                           color: isDark ? Colors.white : null,

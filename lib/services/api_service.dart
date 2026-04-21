@@ -9,15 +9,17 @@ class ApiService {
       'https://super-app-831462757011.asia-south1.run.app';
 
   static String get baseUrl {
-    if (kReleaseMode) return _prodBaseUrl;
-    if (kIsWeb) return _devBaseUrlWebAndIOS;
-    if (defaultTargetPlatform == TargetPlatform.android) {
-      return _devBaseUrlAndroidEmulator;
-    }
-    return _devBaseUrlWebAndIOS;
+    return _prodBaseUrl;
   }
 
   static const String hotelBookingsEndpoint = '/listing/hotel-bookings';
+  static const String bookingsEndpoint = '/listing/bookings';
+  static const String paypalCreateOrderEndpoint =
+      '/payments/paypal/create-order';
+  static const String paypalCaptureOrderEndpoint =
+      '/payments/paypal/capture-order';
+    static const String cashConfirmEndpoint = '/payments/cash/confirm';
+  static const String transactionsEndpoint = '/payments/transactions';
   static const String ownerListingSummaryEndpoint = '/listing/owner-summary';
   static const String expensesEndpoint = '/expenses';
   static const String expenseSummaryEndpoint = '/expenses/summary';
@@ -104,6 +106,124 @@ class ApiService {
 
     throw Exception(
       map['message']?.toString() ?? 'Failed to create hotel booking',
+    );
+  }
+
+  static Future<Map<String, dynamic>> createPaypalOrder({
+    required String token,
+    required String bookingType,
+    required double amount,
+    List<int>? bookingIds,
+    int? propertyId,
+    int? adults,
+    int? children,
+    String currency = 'USD',
+  }) async {
+    final body = <String, dynamic>{
+      'bookingType': bookingType,
+      'amount': double.parse(amount.toStringAsFixed(2)),
+      'currency': currency,
+    };
+
+    if (bookingIds != null && bookingIds.isNotEmpty) {
+      body['bookingIds'] = bookingIds;
+    }
+    if (propertyId != null) {
+      body['propertyId'] = propertyId;
+    }
+    if (adults != null) {
+      body['adults'] = adults;
+    }
+    if (children != null) {
+      body['children'] = children;
+    }
+
+    final response = await post(
+      paypalCreateOrderEndpoint,
+      token: token,
+      body: body,
+    );
+
+    final dynamic decoded = response.body.isNotEmpty
+        ? jsonDecode(response.body)
+        : {};
+    final map = decoded is Map<String, dynamic> ? decoded : <String, dynamic>{};
+
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      return map;
+    }
+
+    throw Exception(
+      map['message']?.toString() ?? 'Failed to create PayPal order',
+    );
+  }
+
+  static Future<Map<String, dynamic>> capturePaypalOrder({
+    required String token,
+    required String orderId,
+  }) async {
+    final response = await post(
+      paypalCaptureOrderEndpoint,
+      token: token,
+      body: {'orderId': orderId},
+    );
+
+    final dynamic decoded = response.body.isNotEmpty
+        ? jsonDecode(response.body)
+        : {};
+    final map = decoded is Map<String, dynamic> ? decoded : <String, dynamic>{};
+
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      return map;
+    }
+
+    throw Exception(
+      map['message']?.toString() ?? 'Failed to capture PayPal order',
+    );
+  }
+
+  static Future<Map<String, dynamic>> confirmCashPayment({
+    required String token,
+    required String bookingType,
+    List<int>? bookingIds,
+    int? propertyId,
+    int? adults,
+    int? children,
+  }) async {
+    final body = <String, dynamic>{
+      'bookingType': bookingType,
+    };
+
+    if (bookingIds != null && bookingIds.isNotEmpty) {
+      body['bookingIds'] = bookingIds;
+    }
+    if (propertyId != null) {
+      body['propertyId'] = propertyId;
+    }
+    if (adults != null) {
+      body['adults'] = adults;
+    }
+    if (children != null) {
+      body['children'] = children;
+    }
+
+    final response = await post(
+      cashConfirmEndpoint,
+      token: token,
+      body: body,
+    );
+
+    final dynamic decoded = response.body.isNotEmpty
+        ? jsonDecode(response.body)
+        : {};
+    final map = decoded is Map<String, dynamic> ? decoded : <String, dynamic>{};
+
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      return map;
+    }
+
+    throw Exception(
+      map['message']?.toString() ?? 'Failed to confirm cash payment',
     );
   }
 
@@ -795,5 +915,85 @@ class ApiService {
   static Future<bool> markNotificationsAsRead(String token) async {
     final response = await patch('/admin/notifications/read-all', token: token);
     return response.statusCode >= 200 && response.statusCode < 300;
+  }
+
+  // Bookings API
+  static Future<List<Map<String, dynamic>>> getUserBookings({
+    required String token,
+  }) async {
+    final response = await get(bookingsEndpoint, token: token);
+
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      final decoded = response.body.isNotEmpty ? jsonDecode(response.body) : [];
+
+      if (decoded is List) {
+        return decoded.map((e) => e as Map<String, dynamic>).toList();
+      }
+      return [];
+    }
+
+    throw Exception('Failed to fetch bookings');
+  }
+
+  static Future<List<Map<String, dynamic>>> getTransactions({
+    required String token,
+  }) async {
+    final response = await get(transactionsEndpoint, token: token);
+
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      final dynamic decoded = jsonDecode(response.body);
+      if (decoded is List) {
+        return decoded.map((e) => e as Map<String, dynamic>).toList();
+      }
+      return [];
+    }
+
+    throw Exception('Failed to fetch transactions');
+  }
+
+  static Future<Map<String, dynamic>> getAiRecommendations({
+    required String token,
+    String? type,
+  }) async {
+    final queryParams = type != null ? '?type=$type' : '';
+    final response = await get(
+      '/ai-assistant/recommendations$queryParams',
+      token: token,
+    );
+
+    final dynamic decoded = response.body.isNotEmpty
+        ? jsonDecode(response.body)
+        : {};
+    final map = decoded is Map<String, dynamic> ? decoded : <String, dynamic>{};
+
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      return map;
+    }
+
+    throw Exception(
+      map['message']?.toString() ?? 'Failed to load AI recommendations',
+    );
+  }
+
+  static Future<Map<String, dynamic>> getInvestmentAnnouncement({
+    required String token,
+  }) async {
+    final response = await get(
+      '/ai-assistant/investment-announcement',
+      token: token,
+    );
+
+    final dynamic decoded = response.body.isNotEmpty
+        ? jsonDecode(response.body)
+        : {};
+    final map = decoded is Map<String, dynamic> ? decoded : <String, dynamic>{};
+
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      return map;
+    }
+
+    throw Exception(
+      map['message']?.toString() ?? 'Failed to load investment announcement',
+    );
   }
 }

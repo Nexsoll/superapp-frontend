@@ -59,8 +59,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                       ),
                     ),
                     const SizedBox(width: 12),
-                    const Text(
-                      'Payment',
+                    Text('Payment'.tr,
                       style: TextStyle(
                         color: Color(0xFF2FC1BE),
                         fontSize: 18,
@@ -100,8 +99,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'Total amount',
+                          Text('Total amount'.tr,
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 18,
@@ -118,8 +116,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                             ),
                           ),
                           const SizedBox(height: 4),
-                          const Text(
-                            'Including taxes and fees',
+                          Text('Including taxes and fees'.tr,
                             style: TextStyle(color: Colors.white, fontSize: 14),
                           ),
                         ],
@@ -228,8 +225,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                               ),
                             ),
                             const SizedBox(width: 8),
-                            Text(
-                              'Card Details',
+                            Text('Card Details'.tr,
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
@@ -286,8 +282,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                 ),
                                 elevation: 0,
                               ),
-                              child: const Text(
-                                'Save Card',
+                              child: Text('Save Card'.tr,
                                 style: TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.bold,
@@ -303,8 +298,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   const SizedBox(height: 24),
 
                   // Saved Cards
-                  Text(
-                    'Saved Cards',
+                  Text('Saved Cards'.tr,
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -347,8 +341,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              '.... .... .... 4242',
+                            Text('.... .... .... 4242'.tr,
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -358,8 +351,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                               ),
                             ),
                             const SizedBox(height: 4),
-                            Text(
-                              'Expires 12/25',
+                            Text('Expires 12/25'.tr,
                               style: TextStyle(
                                 fontSize: 13,
                                 color: theme.brightness == Brightness.dark
@@ -409,8 +401,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  'Wallet Balance',
+                                Text('Wallet Balance'.tr,
                                   style: TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w500,
@@ -432,8 +423,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                           ],
                         ),
                         const SizedBox(height: 20),
-                        Text(
-                          'You have sufficient balance to complete this booking.',
+                        Text('You have sufficient balance to complete this booking.'.tr,
                           style: TextStyle(
                             fontSize: 15,
                             color: theme.brightness == Brightness.dark
@@ -465,8 +455,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          'Remaining balance after payment:',
+                        Text('Remaining balance after payment:'.tr,
                           style: TextStyle(
                             fontSize: 14,
                             color: theme.brightness == Brightness.dark
@@ -524,8 +513,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                   : Colors.black,
                             ),
                             const SizedBox(width: 4),
-                            Text(
-                              'Pay',
+                            Text('Pay'.tr,
                               style: TextStyle(
                                 fontSize: 42,
                                 fontWeight: FontWeight.w600,
@@ -537,8 +525,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                           ],
                         ),
                         const SizedBox(height: 16),
-                        Text(
-                          'Fast and secure payment with Apple Pay',
+                        Text('Fast and secure payment with Apple Pay'.tr,
                           style: TextStyle(
                             fontSize: 15,
                             color: theme.brightness == Brightness.dark
@@ -576,8 +563,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                       : Colors.white,
                                 ),
                                 const SizedBox(width: 8),
-                                Text(
-                                  'Pay with Apple Pay',
+                                Text('Pay with Apple Pay'.tr,
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
@@ -624,8 +610,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              'Secure Payment',
+                            Text('Secure Payment'.tr,
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -635,8 +620,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                               ),
                             ),
                             const SizedBox(height: 4),
-                            Text(
-                              'Your payment information is encrypted and secure. We never store your full card details.',
+                            Text('Your payment information is encrypted and secure. We never store your full card details.'.tr,
                               style: TextStyle(
                                 fontSize: 13,
                                 color: theme.brightness == Brightness.dark
@@ -896,8 +880,7 @@ class _PayPalSection extends StatelessWidget {
         const SizedBox(height: 24),
 
         // Saved Accounts
-        Text(
-          'Saved Accounts',
+        Text('Saved Accounts'.tr,
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
@@ -936,8 +919,7 @@ class _PayPalSection extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Alex Hales',
+                  Text('Alex Hales'.tr,
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -947,8 +929,7 @@ class _PayPalSection extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  Text(
-                    'alex@gmail.com',
+                  Text('alex@gmail.com'.tr,
                     style: TextStyle(
                       fontSize: 13,
                       color: theme.brightness == Brightness.dark
@@ -964,8 +945,7 @@ class _PayPalSection extends StatelessWidget {
         const SizedBox(height: 20),
 
         // Add Account
-        Text(
-          'Add Account',
+        Text('Add Account'.tr,
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
@@ -1044,8 +1024,7 @@ class _StripeSection extends StatelessWidget {
         const SizedBox(height: 24),
 
         // Saved Accounts
-        Text(
-          'Saved Accounts',
+        Text('Saved Accounts'.tr,
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
@@ -1072,8 +1051,7 @@ class _StripeSection extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               // "S" letter in Stripe purple color (no background)
-              const Text(
-                'S',
+              Text('S'.tr,
                 style: TextStyle(
                   color: Color(0xFF635BFF),
                   fontSize: 40,
@@ -1084,8 +1062,7 @@ class _StripeSection extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Alex Hales',
+                  Text('Alex Hales'.tr,
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -1095,8 +1072,7 @@ class _StripeSection extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  Text(
-                    'alex@gmail.com',
+                  Text('alex@gmail.com'.tr,
                     style: TextStyle(
                       fontSize: 13,
                       color: theme.brightness == Brightness.dark
@@ -1112,8 +1088,7 @@ class _StripeSection extends StatelessWidget {
         const SizedBox(height: 20),
 
         // Add Account
-        Text(
-          'Add Account',
+        Text('Add Account'.tr,
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,

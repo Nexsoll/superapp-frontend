@@ -44,8 +44,7 @@ class EditProfileController extends GetxController {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              'Change Profile Picture',
+            Text('Change Profile Picture'.tr,
               style: Get.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w700,
               ),
@@ -56,7 +55,7 @@ class EditProfileController extends GetxController {
                 Icons.camera_alt_rounded,
                 color: Get.theme.colorScheme.primary,
               ),
-              title: const Text('Take a Photo'),
+              title: Text('Take a Photo'.tr),
               onTap: () {
                 Get.back();
                 _pickImage(ImageSource.camera);
@@ -67,7 +66,7 @@ class EditProfileController extends GetxController {
                 Icons.photo_library_rounded,
                 color: Get.theme.colorScheme.primary,
               ),
-              title: const Text('Choose from Gallery'),
+              title: Text('Choose from Gallery'.tr),
               onTap: () {
                 Get.back();
                 _pickImage(ImageSource.gallery);
@@ -76,8 +75,7 @@ class EditProfileController extends GetxController {
             if (photoUrl.value.isNotEmpty || localPhotoPath.value.isNotEmpty)
               ListTile(
                 leading: const Icon(Icons.delete_rounded, color: Colors.red),
-                title: const Text(
-                  'Remove Photo',
+                title: Text('Remove Photo'.tr,
                   style: TextStyle(color: Colors.red),
                 ),
                 onTap: () {

@@ -90,8 +90,7 @@ class PermissionsFlowScreen extends StatelessWidget {
                             const SizedBox(height: 14),
                             TextButton(
                               onPressed: controller.onSkipPressed,
-                              child: Text(
-                                'Skip for now',
+                              child: Text('Skip for now'.tr,
                                 style: theme.textTheme.bodyMedium?.copyWith(
                                   color: const Color(0xFFB6BAC5),
                                   fontWeight: FontWeight.w500,

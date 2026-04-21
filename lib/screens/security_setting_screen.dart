@@ -23,8 +23,7 @@ class SecuritySettingsScreen extends StatelessWidget {
           color: kPrimaryColor,
           onPressed: () => Get.back(),
         ),
-        title: Text(
-          'Security Settings',
+        title: Text('Security Settings'.tr,
           style: theme.textTheme.titleMedium?.copyWith(
             color: kPrimaryColor,
             fontWeight: FontWeight.w500,

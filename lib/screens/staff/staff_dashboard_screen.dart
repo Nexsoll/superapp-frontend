@@ -68,8 +68,7 @@ class _StaffJobsTab extends StatelessWidget {
                       color: Colors.grey.withOpacity(0.5),
                     ),
                     const SizedBox(height: 16),
-                    Text(
-                      'No jobs assigned to you yet',
+                    Text('No jobs assigned to you yet'.tr,
                       style: theme.textTheme.bodyLarge?.copyWith(
                         color: Colors.grey,
                       ),
@@ -266,8 +265,7 @@ class _StaffJobCard extends StatelessWidget {
                       ),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
-                    child: const Text(
-                      'Reject',
+                    child: Text('Reject'.tr,
                       style: TextStyle(fontWeight: FontWeight.w700),
                     ),
                   ),
@@ -285,8 +283,7 @@ class _StaffJobCard extends StatelessWidget {
                       ),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
-                    child: const Text(
-                      'Accept',
+                    child: Text('Accept'.tr,
                       style: TextStyle(fontWeight: FontWeight.w700),
                     ),
                   ),
@@ -326,9 +323,8 @@ class _StaffJobCard extends StatelessWidget {
                 color: Colors.blue.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Center(
-                child: Text(
-                  'Awaiting Review',
+              child: Center(
+                child: Text('Awaiting Review'.tr,
                   style: TextStyle(
                     color: Colors.blue,
                     fontWeight: FontWeight.w700,
@@ -364,8 +360,7 @@ class _StaffEarningsTab extends StatelessWidget {
                 children: [
                   _buildEarningsSummary(context),
                   const SizedBox(height: 24),
-                  const Text(
-                    'Payment History',
+                  Text('Payment History'.tr,
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
                   ),
                   const SizedBox(height: 16),
@@ -373,8 +368,7 @@ class _StaffEarningsTab extends StatelessWidget {
                     Center(
                       child: Padding(
                         padding: const EdgeInsets.only(top: 40),
-                        child: Text(
-                          'No completed jobs yet',
+                        child: Text('No completed jobs yet'.tr,
                           style: TextStyle(color: Colors.grey),
                         ),
                       ),
@@ -439,8 +433,7 @@ class _StaffEarningsTab extends StatelessWidget {
       ),
       child: Column(
         children: [
-          const Text(
-            'Total Balance',
+          Text('Total Balance'.tr,
             style: TextStyle(color: Colors.white70, fontSize: 16),
           ),
           const SizedBox(height: 12),
@@ -530,8 +523,7 @@ class _StaffEarningsTab extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 4),
-                Text(
-                  'Completed',
+                Text('Completed'.tr,
                   style: TextStyle(color: Colors.grey, fontSize: 12),
                 ),
               ],

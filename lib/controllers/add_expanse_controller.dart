@@ -124,8 +124,7 @@ class AddExpenseController extends GetxController {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                'Upload Receipt',
+              Text('Upload Receipt'.tr,
                 style: Get.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
                 ),
@@ -136,7 +135,7 @@ class AddExpenseController extends GetxController {
                   Icons.camera_alt_rounded,
                   color: Get.theme.colorScheme.primary,
                 ),
-                title: const Text('Take a Photo'),
+                title: Text('Take a Photo'.tr),
                 onTap: () {
                   Get.back();
                   _pickImage(ImageSource.camera);
@@ -147,7 +146,7 @@ class AddExpenseController extends GetxController {
                   Icons.photo_library_rounded,
                   color: Get.theme.colorScheme.primary,
                 ),
-                title: const Text('Choose from Gallery'),
+                title: Text('Choose from Gallery'.tr),
                 onTap: () {
                   Get.back();
                   _pickImage(ImageSource.gallery);

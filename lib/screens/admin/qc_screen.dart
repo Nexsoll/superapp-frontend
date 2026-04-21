@@ -1,3 +1,4 @@
+import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart'; // Assuming we might use SVGs or fallback to Icons
 
@@ -22,8 +23,7 @@ class QCScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Quality Control',
+                  Text('Quality Control'.tr,
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -31,8 +31,7 @@ class QCScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  Text(
-                    'Review and approve completed jobs',
+                  Text('Review and approve completed jobs'.tr,
                     style: TextStyle(
                       fontSize: 14,
                       color: isDark
@@ -81,10 +80,9 @@ class QCScreen extends StatelessWidget {
             onTap: () => Navigator.pop(context),
             child: const Icon(Icons.arrow_back, color: Colors.white, size: 24),
           ),
-          const Expanded(
+          Expanded(
             child: Center(
-              child: Text(
-                'Quality Control',
+              child: Text('Quality Control'.tr,
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 18,
@@ -212,8 +210,7 @@ class QCScreen extends StatelessWidget {
                       ),
                     ),
                     child: Center(
-                      child: Text(
-                        '+3',
+                      child: Text('+3'.tr,
                         style: TextStyle(
                           color: isDark
                               ? Colors.white60
@@ -241,8 +238,7 @@ class QCScreen extends StatelessWidget {
                     ),
                     padding: const EdgeInsets.symmetric(vertical: 14),
                   ),
-                  child: const Text(
-                    'Approve',
+                  child: Text('Approve'.tr,
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w600,
@@ -264,8 +260,7 @@ class QCScreen extends StatelessWidget {
                     ),
                     padding: const EdgeInsets.symmetric(vertical: 14),
                   ),
-                  child: Text(
-                    'Request Redo',
+                  child: Text('Request Redo'.tr,
                     style: TextStyle(
                       color: isDark ? Colors.white : const Color(0xFF374151),
                       fontWeight: FontWeight.w600,
@@ -336,8 +331,7 @@ class QCScreen extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      'Progress',
+                    Text('Progress'.tr,
                       style: TextStyle(
                         color: isDark
                             ? Colors.white60
@@ -345,8 +339,7 @@ class QCScreen extends StatelessWidget {
                         fontSize: 13,
                       ),
                     ),
-                    Text(
-                      '65%',
+                    Text('65%'.tr,
                       style: TextStyle(
                         color: isDark ? Colors.white : const Color(0xFF111827),
                         fontWeight: FontWeight.bold,

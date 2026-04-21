@@ -1,12 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import 'package:superapp/screens/booking_paypal_screen.dart';
 import 'package:superapp/services/listing_service.dart';
-import 'package:superapp/screens/payment_screen.dart';
+import 'package:superapp/services/currency_service.dart';
+import 'package:superapp/controllers/profile_controller.dart';
+
+String _formatCurrency(double amountInUSD, {int decimals = 0}) {
+  final profileCtrl = Get.isRegistered<ProfileController>()
+      ? Get.find<ProfileController>()
+      : Get.put(ProfileController());
+  final currency = profileCtrl.userCurrency.value;
+  final converted = CurrencyService.convertFromUSD(amountInUSD, currency);
+  return CurrencyService.formatAmount(converted, currency, decimals: decimals);
+}
+
+String _formatCompactCurrency(double amountInUSD) {
+  final profileCtrl = Get.isRegistered<ProfileController>()
+      ? Get.find<ProfileController>()
+      : Get.put(ProfileController());
+  final currency = profileCtrl.userCurrency.value;
+  final converted = CurrencyService.convertFromUSD(amountInUSD, currency);
+
+  if (converted >= 1000000) {
+    return CurrencyService.formatAmount(converted / 1000000, currency, decimals: 1) + 'M';
+  }
+  if (converted >= 1000) {
+    return CurrencyService.formatAmount(converted / 1000, currency, decimals: 0) + 'K';
+  }
+  return CurrencyService.formatAmount(converted, currency, decimals: 0);
+}
 
 class BookingSummaryScreen extends StatefulWidget {
   final String bookingType; // 'hotel' or 'property'
   final String hotelTitle;
+  final String hotelAddress;
+  final String? hotelImageUrl;
   final Map<String, dynamic>? propertyData;
   final DateTime? checkIn;
   final DateTime? checkOut;
@@ -19,6 +48,8 @@ class BookingSummaryScreen extends StatefulWidget {
     super.key,
     this.bookingType = 'hotel',
     this.hotelTitle = '',
+    this.hotelAddress = '',
+    this.hotelImageUrl,
     this.propertyData,
     this.checkIn,
     this.checkOut,
@@ -67,29 +98,6 @@ class _BookingSummaryScreenState extends State<BookingSummaryScreen> {
   }
 
   String _formatMoney(double amount) {
-    return amount.toStringAsFixed(0);
-  }
-
-  String _formatCurrency(double amount, {int decimals = 0}) {
-    final fixed = amount.toStringAsFixed(decimals);
-    final parts = fixed.split('.');
-    final whole = parts[0].replaceAllMapped(
-      RegExp(r'\B(?=(\d{3})+(?!\d))'),
-      (match) => ',',
-    );
-    if (decimals > 0 && parts.length > 1) {
-      return '\$$whole.${parts[1]}';
-    }
-    return '\$$whole';
-  }
-
-  String _formatCompactCurrency(double amount) {
-    if (amount >= 1000000) {
-      return '\$${(amount / 1000000).toStringAsFixed(1)}M';
-    }
-    if (amount >= 1000) {
-      return '\$${(amount / 1000).toStringAsFixed(0)}K';
-    }
     return _formatCurrency(amount);
   }
 
@@ -214,6 +222,19 @@ class _BookingSummaryScreenState extends State<BookingSummaryScreen> {
     final closingCostsLabel = _formatCurrency(closingCosts, decimals: 2);
     final agentFeesLabel = _formatCurrency(agentFees, decimals: 2);
     final propertyTotalLabel = _formatCurrency(propertyTotal, decimals: 0);
+    final bookingItems = widget.bookingResponse?['bookings'] as List?;
+    final bookingIds = bookingItems is List
+        ? bookingItems
+              .map((item) {
+                if (item is Map<String, dynamic>) {
+                  return _toInt(item['id']);
+                }
+                return null;
+              })
+              .whereType<int>()
+              .where((id) => id > 0)
+              .toList()
+        : <int>[];
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -237,8 +258,7 @@ class _BookingSummaryScreenState extends State<BookingSummaryScreen> {
                       ),
                     ),
                     const SizedBox(width: 12),
-                    const Text(
-                      'Summary',
+                    Text('Summary'.tr,
                       style: TextStyle(
                         color: Color(0xFF2FC1BE),
                         fontSize: 18,
@@ -378,7 +398,7 @@ class _BookingSummaryScreenState extends State<BookingSummaryScreen> {
                         ),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
+                          children: [
                             Icon(
                               Icons.verified_user_outlined,
                               color: Color(0xFF43A047),
@@ -386,8 +406,7 @@ class _BookingSummaryScreenState extends State<BookingSummaryScreen> {
                             ),
                             SizedBox(width: 12),
                             Expanded(
-                              child: Text(
-                                'Free cancellation until 24 hours before check-in.\nAfter that cancellation fees may apply.',
+                              child: Text('Free cancellation until 24 hours before check-in.\nAfter that cancellation fees may apply.'.tr,
                                 style: TextStyle(
                                   color: Color(0xFF2E7D32),
                                   fontSize: 12,
@@ -429,8 +448,7 @@ class _BookingSummaryScreenState extends State<BookingSummaryScreen> {
                         borderRadius: BorderRadius.circular(16),
                       ),
                     ),
-                    child: Text(
-                      'Cancel',
+                    child: Text('Cancel'.tr,
                       style: TextStyle(
                         color: theme.brightness == Brightness.dark
                             ? Colors.white
@@ -449,8 +467,19 @@ class _BookingSummaryScreenState extends State<BookingSummaryScreen> {
                   height: 48,
                   child: ElevatedButton(
                     onPressed: () => Get.to(
-                      () => PaymentScreen(
+                      () => BookingPaypalScreen(
                         bookingType: widget.bookingType,
+                        hotelTitle: widget.hotelTitle,
+                        hotelAddress: widget.hotelAddress,
+                        hotelImageUrl: widget.hotelImageUrl,
+                        propertyData: widget.propertyData,
+                        selectedRooms: widget.selectedRooms,
+                        bookingIds: bookingIds,
+                        propertyId: propertyId,
+                        adults: _adults,
+                        children: _children,
+                        checkIn: widget.checkIn,
+                        checkOut: widget.checkOut,
                         totalAmount: isProperty ? propertyTotal : totalPrice,
                       ),
                     ),
@@ -571,7 +600,7 @@ class _SummaryRoomCard extends StatelessWidget {
                   text: TextSpan(
                     children: [
                       TextSpan(
-                        text: '\$$price',
+                        text: price,
                         style: const TextStyle(
                           color: Color(0xFF2FC1BE),
                           fontSize: 16, // Font size for price per night
@@ -829,8 +858,7 @@ class _PromoCodeSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Promo Code',
+        Text('Promo Code'.tr,
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
@@ -856,8 +884,7 @@ class _PromoCodeSection extends StatelessWidget {
                   ),
                 ),
                 alignment: Alignment.centerLeft,
-                child: Text(
-                  'Promo code',
+                child: Text('Promo code'.tr,
                   style: TextStyle(
                     color: theme.brightness == Brightness.dark
                         ? Colors.white60
@@ -879,8 +906,7 @@ class _PromoCodeSection extends StatelessWidget {
                   ),
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                 ),
-                child: const Text(
-                  'Apply',
+                child: Text('Apply'.tr,
                   style: TextStyle(fontWeight: FontWeight.w600),
                 ),
               ),
@@ -913,8 +939,7 @@ class _PriceDetailsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Price Details',
+        Text('Price Details'.tr,
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
@@ -926,27 +951,27 @@ class _PriceDetailsSection extends StatelessWidget {
         const SizedBox(height: 12),
         _buildPriceRow(
           roomNightsLabel,
-          '\$${roomSubtotal.toStringAsFixed(0)}',
+          _formatCurrency(roomSubtotal),
           theme,
         ),
         if (guestCharge > 0) ...[
           const SizedBox(height: 8),
           _buildPriceRow(
             'Extra Guest Charges',
-            '\$${guestCharge.toStringAsFixed(0)}',
+            _formatCurrency(guestCharge),
             theme,
           ),
         ],
         const SizedBox(height: 8),
         _buildPriceRow(
           'Taxes & Fees (10%)',
-          '\$${taxes.toStringAsFixed(0)}',
+          _formatCurrency(taxes),
           theme,
         ),
         const SizedBox(height: 8),
         _buildPriceRow(
           'Service Charge',
-          '\$${serviceCharge.toStringAsFixed(0)}',
+          _formatCurrency(serviceCharge),
           theme,
         ),
         const SizedBox(height: 16),
@@ -1020,8 +1045,7 @@ class _TotalSection extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        Text(
-          'Total',
+        Text('Total'.tr,
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
@@ -1034,7 +1058,7 @@ class _TotalSection extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Text(
-              '\$${total.toStringAsFixed(0)}',
+              _formatCurrency(total),
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -1044,8 +1068,7 @@ class _TotalSection extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 2),
-            Text(
-              'Includes all taxes',
+            Text('Includes all taxes'.tr,
               style: TextStyle(
                 fontSize: 10,
                 color: theme.brightness == Brightness.dark
@@ -1206,8 +1229,7 @@ class _PropertyPriceDetailsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Payment Details',
+        Text('Payment Details'.tr,
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
@@ -1296,8 +1318,7 @@ class _PropertyTotalSection extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Down Payment Required',
+            Text('Down Payment Required'.tr,
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -1305,8 +1326,7 @@ class _PropertyTotalSection extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 4),
-            const Text(
-              '(20%)',
+            Text('(20%)'.tr,
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
@@ -1314,8 +1334,7 @@ class _PropertyTotalSection extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 6),
-            Text(
-              'Due today to secure property',
+            Text('Due today to secure property'.tr,
               style: TextStyle(
                 fontSize: 12,
                 color: theme.brightness == Brightness.dark
@@ -1339,8 +1358,7 @@ class _PropertyTotalSection extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 4),
-            Text(
-              'Includes all taxes',
+            Text('Includes all taxes'.tr,
               style: TextStyle(
                 fontSize: 11,
                 color: theme.brightness == Brightness.dark

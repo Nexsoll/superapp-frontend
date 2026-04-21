@@ -310,8 +310,7 @@ class _MapLocationPickerScreenState extends State<MapLocationPickerScreen> {
                         ),
                       ),
                       const SizedBox(width: 16),
-                      const Text(
-                        'Select Location',
+                      Text('Select Location'.tr,
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -339,8 +338,8 @@ class _MapLocationPickerScreenState extends State<MapLocationPickerScreen> {
                         Expanded(
                           child: TextField(
                             controller: _searchController,
-                            decoration: const InputDecoration(
-                              hintText: 'Search location...',
+                            decoration: InputDecoration(
+                              hintText: 'Search location...'.tr,
                               hintStyle: TextStyle(color: Color(0xFF9AA0AF)),
                               border: InputBorder.none,
                             ),
@@ -561,8 +560,7 @@ class _MapLocationPickerScreenState extends State<MapLocationPickerScreen> {
                             borderRadius: BorderRadius.circular(25),
                           ),
                         ),
-                        child: const Text(
-                          'Confirm Location',
+                        child: Text('Confirm Location'.tr,
                           style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
