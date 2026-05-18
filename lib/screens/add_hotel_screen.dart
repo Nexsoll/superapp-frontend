@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -43,6 +44,13 @@ class _AddHotelScreenState extends State<AddHotelScreen> {
 
   final ImagePicker _picker = ImagePicker();
   final ListingService _listingService = ListingService();
+
+  ImageProvider _imageProviderForXFile(XFile file) {
+    if (kIsWeb) {
+      return NetworkImage(file.path);
+    }
+    return FileImage(File(file.path));
+  }
 
   // Keep track of existing image count (from backend) for edit mode
   int _existingImageCount = 0;
@@ -462,8 +470,8 @@ class _AddHotelScreenState extends State<AddHotelScreen> {
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(16),
                             image: DecorationImage(
-                              image: FileImage(
-                                File(_selectedImages[index].path),
+                              image: _imageProviderForXFile(
+                                _selectedImages[index],
                               ),
                               fit: BoxFit.cover,
                             ),
@@ -730,12 +738,23 @@ class _AddHotelScreenState extends State<AddHotelScreen> {
                             child: _roomImages[index] != null
                                 ? ClipRRect(
                                     borderRadius: BorderRadius.circular(11),
-                                    child: Image.file(
-                                      File(_roomImages[index]!.path),
-                                      fit: BoxFit.cover,
-                                      width: double.infinity,
-                                      height: double.infinity,
-                                    ),
+                                    child: kIsWeb
+                                        ? Image.network(
+                                            _roomImages[index]!.path,
+                                            fit: BoxFit.cover,
+                                            width: double.infinity,
+                                            height: double.infinity,
+                                            errorBuilder: (_, __, ___) =>
+                                                _buildAddPhotoPlaceholder(
+                                                  isDark,
+                                                ),
+                                          )
+                                        : Image.file(
+                                            File(_roomImages[index]!.path),
+                                            fit: BoxFit.cover,
+                                            width: double.infinity,
+                                            height: double.infinity,
+                                          ),
                                   )
                                 : (_existingRoomImageUrls[index] != null
                                       ? ClipRRect(

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -23,10 +24,20 @@ String _formatCompactCurrency(double amountInUSD) {
   final converted = CurrencyService.convertFromUSD(amountInUSD, currency);
 
   if (converted >= 1000000) {
-    return CurrencyService.formatAmount(converted / 1000000, currency, decimals: 1) + 'M';
+    return CurrencyService.formatAmount(
+          converted / 1000000,
+          currency,
+          decimals: 1,
+        ) +
+        'M';
   }
   if (converted >= 1000) {
-    return CurrencyService.formatAmount(converted / 1000, currency, decimals: 0) + 'K';
+    return CurrencyService.formatAmount(
+          converted / 1000,
+          currency,
+          decimals: 0,
+        ) +
+        'K';
   }
   return CurrencyService.formatAmount(converted, currency, decimals: 0);
 }
@@ -235,6 +246,263 @@ class _BookingSummaryScreenState extends State<BookingSummaryScreen> {
               .where((id) => id > 0)
               .toList()
         : <int>[];
+    final isDesktopWeb = kIsWeb && MediaQuery.sizeOf(context).width >= 900;
+
+    void openPayment() {
+      Get.to(
+        () => BookingPaypalScreen(
+          bookingType: widget.bookingType,
+          hotelTitle: widget.hotelTitle,
+          hotelAddress: widget.hotelAddress,
+          hotelImageUrl: widget.hotelImageUrl,
+          propertyData: widget.propertyData,
+          selectedRooms: widget.selectedRooms,
+          bookingIds: bookingIds,
+          propertyId: propertyId,
+          adults: _adults,
+          children: _children,
+          checkIn: widget.checkIn,
+          checkOut: widget.checkOut,
+          totalAmount: isProperty ? propertyTotal : totalPrice,
+        ),
+      );
+    }
+
+    if (isDesktopWeb) {
+      return Scaffold(
+        backgroundColor: theme.scaffoldBackgroundColor,
+        body: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 30),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 1180),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TextButton.icon(
+                      onPressed: () => Get.back(),
+                      icon: const Icon(Icons.arrow_back_rounded),
+                      label: Text('Back'.tr),
+                    ),
+                    const SizedBox(height: 18),
+                    Text(
+                      'Booking Summary'.tr,
+                      style: theme.textTheme.headlineMedium?.copyWith(
+                        color: const Color(0xFF2FC1BE),
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    const SizedBox(height: 26),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          flex: 7,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (isProperty) ...[
+                                _PropertySummaryCard(
+                                  title: propertyTitle,
+                                  address: propertyAddress,
+                                  priceLabel: propertyCardPriceLabel,
+                                  rating: propertyRating,
+                                  imageUrl: propertyImageUrl,
+                                ),
+                                const SizedBox(height: 24),
+                              ],
+                              if (!isProperty) ...[
+                                Text(
+                                  widget.hotelTitle,
+                                  style: theme.textTheme.titleLarge?.copyWith(
+                                    fontWeight: FontWeight.w900,
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                ...hotelRooms.asMap().entries.map((entry) {
+                                  final room = entry.value;
+                                  final qty = _toInt(
+                                    room['quantity'],
+                                    fallback: 1,
+                                  );
+                                  final title =
+                                      room['title']?.toString() ?? 'Room';
+                                  final specs =
+                                      room['specs']?.toString() ??
+                                      '$qty Room${qty > 1 ? 's' : ''} selected';
+                                  final imagePath =
+                                      room['imagePath']?.toString() ??
+                                      'assets/room1.png';
+                                  final imageUrl = room['imageUrl']?.toString();
+                                  return Padding(
+                                    padding: EdgeInsets.only(
+                                      bottom: entry.key == hotelRooms.length - 1
+                                          ? 0
+                                          : 16,
+                                    ),
+                                    child: _SummaryRoomCard(
+                                      title: '$title ($qty)',
+                                      specs: specs,
+                                      price: _formatMoney(
+                                        _toDouble(room['price']),
+                                      ),
+                                      imagePath: imagePath,
+                                      imageUrl: imageUrl,
+                                    ),
+                                  );
+                                }),
+                                const SizedBox(height: 24),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: _DateCard(
+                                        label: 'CHECK-IN',
+                                        date: checkInLabel,
+                                        icon: Icons.login,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 16),
+                                    Expanded(
+                                      child: _DateCard(
+                                        label: 'CHECK-OUT',
+                                        date: checkOutLabel,
+                                        icon: Icons.logout,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 24),
+                                _GuestDetailsCard(
+                                  adults: _adults,
+                                  children: _children,
+                                  onAdultsChanged: (value) {
+                                    setState(() => _adults = value);
+                                  },
+                                  onChildrenChanged: (value) {
+                                    setState(() => _children = value);
+                                  },
+                                ),
+                              ],
+                              const SizedBox(height: 24),
+                              const _PromoCodeSection(),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 34),
+                        SizedBox(
+                          width: 360,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(24),
+                                decoration: BoxDecoration(
+                                  color: theme.cardColor,
+                                  borderRadius: BorderRadius.circular(24),
+                                  border: Border.all(
+                                    color: theme.dividerColor.withValues(
+                                      alpha: 0.35,
+                                    ),
+                                  ),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Payment Details'.tr,
+                                      style: theme.textTheme.titleLarge
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.w900,
+                                          ),
+                                    ),
+                                    const SizedBox(height: 18),
+                                    if (isProperty)
+                                      _PropertyPriceDetailsSection(
+                                        purchasePrice: purchasePriceLabel,
+                                        closingCosts: closingCostsLabel,
+                                        agentFees: agentFeesLabel,
+                                      )
+                                    else
+                                      _PriceDetailsSection(
+                                        roomNightsLabel:
+                                            '$selectedRoomCount Room${selectedRoomCount > 1 ? 's' : ''} x $stayNights Night${stayNights > 1 ? 's' : ''}',
+                                        roomSubtotal: effectiveRoomSubtotal,
+                                        guestCharge: guestSurcharge,
+                                        taxes: taxes,
+                                        serviceCharge: serviceCharge,
+                                      ),
+                                    const SizedBox(height: 18),
+                                    if (isProperty)
+                                      _PropertyTotalSection(
+                                        totalLabel: propertyTotalLabel,
+                                      )
+                                    else
+                                      _TotalSection(total: totalPrice),
+                                    const SizedBox(height: 22),
+                                    SizedBox(
+                                      height: 52,
+                                      child: ElevatedButton(
+                                        onPressed: openPayment,
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: const Color(
+                                            0xFF2FC1BE,
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              16,
+                                            ),
+                                          ),
+                                        ),
+                                        child: Text(
+                                          isProperty
+                                              ? 'Proceed to Payment'
+                                              : 'Proceed to Checkout',
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w800,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              if (!isProperty) ...[
+                                const SizedBox(height: 16),
+                                Container(
+                                  padding: const EdgeInsets.all(18),
+                                  decoration: BoxDecoration(
+                                    color: const Color(
+                                      0xFF43A047,
+                                    ).withValues(alpha: 0.12),
+                                    borderRadius: BorderRadius.circular(18),
+                                  ),
+                                  child: Text(
+                                    'Free cancellation until 24 hours before check-in. After that cancellation fees may apply.'
+                                        .tr,
+                                    style: const TextStyle(
+                                      color: Color(0xFF2E7D32),
+                                      height: 1.4,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -258,7 +526,8 @@ class _BookingSummaryScreenState extends State<BookingSummaryScreen> {
                       ),
                     ),
                     const SizedBox(width: 12),
-                    Text('Summary'.tr,
+                    Text(
+                      'Summary'.tr,
                       style: TextStyle(
                         color: Color(0xFF2FC1BE),
                         fontSize: 18,
@@ -406,7 +675,9 @@ class _BookingSummaryScreenState extends State<BookingSummaryScreen> {
                             ),
                             SizedBox(width: 12),
                             Expanded(
-                              child: Text('Free cancellation until 24 hours before check-in.\nAfter that cancellation fees may apply.'.tr,
+                              child: Text(
+                                'Free cancellation until 24 hours before check-in.\nAfter that cancellation fees may apply.'
+                                    .tr,
                                 style: TextStyle(
                                   color: Color(0xFF2E7D32),
                                   fontSize: 12,
@@ -448,7 +719,8 @@ class _BookingSummaryScreenState extends State<BookingSummaryScreen> {
                         borderRadius: BorderRadius.circular(16),
                       ),
                     ),
-                    child: Text('Cancel'.tr,
+                    child: Text(
+                      'Cancel'.tr,
                       style: TextStyle(
                         color: theme.brightness == Brightness.dark
                             ? Colors.white
@@ -466,23 +738,7 @@ class _BookingSummaryScreenState extends State<BookingSummaryScreen> {
                 child: SizedBox(
                   height: 48,
                   child: ElevatedButton(
-                    onPressed: () => Get.to(
-                      () => BookingPaypalScreen(
-                        bookingType: widget.bookingType,
-                        hotelTitle: widget.hotelTitle,
-                        hotelAddress: widget.hotelAddress,
-                        hotelImageUrl: widget.hotelImageUrl,
-                        propertyData: widget.propertyData,
-                        selectedRooms: widget.selectedRooms,
-                        bookingIds: bookingIds,
-                        propertyId: propertyId,
-                        adults: _adults,
-                        children: _children,
-                        checkIn: widget.checkIn,
-                        checkOut: widget.checkOut,
-                        totalAmount: isProperty ? propertyTotal : totalPrice,
-                      ),
-                    ),
+                    onPressed: openPayment,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF2FC1BE),
                       shape: RoundedRectangleBorder(
@@ -858,7 +1114,8 @@ class _PromoCodeSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Promo Code'.tr,
+        Text(
+          'Promo Code'.tr,
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
@@ -884,7 +1141,8 @@ class _PromoCodeSection extends StatelessWidget {
                   ),
                 ),
                 alignment: Alignment.centerLeft,
-                child: Text('Promo code'.tr,
+                child: Text(
+                  'Promo code'.tr,
                   style: TextStyle(
                     color: theme.brightness == Brightness.dark
                         ? Colors.white60
@@ -906,7 +1164,8 @@ class _PromoCodeSection extends StatelessWidget {
                   ),
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                 ),
-                child: Text('Apply'.tr,
+                child: Text(
+                  'Apply'.tr,
                   style: TextStyle(fontWeight: FontWeight.w600),
                 ),
               ),
@@ -939,7 +1198,8 @@ class _PriceDetailsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Price Details'.tr,
+        Text(
+          'Price Details'.tr,
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
@@ -949,11 +1209,7 @@ class _PriceDetailsSection extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 12),
-        _buildPriceRow(
-          roomNightsLabel,
-          _formatCurrency(roomSubtotal),
-          theme,
-        ),
+        _buildPriceRow(roomNightsLabel, _formatCurrency(roomSubtotal), theme),
         if (guestCharge > 0) ...[
           const SizedBox(height: 8),
           _buildPriceRow(
@@ -963,17 +1219,9 @@ class _PriceDetailsSection extends StatelessWidget {
           ),
         ],
         const SizedBox(height: 8),
-        _buildPriceRow(
-          'Taxes & Fees (10%)',
-          _formatCurrency(taxes),
-          theme,
-        ),
+        _buildPriceRow('Taxes & Fees (10%)', _formatCurrency(taxes), theme),
         const SizedBox(height: 8),
-        _buildPriceRow(
-          'Service Charge',
-          _formatCurrency(serviceCharge),
-          theme,
-        ),
+        _buildPriceRow('Service Charge', _formatCurrency(serviceCharge), theme),
         const SizedBox(height: 16),
         LayoutBuilder(
           builder: (context, constraints) {
@@ -1045,7 +1293,8 @@ class _TotalSection extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        Text('Total'.tr,
+        Text(
+          'Total'.tr,
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
@@ -1068,7 +1317,8 @@ class _TotalSection extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 2),
-            Text('Includes all taxes'.tr,
+            Text(
+              'Includes all taxes'.tr,
               style: TextStyle(
                 fontSize: 10,
                 color: theme.brightness == Brightness.dark
@@ -1229,7 +1479,8 @@ class _PropertyPriceDetailsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Payment Details'.tr,
+        Text(
+          'Payment Details'.tr,
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
@@ -1318,7 +1569,8 @@ class _PropertyTotalSection extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Down Payment Required'.tr,
+            Text(
+              'Down Payment Required'.tr,
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -1326,7 +1578,8 @@ class _PropertyTotalSection extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 4),
-            Text('(20%)'.tr,
+            Text(
+              '(20%)'.tr,
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
@@ -1334,7 +1587,8 @@ class _PropertyTotalSection extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 6),
-            Text('Due today to secure property'.tr,
+            Text(
+              'Due today to secure property'.tr,
               style: TextStyle(
                 fontSize: 12,
                 color: theme.brightness == Brightness.dark
@@ -1358,7 +1612,8 @@ class _PropertyTotalSection extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 4),
-            Text('Includes all taxes'.tr,
+            Text(
+              'Includes all taxes'.tr,
               style: TextStyle(
                 fontSize: 11,
                 color: theme.brightness == Brightness.dark

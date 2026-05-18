@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:app_links/app_links.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -62,7 +63,9 @@ class _BookingPaypalScreenState extends State<BookingPaypalScreen> {
   @override
   void initState() {
     super.initState();
-    _paypalLinkSubscription = _appLinks.uriLinkStream.listen(_handlePaypalRedirect);
+    _paypalLinkSubscription = _appLinks.uriLinkStream.listen(
+      _handlePaypalRedirect,
+    );
   }
 
   @override
@@ -198,12 +201,10 @@ class _BookingPaypalScreenState extends State<BookingPaypalScreen> {
       final cancelUrl = createResponse['cancelUrl']?.toString() ?? '';
       final approvedAmount = _toDouble(createResponse['amount']);
 
-      if (
-        orderId.isEmpty ||
-        approvalUrl.isEmpty ||
-        returnUrl.isEmpty ||
-        cancelUrl.isEmpty
-      ) {
+      if (orderId.isEmpty ||
+          approvalUrl.isEmpty ||
+          returnUrl.isEmpty ||
+          cancelUrl.isEmpty) {
         throw Exception('Invalid PayPal order response');
       }
 
@@ -323,7 +324,9 @@ class _BookingPaypalScreenState extends State<BookingPaypalScreen> {
 
     final title = _isProperty ? propertyTitle : widget.hotelTitle;
     final location = _isProperty ? propertyAddress : widget.hotelAddress;
-    final imageUrl = _isProperty ? _propertyImageUrl() : (widget.hotelImageUrl ?? '');
+    final imageUrl = _isProperty
+        ? _propertyImageUrl()
+        : (widget.hotelImageUrl ?? '');
     final roomTitles = widget.selectedRooms
         .map((room) => room['title']?.toString() ?? '')
         .where((title) => title.trim().isNotEmpty)
@@ -369,7 +372,9 @@ class _BookingPaypalScreenState extends State<BookingPaypalScreen> {
           duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.symmetric(vertical: 10),
           decoration: BoxDecoration(
-            color: selected ? const Color(0xFF28C2C0) : const Color(0xFF28C2C0).withOpacity(0.16),
+            color: selected
+                ? const Color(0xFF28C2C0)
+                : const Color(0xFF28C2C0).withOpacity(0.16),
             borderRadius: BorderRadius.circular(30),
             boxShadow: selected
                 ? [
@@ -417,6 +422,227 @@ class _BookingPaypalScreenState extends State<BookingPaypalScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDesktopWeb = kIsWeb && MediaQuery.sizeOf(context).width >= 900;
+
+    if (isDesktopWeb) {
+      return Scaffold(
+        backgroundColor: theme.scaffoldBackgroundColor,
+        body: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 30),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 1080),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TextButton.icon(
+                      onPressed: () => Get.back(),
+                      icon: const Icon(Icons.arrow_back_rounded),
+                      label: Text('Back'.tr),
+                    ),
+                    const SizedBox(height: 18),
+                    Text(
+                      'Payment'.tr,
+                      style: theme.textTheme.headlineMedium?.copyWith(
+                        color: const Color(0xFF2FC1BE),
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    const SizedBox(height: 26),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Container(
+                            padding: const EdgeInsets.all(30),
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [
+                                  Color(0xFF38CAC7),
+                                  Color(0xFF27B9B6),
+                                  Color(0xFF119C99),
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              borderRadius: BorderRadius.circular(28),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  _isProperty
+                                      ? 'Property payment'.tr
+                                      : 'Hotel booking payment'.tr,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                const SizedBox(height: 18),
+                                Text(
+                                  _formatAmount(widget.totalAmount),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 46,
+                                    fontWeight: FontWeight.w900,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'Including taxes and fees'.tr,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                const SizedBox(height: 34),
+                                _PaymentFact(
+                                  icon: Icons.lock_outline,
+                                  title: 'Secure checkout'.tr,
+                                  subtitle:
+                                      'Payment confirmation activates your booking instantly.'
+                                          .tr,
+                                ),
+                                const SizedBox(height: 16),
+                                _PaymentFact(
+                                  icon: Icons.receipt_long_outlined,
+                                  title: 'Receipt ready'.tr,
+                                  subtitle:
+                                      'A booking receipt is generated after payment.'
+                                          .tr,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 34),
+                        SizedBox(
+                          width: 420,
+                          child: Container(
+                            padding: const EdgeInsets.all(26),
+                            decoration: BoxDecoration(
+                              color: theme.cardColor,
+                              borderRadius: BorderRadius.circular(28),
+                              border: Border.all(
+                                color: theme.dividerColor.withValues(
+                                  alpha: 0.35,
+                                ),
+                              ),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Choose payment method'.tr,
+                                  style: theme.textTheme.titleLarge?.copyWith(
+                                    fontWeight: FontWeight.w900,
+                                  ),
+                                ),
+                                const SizedBox(height: 18),
+                                Row(
+                                  children: [
+                                    _paymentMethodTab(
+                                      id: 'paypal',
+                                      label: 'PayPal',
+                                      icon:
+                                          Icons.account_balance_wallet_outlined,
+                                    ),
+                                    const SizedBox(width: 12),
+                                    _paymentMethodTab(
+                                      id: 'cash',
+                                      label: 'Cash',
+                                      icon: Icons.payments_outlined,
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 28),
+                                Center(
+                                  child: _isCashSelected
+                                      ? const Icon(
+                                          Icons.payments_rounded,
+                                          size: 62,
+                                          color: Color(0xFF2FC1BE),
+                                        )
+                                      : SvgPicture.asset(
+                                          'assets/logos_paypal.svg',
+                                          height: 58,
+                                        ),
+                                ),
+                                const SizedBox(height: 22),
+                                Text(
+                                  _isCashSelected
+                                      ? (_isProperty
+                                            ? 'Confirm your property booking with cash payment and pay directly at final handover.'
+                                            : 'Confirm your hotel booking with cash payment and pay at check-in.')
+                                      : (_isProperty
+                                            ? 'Complete your property booking securely with PayPal.'
+                                            : 'Complete your hotel booking securely with PayPal.'),
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    height: 1.45,
+                                    color: theme.textTheme.bodyMedium?.color
+                                        ?.withValues(alpha: 0.72),
+                                  ),
+                                ),
+                                const SizedBox(height: 24),
+                                SizedBox(
+                                  width: double.infinity,
+                                  height: 54,
+                                  child: ElevatedButton(
+                                    onPressed: _isProcessing
+                                        ? null
+                                        : (_isCashSelected
+                                              ? _confirmCashPayment
+                                              : _payWithPaypal),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: _isCashSelected
+                                          ? const Color(0xFF2FC1BE)
+                                          : const Color(0xFFF5A623),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(18),
+                                      ),
+                                      elevation: 0,
+                                    ),
+                                    child: _isProcessing
+                                        ? const SizedBox(
+                                            width: 22,
+                                            height: 22,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2.2,
+                                              color: Colors.white,
+                                            ),
+                                          )
+                                        : Text(
+                                            _isCashSelected
+                                                ? 'Confirm Cash Payment'
+                                                : 'Continue with PayPal',
+                                            style: TextStyle(
+                                              color: _isCashSelected
+                                                  ? Colors.white
+                                                  : const Color(0xFF003087),
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w800,
+                                            ),
+                                          ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
@@ -437,7 +663,8 @@ class _BookingPaypalScreenState extends State<BookingPaypalScreen> {
                       ),
                     ),
                     const SizedBox(width: 12),
-                    Text('Payment'.tr,
+                    Text(
+                      'Payment'.tr,
                       style: TextStyle(
                         color: Color(0xFF2FC1BE),
                         fontSize: 18,
@@ -466,7 +693,8 @@ class _BookingPaypalScreenState extends State<BookingPaypalScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Total amount'.tr,
+                      Text(
+                        'Total amount'.tr,
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 18,
@@ -483,7 +711,8 @@ class _BookingPaypalScreenState extends State<BookingPaypalScreen> {
                         ),
                       ),
                       const SizedBox(height: 4),
-                      Text('Including taxes and fees'.tr,
+                      Text(
+                        'Including taxes and fees'.tr,
                         style: TextStyle(color: Colors.white, fontSize: 14),
                       ),
                     ],
@@ -527,7 +756,10 @@ class _BookingPaypalScreenState extends State<BookingPaypalScreen> {
                                 size: 52,
                                 color: Color(0xFF2FC1BE),
                               )
-                            : SvgPicture.asset('assets/logos_paypal.svg', height: 52),
+                            : SvgPicture.asset(
+                                'assets/logos_paypal.svg',
+                                height: 52,
+                              ),
                       ),
                       const SizedBox(height: 20),
                       Text(
@@ -619,7 +851,10 @@ class _BookingPaypalScreenState extends State<BookingPaypalScreen> {
                                         size: 22,
                                       )
                                     else
-                                      SvgPicture.asset('assets/logos_paypal.svg', height: 24),
+                                      SvgPicture.asset(
+                                        'assets/logos_paypal.svg',
+                                        height: 24,
+                                      ),
                                     const SizedBox(width: 8),
                                     Text(
                                       _isCashSelected
@@ -645,6 +880,59 @@ class _BookingPaypalScreenState extends State<BookingPaypalScreen> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _PaymentFact extends StatelessWidget {
+  const _PaymentFact({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+  });
+
+  final IconData icon;
+  final String title;
+  final String subtitle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 42,
+          height: 42,
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.18),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(icon, color: Colors.white),
+        ),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                subtitle,
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.82),
+                  height: 1.35,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

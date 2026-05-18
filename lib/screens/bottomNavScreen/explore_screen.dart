@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -37,14 +38,18 @@ class _ExploreScreenState extends State<ExploreScreen> {
         : ListingService.hotelImageUrl(id, 0);
   }
 
-  Set<Marker> _buildMarkers(List listings, bool isProperty, BuildContext context) {
+  Set<Marker> _buildMarkers(
+    List listings,
+    bool isProperty,
+    BuildContext context,
+  ) {
     final markers = <Marker>{};
     for (final listing in listings) {
       final lat = (listing['latitude'] as num).toDouble();
       final lng = (listing['longitude'] as num).toDouble();
       final title = listing['title'] ?? 'Unknown';
       final id = listing['id'] as int;
-      
+
       markers.add(
         Marker(
           markerId: MarkerId(isProperty ? 'property_$id' : 'hotel_$id'),
@@ -66,7 +71,10 @@ class _ExploreScreenState extends State<ExploreScreen> {
     return markers;
   }
 
-  Widget _buildMapListingCard(ThemeData theme, MainScreenController controller) {
+  Widget _buildMapListingCard(
+    ThemeData theme,
+    MainScreenController controller,
+  ) {
     final listing = _selectedMapListing;
     if (listing == null) return const SizedBox.shrink();
 
@@ -116,13 +124,10 @@ class _ExploreScreenState extends State<ExploreScreen> {
                     ? Image.network(
                         imageUrl,
                         fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) => Container(
-                          color: theme.dividerColor,
-                        ),
+                        errorBuilder: (context, error, stackTrace) =>
+                            Container(color: theme.dividerColor),
                       )
-                    : Container(
-                        color: theme.dividerColor,
-                      ),
+                    : Container(color: theme.dividerColor),
               ),
             ),
             const SizedBox(width: 12),
@@ -248,7 +253,8 @@ class _ExploreScreenState extends State<ExploreScreen> {
                       GestureDetector(
                         onTap: () {
                           final lat = (listing['latitude'] as num?)?.toDouble();
-                          final lng = (listing['longitude'] as num?)?.toDouble();
+                          final lng = (listing['longitude'] as num?)
+                              ?.toDouble();
                           if (lat == null || lng == null) {
                             Get.snackbar('Error', 'Location not available');
                             return;
@@ -280,7 +286,8 @@ class _ExploreScreenState extends State<ExploreScreen> {
                               ),
                             ),
                             const SizedBox(height: 2),
-                            Text('Directions'.tr,
+                            Text(
+                              'Directions'.tr,
                               style: TextStyle(
                                 fontSize: 14,
                                 color: Color(0xFF2FC1BE),
@@ -306,6 +313,96 @@ class _ExploreScreenState extends State<ExploreScreen> {
   Widget build(BuildContext context) {
     final controller = Get.find<MainScreenController>();
     final theme = Theme.of(context);
+    final isDesktopWeb = kIsWeb && MediaQuery.sizeOf(context).width >= 900;
+
+    if (isDesktopWeb) {
+      return Container(
+        color: theme.scaffoldBackgroundColor,
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 28),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Explore'.tr,
+                            style: theme.textTheme.headlineMedium?.copyWith(
+                              color: theme.colorScheme.primary,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Browse hotels and properties across your selected market.'
+                                .tr,
+                            style: theme.textTheme.bodyLarge?.copyWith(
+                              color: theme.textTheme.bodyLarge?.color
+                                  ?.withValues(alpha: 0.66),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      width: 360,
+                      child: Obx(
+                        () => _CategoryToggle(
+                          selectedIndex: controller.categoryIndex.value,
+                          onChanged: controller.onCategoryTap,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 22),
+                Row(
+                  children: [
+                    const Expanded(child: _SearchBar()),
+                    const SizedBox(width: 14),
+                    Obx(
+                      () => _DesktopViewToggle(
+                        isMap: isMapView.value,
+                        onCards: () => isMapView.value = false,
+                        onMap: () => isMapView.value = true,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 18),
+                Obx(() {
+                  if (controller.categoryIndex.value != 1) {
+                    return const SizedBox.shrink();
+                  }
+                  return SizedBox(
+                    width: 320,
+                    child: _PropertyTypeToggle(
+                      selectedIndex: propertyTypeIndex.value,
+                      onChanged: (index) => propertyTypeIndex.value = index,
+                    ),
+                  );
+                }),
+                const SizedBox(height: 18),
+                Expanded(
+                  child: Obx(() {
+                    if (isMapView.value) {
+                      return _buildDesktopMap(theme, controller);
+                    }
+                    return _buildDesktopGrid(theme, controller);
+                  }),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
 
     return Container(
       color: theme.scaffoldBackgroundColor,
@@ -318,7 +415,8 @@ class _ExploreScreenState extends State<ExploreScreen> {
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 10),
               child: Row(
                 children: [
-                  Text('Explore'.tr,
+                  Text(
+                    'Explore'.tr,
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.w700,
@@ -454,41 +552,71 @@ class _ExploreScreenState extends State<ExploreScreen> {
               child: Obx(() {
                 if (isMapView.value) {
                   // Debug logging
-                  print('Total hotels in DB: ${controller.allHotelsData.length}');
-                  print('Total properties in DB: ${controller.allPropertiesData.length}');
-                  
+                  print(
+                    'Total hotels in DB: ${controller.allHotelsData.length}',
+                  );
+                  print(
+                    'Total properties in DB: ${controller.allPropertiesData.length}',
+                  );
+
                   // Check first few hotels for coordinates
-                  for (int i = 0; i < controller.allHotelsData.length && i < 3; i++) {
+                  for (
+                    int i = 0;
+                    i < controller.allHotelsData.length && i < 3;
+                    i++
+                  ) {
                     final h = controller.allHotelsData[i];
-                    print('Hotel ${h['title']}: lat=${h['latitude']}, lng=${h['longitude']}');
+                    print(
+                      'Hotel ${h['title']}: lat=${h['latitude']}, lng=${h['longitude']}',
+                    );
                   }
-                  
+
                   // Get hotels and properties with coordinates
                   final hotelsWithCoords = controller.allHotelsData.where((h) {
                     final lat = h['latitude'];
                     final lng = h['longitude'];
-                    return lat != null && lng != null && (lat as num) != 0 && (lng as num) != 0;
+                    return lat != null &&
+                        lng != null &&
+                        (lat as num) != 0 &&
+                        (lng as num) != 0;
                   }).toList();
-                  
-                  final propertiesWithCoords = controller.allPropertiesData.where((p) {
-                    final lat = p['latitude'];
-                    final lng = p['longitude'];
-                    return lat != null && lng != null && (lat as num) != 0 && (lng as num) != 0;
-                  }).toList();
+
+                  final propertiesWithCoords = controller.allPropertiesData
+                      .where((p) {
+                        final lat = p['latitude'];
+                        final lng = p['longitude'];
+                        return lat != null &&
+                            lng != null &&
+                            (lat as num) != 0 &&
+                            (lng as num) != 0;
+                      })
+                      .toList();
 
                   final isProperty = controller.categoryIndex.value == 1;
-                  final allListings = isProperty ? controller.allPropertiesData : controller.allHotelsData;
-                  final listingsWithCoords = isProperty ? propertiesWithCoords : hotelsWithCoords;
+                  final allListings = isProperty
+                      ? controller.allPropertiesData
+                      : controller.allHotelsData;
+                  final listingsWithCoords = isProperty
+                      ? propertiesWithCoords
+                      : hotelsWithCoords;
 
-                  print('${isProperty ? 'Properties' : 'Hotels'} with coords: ${listingsWithCoords.length}/${allListings.length}');
+                  print(
+                    '${isProperty ? 'Properties' : 'Hotels'} with coords: ${listingsWithCoords.length}/${allListings.length}',
+                  );
 
                   // Build markers in build method
-                  final markers = _buildMarkers(listingsWithCoords, isProperty, context);
+                  final markers = _buildMarkers(
+                    listingsWithCoords,
+                    isProperty,
+                    context,
+                  );
 
-                  final initialPosition = listingsWithCoords.isNotEmpty 
+                  final initialPosition = listingsWithCoords.isNotEmpty
                       ? LatLng(
-                          (listingsWithCoords.first['latitude'] as num).toDouble(),
-                          (listingsWithCoords.first['longitude'] as num).toDouble(),
+                          (listingsWithCoords.first['latitude'] as num)
+                              .toDouble(),
+                          (listingsWithCoords.first['longitude'] as num)
+                              .toDouble(),
                         )
                       : const LatLng(37.7749, -122.4194);
 
@@ -508,10 +636,15 @@ class _ExploreScreenState extends State<ExploreScreen> {
                           _mapController = mapController;
                           // Fit all markers in view if we have listings with coords
                           if (listingsWithCoords.isNotEmpty) {
-                            double minLat = 90, maxLat = -90, minLng = 180, maxLng = -180;
+                            double minLat = 90,
+                                maxLat = -90,
+                                minLng = 180,
+                                maxLng = -180;
                             for (final listing in listingsWithCoords) {
-                              final lat = (listing['latitude'] as num).toDouble();
-                              final lng = (listing['longitude'] as num).toDouble();
+                              final lat = (listing['latitude'] as num)
+                                  .toDouble();
+                              final lng = (listing['longitude'] as num)
+                                  .toDouble();
                               if (lat < minLat) minLat = lat;
                               if (lat > maxLat) maxLat = lat;
                               if (lng < minLng) minLng = lng;
@@ -535,7 +668,10 @@ class _ExploreScreenState extends State<ExploreScreen> {
                         left: 16,
                         right: 16,
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
                           decoration: BoxDecoration(
                             color: theme.cardColor,
                             borderRadius: BorderRadius.circular(20),
@@ -550,15 +686,15 @@ class _ExploreScreenState extends State<ExploreScreen> {
                             '${listingsWithCoords.length}/${allListings.length} ${isProperty ? 'properties' : 'hotels'} on map',
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                              color: theme.brightness == Brightness.dark 
-                                  ? Colors.white 
+                              color: theme.brightness == Brightness.dark
+                                  ? Colors.white
                                   : Colors.black87,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
                         ),
                       ),
-                      
+
                       // Zoom controls
                       Positioned(
                         right: 16,
@@ -597,7 +733,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                           ],
                         ),
                       ),
-                      
+
                       // Current location button
                       Positioned(
                         right: 16,
@@ -608,21 +744,26 @@ class _ExploreScreenState extends State<ExploreScreen> {
                           heroTag: 'myLocation',
                           onPressed: () async {
                             try {
-                              final permission = await Geolocator.checkPermission();
+                              final permission =
+                                  await Geolocator.checkPermission();
                               if (permission == LocationPermission.denied) {
                                 await Geolocator.requestPermission();
                               }
-                              
-                              final position = await Geolocator.getCurrentPosition(
-                                desiredAccuracy: LocationAccuracy.high,
-                              );
+
+                              final position =
+                                  await Geolocator.getCurrentPosition(
+                                    desiredAccuracy: LocationAccuracy.high,
+                                  );
                               _mapController?.animateCamera(
                                 CameraUpdate.newLatLng(
                                   LatLng(position.latitude, position.longitude),
                                 ),
                               );
                             } catch (e) {
-                              Get.snackbar('Error', 'Could not get current location');
+                              Get.snackbar(
+                                'Error',
+                                'Could not get current location',
+                              );
                             }
                           },
                           child: const Icon(
@@ -648,7 +789,9 @@ class _ExploreScreenState extends State<ExploreScreen> {
 
                   if (isProperty) {
                     // Filter properties by Buy/Rent
-                    final desiredType = propertyTypeIndex.value == 1 ? 'FOR_RENT' : 'FOR_SALE';
+                    final desiredType = propertyTypeIndex.value == 1
+                        ? 'FOR_RENT'
+                        : 'FOR_SALE';
                     final allProperties = controller.allPropertiesData;
                     final properties = allProperties.where((property) {
                       final raw = property['listingType'];
@@ -658,10 +801,11 @@ class _ExploreScreenState extends State<ExploreScreen> {
                       }
                       return listingType == desiredType;
                     }).toList();
-                    
+
                     if (properties.isEmpty) {
                       return Center(
-                        child: Text('No properties found'.tr,
+                        child: Text(
+                          'No properties found'.tr,
                           style: TextStyle(
                             fontSize: 16,
                             color: theme.brightness == Brightness.dark
@@ -684,13 +828,15 @@ class _ExploreScreenState extends State<ExploreScreen> {
                         final imageUrl = (images != null && images.isNotEmpty)
                             ? ListingService.propertyImageUrl(propertyId, 0)
                             : null;
-                        
+
                         // Get property price using controller like property_search_screen.dart
                         final price = controller.getPropertyPrice(property);
                         // Debug: print actual price data
-                        print('Property: ${property['title']}, Raw price: ${property['price']}, Formatted: $price');
+                        print(
+                          'Property: ${property['title']}, Raw price: ${property['price']}, Formatted: $price',
+                        );
                         final priceDisplay = price.isNotEmpty ? price : '\$0';
-                        
+
                         return ExploreHotelCard(
                           title: title,
                           location: address,
@@ -710,7 +856,8 @@ class _ExploreScreenState extends State<ExploreScreen> {
                     final hotels = controller.allHotelsData;
                     if (hotels.isEmpty) {
                       return Center(
-                        child: Text('No hotels found'.tr,
+                        child: Text(
+                          'No hotels found'.tr,
                           style: TextStyle(
                             fontSize: 16,
                             color: theme.brightness == Brightness.dark
@@ -733,24 +880,28 @@ class _ExploreScreenState extends State<ExploreScreen> {
                         final imageUrl = (images != null && images.isNotEmpty)
                             ? ListingService.hotelImageUrl(hotelId, 0)
                             : null;
-                        
+
                         // Get minimum room price with /night suffix for hotels
                         final rooms = hotel['rooms'] as List<dynamic>?;
                         int minPrice = 0;
                         if (rooms != null && rooms.isNotEmpty) {
                           for (final room in rooms) {
                             final priceData = room['price'];
-                            final price = priceData is num 
-                                ? priceData.toInt() 
-                                : int.tryParse(priceData?.toString() ?? '0') ?? 0;
-                            if (minPrice == 0 || (price > 0 && price < minPrice)) {
+                            final price = priceData is num
+                                ? priceData.toInt()
+                                : int.tryParse(priceData?.toString() ?? '0') ??
+                                      0;
+                            if (minPrice == 0 ||
+                                (price > 0 && price < minPrice)) {
                               minPrice = price;
                             }
                           }
                         }
-                        
-                        final priceDisplay = minPrice > 0 ? '\$$minPrice' : '\$0';
-                        
+
+                        final priceDisplay = minPrice > 0
+                            ? '\$$minPrice'
+                            : '\$0';
+
                         return ExploreHotelCard(
                           title: title,
                           location: address,
@@ -759,9 +910,8 @@ class _ExploreScreenState extends State<ExploreScreen> {
                           rating: rating,
                           price: priceDisplay,
                           showPerNight: true,
-                          onTap: () => Get.to(
-                            () => HotelDetailScreen(hotelData: hotel),
-                          ),
+                          onTap: () =>
+                              Get.to(() => HotelDetailScreen(hotelData: hotel)),
                         );
                       },
                     );
@@ -775,14 +925,18 @@ class _ExploreScreenState extends State<ExploreScreen> {
     );
   }
 
-  void _showListingOnMap(Map<String, dynamic> listing, bool isProperty, BuildContext context) {
+  void _showListingOnMap(
+    Map<String, dynamic> listing,
+    bool isProperty,
+    BuildContext context,
+  ) {
     final controller = Get.find<MainScreenController>();
     final title = listing['title'] ?? 'Unknown';
     final address = listing['address'] ?? '';
-    final price = isProperty 
+    final price = isProperty
         ? controller.getPropertyPrice(listing)
         : controller.getMinPrice(listing);
-    
+
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -819,10 +973,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
               const SizedBox(height: 4),
               Text(
                 address,
-                style: TextStyle(
-                  color: Colors.grey[600],
-                  fontSize: 14,
-                ),
+                style: TextStyle(color: Colors.grey[600], fontSize: 14),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -855,14 +1006,204 @@ class _ExploreScreenState extends State<ExploreScreen> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                child: Text('View Details'.tr,
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                child: Text(
+                  'View Details'.tr,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
             const SizedBox(height: 8),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildDesktopGrid(ThemeData theme, MainScreenController controller) {
+    final isProperty = controller.categoryIndex.value == 1;
+    final List<Map<String, dynamic>> listings;
+
+    if (isProperty) {
+      final desiredType = propertyTypeIndex.value == 1
+          ? 'FOR_RENT'
+          : 'FOR_SALE';
+      listings = controller.allPropertiesData
+          .where((property) {
+            final raw = property['listingType'];
+            final listingType = raw?.toString();
+            if (listingType == null || listingType.isEmpty) return true;
+            return listingType == desiredType;
+          })
+          .cast<Map<String, dynamic>>()
+          .toList();
+    } else {
+      listings = controller.allHotelsData.cast<Map<String, dynamic>>().toList();
+    }
+
+    if (listings.isEmpty) {
+      return Center(
+        child: Text(
+          isProperty ? 'No properties found'.tr : 'No hotels found'.tr,
+          style: theme.textTheme.titleMedium?.copyWith(
+            color: theme.textTheme.titleMedium?.color?.withValues(alpha: 0.64),
+          ),
+        ),
+      );
+    }
+
+    return GridView.builder(
+      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+        maxCrossAxisExtent: 390,
+        mainAxisSpacing: 18,
+        crossAxisSpacing: 18,
+        childAspectRatio: 1.18,
+      ),
+      itemCount: listings.length,
+      itemBuilder: (context, index) {
+        final listing = listings[index];
+        final title = listing['title'] ?? (isProperty ? 'Property' : 'Hotel');
+        final address = listing['address'] ?? '';
+        final rating = controller.getRating(listing);
+        final id = listing['id'] as int;
+        final images = listing['images'] as List<dynamic>?;
+        final imageUrl = (images != null && images.isNotEmpty)
+            ? (isProperty
+                  ? ListingService.propertyImageUrl(id, 0)
+                  : ListingService.hotelImageUrl(id, 0))
+            : null;
+        final price = isProperty
+            ? controller.getPropertyPrice(listing)
+            : controller.getMinPrice(listing);
+
+        return ExploreHotelCard(
+          title: title,
+          location: address,
+          imagePath: 'assets/hotel1.png',
+          imageUrl: imageUrl,
+          rating: rating,
+          price: price.isNotEmpty ? price : '\$0',
+          showPerNight: !isProperty,
+          onTap: () => Get.to(
+            () => isProperty
+                ? PropertyDetailScreen(propertyData: listing)
+                : HotelDetailScreen(hotelData: listing),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildDesktopMap(ThemeData theme, MainScreenController controller) {
+    final isProperty = controller.categoryIndex.value == 1;
+    final allListings = isProperty
+        ? controller.allPropertiesData
+        : controller.allHotelsData;
+    final listingsWithCoords = allListings.where((listing) {
+      final lat = listing['latitude'];
+      final lng = listing['longitude'];
+      return lat != null &&
+          lng != null &&
+          (lat as num) != 0 &&
+          (lng as num) != 0;
+    }).toList();
+
+    final markers = _buildMarkers(listingsWithCoords, isProperty, context);
+    final initialPosition = listingsWithCoords.isNotEmpty
+        ? LatLng(
+            (listingsWithCoords.first['latitude'] as num).toDouble(),
+            (listingsWithCoords.first['longitude'] as num).toDouble(),
+          )
+        : const LatLng(42.7087, 19.3744);
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(24),
+      child: Stack(
+        children: [
+          GoogleMap(
+            initialCameraPosition: CameraPosition(
+              target: initialPosition,
+              zoom: 9,
+            ),
+            markers: markers,
+            myLocationEnabled: false,
+            myLocationButtonEnabled: false,
+            zoomControlsEnabled: false,
+            mapToolbarEnabled: false,
+            onMapCreated: (mapController) {
+              _mapController = mapController;
+            },
+          ),
+          Positioned(
+            top: 18,
+            left: 18,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: theme.cardColor,
+                borderRadius: BorderRadius.circular(999),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 10,
+                ),
+                child: Text(
+                  '${listingsWithCoords.length}/${allListings.length} ${isProperty ? 'properties' : 'hotels'} on map',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          if (_selectedMapListing != null)
+            Positioned(
+              left: 18,
+              right: 18,
+              bottom: 18,
+              child: _buildMapListingCard(theme, controller),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DesktopViewToggle extends StatelessWidget {
+  const _DesktopViewToggle({
+    required this.isMap,
+    required this.onCards,
+    required this.onMap,
+  });
+
+  final bool isMap;
+  final VoidCallback onCards;
+  final VoidCallback onMap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return SegmentedButton<bool>(
+      segments: const [
+        ButtonSegment(
+          value: false,
+          icon: Icon(Icons.grid_view_rounded),
+          label: Text('Cards'),
+        ),
+        ButtonSegment(
+          value: true,
+          icon: Icon(Icons.map_rounded),
+          label: Text('Map'),
+        ),
+      ],
+      selected: {isMap},
+      onSelectionChanged: (value) {
+        value.first ? onMap() : onCards();
+      },
+      style: ButtonStyle(
+        foregroundColor: WidgetStatePropertyAll(theme.colorScheme.primary),
       ),
     );
   }
@@ -1085,7 +1426,8 @@ class _PropertyTypeToggle extends StatelessWidget {
                   borderRadius: BorderRadius.circular(23),
                 ),
                 alignment: Alignment.center,
-                child: Text('Buy'.tr,
+                child: Text(
+                  'Buy'.tr,
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -1109,7 +1451,8 @@ class _PropertyTypeToggle extends StatelessWidget {
                   borderRadius: BorderRadius.circular(23),
                 ),
                 alignment: Alignment.center,
-                child: Text('Rent'.tr,
+                child: Text(
+                  'Rent'.tr,
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,

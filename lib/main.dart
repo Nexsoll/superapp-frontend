@@ -1,14 +1,13 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:superapp/app_routes.dart';
 import 'package:superapp/controllers/profile_controller.dart';
-import 'package:google_maps_flutter_android/google_maps_flutter_android.dart';
-import 'package:google_maps_flutter_platform_interface/google_maps_flutter_platform_interface.dart';
+import 'package:superapp/firebase_options.dart';
+import 'package:superapp/screens/splash_screen.dart';
 
-import 'screens/splash_screen.dart';
 import 'utils/size_config.dart';
 
 const Color kPrimaryColor = Color(0xFF2FC1BE);
@@ -16,25 +15,36 @@ const Color kBackgroundColor = Color(0xFFF4F8F8);
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-
-  if (Platform.isAndroid) {
-    final mapsImplementation = GoogleMapsFlutterPlatform.instance;
-    if (mapsImplementation is GoogleMapsFlutterAndroid) {
-      mapsImplementation.useAndroidViewSurface = true;
-      try {
-        await mapsImplementation.initializeWithRenderer(AndroidMapRenderer.latest);
-      } catch (e) {
-        debugPrint('Google Maps Renderer already initialized: $e');
-      }
-    }
+  usePathUrlStrategy();
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } catch (e, stackTrace) {
+    debugPrint('Firebase initialization failed: $e');
+    debugPrintStack(stackTrace: stackTrace);
   }
 
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  late final ProfileController _profileController;
+
+  @override
+  void initState() {
+    super.initState();
+    _profileController = Get.isRegistered<ProfileController>()
+        ? Get.find<ProfileController>()
+        : Get.put(ProfileController(), permanent: true);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,13 +52,11 @@ class MyApp extends StatelessWidget {
       Theme.of(context).textTheme,
     ).apply(fontFamilyFallback: ['Noto Sans']);
 
-    final profileController = Get.put(ProfileController());
-
     return Obx(
       () => GetMaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Flutter Demo',
-        themeMode: profileController.isDark.value
+        themeMode: _profileController.isDark.value
             ? ThemeMode.dark
             : ThemeMode.light,
         theme: ThemeData(
@@ -156,7 +164,12 @@ class MyApp extends StatelessWidget {
           SizeConfig.init(context);
           return child ?? const SizedBox.shrink();
         },
-        home: const SplashScreen(),
+        initialRoute: AppRoutes.splash,
+        getPages: AppRoutes.pages,
+        unknownRoute: GetPage(
+          name: '/not-found',
+          page: () => const SplashScreen(),
+        ),
       ),
     );
   }

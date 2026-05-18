@@ -1,9 +1,8 @@
 import 'package:get/get.dart';
-import 'package:superapp/screens/auth/signin_screen.dart';
-import 'package:superapp/screens/auth/signup_screen.dart';
+import 'package:superapp/app_routes.dart';
 
 class WelcomeController extends GetxController {
-  void goToSignup() => Get.to(() => SignupScreen());
+  void goToSignup() => Get.toNamed(AppRoutes.signUp);
 
-  void goToLogin() => Get.to(() => SignInScreen());
+  void goToLogin() => Get.toNamed(AppRoutes.signIn);
 }

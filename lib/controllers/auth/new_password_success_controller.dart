@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
+import 'package:superapp/app_routes.dart';
 import 'package:superapp/controllers/auth/signin_controller.dart';
-import 'package:superapp/screens/auth/signin_screen.dart';
 
 class NewPasswordSuccessController extends GetxController {
   void continueToLogin() {
@@ -8,6 +8,6 @@ class NewPasswordSuccessController extends GetxController {
     if (Get.isRegistered<SignInController>()) {
       Get.delete<SignInController>(force: true);
     }
-    Get.offAll(() => const SignInScreen());
+    Get.offAllNamed(AppRoutes.signIn);
   }
 }

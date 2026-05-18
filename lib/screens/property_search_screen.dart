@@ -1,7 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../widgets/filter_bottom_sheet.dart';
 import '../widgets/property_filter_bottom_sheet.dart';
 import '../widgets/property_card.dart';
 import '../widgets/main_bottom_bar.dart';
@@ -26,13 +26,12 @@ class _PropertySearchScreenState extends State<PropertySearchScreen> {
   bool _hasSearched = false;
   late final MainScreenController controller;
   bool _showSearchBar = true;
-  
+
   // Filter state
   Map<String, dynamic>? _activeFilters;
-  
+
   // Sort state
   String _sortBy = 'recommended';
-  final List<String> _sortOptions = ['recommended', 'price_low', 'price_high', 'rating'];
 
   List<Map<String, dynamic>> _filterByListingType(
     List<Map<String, dynamic>> input,
@@ -48,10 +47,7 @@ class _PropertySearchScreenState extends State<PropertySearchScreen> {
     }).toList();
   }
 
-  Widget _buildCountRow({
-    required ThemeData theme,
-    required int count,
-  }) {
+  Widget _buildCountRow({required ThemeData theme, required int count}) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Row(
@@ -68,19 +64,13 @@ class _PropertySearchScreenState extends State<PropertySearchScreen> {
             ),
           ),
           Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 8,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
               color: theme.brightness == Brightness.dark
                   ? theme.cardColor
                   : const Color(0xFFE8F1F1),
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: const Color(0xFF2FC1BE),
-                width: 0.5,
-              ),
+              border: Border.all(color: const Color(0xFF2FC1BE), width: 0.5),
             ),
             child: PopupMenuButton<String>(
               onSelected: (value) {
@@ -126,10 +116,7 @@ class _PropertySearchScreenState extends State<PropertySearchScreen> {
                   value: 'price_high',
                   child: Text('Price: High to Low'.tr),
                 ),
-                PopupMenuItem(
-                  value: 'rating',
-                  child: Text('Rating'.tr),
-                ),
+                PopupMenuItem(value: 'rating', child: Text('Rating'.tr)),
               ],
             ),
           ),
@@ -145,7 +132,8 @@ class _PropertySearchScreenState extends State<PropertySearchScreen> {
   }) {
     if (properties.isEmpty) {
       return Center(
-        child: Text('No properties found'.tr,
+        child: Text(
+          'No properties found'.tr,
           style: TextStyle(
             fontSize: 16,
             color: theme.brightness == Brightness.dark
@@ -180,11 +168,157 @@ class _PropertySearchScreenState extends State<PropertySearchScreen> {
           rating: rating,
           price: price.isNotEmpty ? price : '\$0',
           tag: tag.isNotEmpty ? tag : null,
-          onTap: () => Get.to(
-            () => PropertyDetailScreen(propertyData: property),
-          ),
+          onTap: () =>
+              Get.to(() => PropertyDetailScreen(propertyData: property)),
         );
       },
+    );
+  }
+
+  Widget _buildDesktopPropertyGrid({
+    required ThemeData theme,
+    required MainScreenController controller,
+    required List<Map<String, dynamic>> properties,
+  }) {
+    if (properties.isEmpty) {
+      return Center(
+        child: Text(
+          'No properties found'.tr,
+          style: theme.textTheme.titleMedium?.copyWith(
+            color: theme.textTheme.titleMedium?.color?.withValues(alpha: 0.64),
+          ),
+        ),
+      );
+    }
+
+    return GridView.builder(
+      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+        maxCrossAxisExtent: 390,
+        mainAxisSpacing: 18,
+        crossAxisSpacing: 18,
+        childAspectRatio: 1.10,
+      ),
+      itemCount: properties.length,
+      itemBuilder: (context, index) {
+        final property = properties[index];
+        final title = property['title'] ?? 'Property';
+        final address = property['address'] ?? '';
+        final rating = controller.getRating(property);
+        final price = controller.getPropertyPrice(property);
+        final tag = controller.getPropertyTag(property);
+        final propertyId = property['id'] as int;
+        final images = property['images'] as List<dynamic>?;
+        final imageUrl = (images != null && images.isNotEmpty)
+            ? ListingService.propertyImageUrl(propertyId, 0)
+            : null;
+
+        return PropertyCard(
+          title: title,
+          location: address,
+          imagePath: 'assets/property-header.png',
+          imageUrl: imageUrl,
+          rating: rating,
+          price: price.isNotEmpty ? price : '\$0',
+          tag: tag.isNotEmpty ? tag : null,
+          onTap: () =>
+              Get.to(() => PropertyDetailScreen(propertyData: property)),
+        );
+      },
+    );
+  }
+
+  Widget _desktopListingTypeToggle(ThemeData theme) {
+    Widget option(String label, int value) {
+      final selected = _selectedType == value;
+      return Expanded(
+        child: InkWell(
+          onTap: () {
+            setState(() => _selectedType = value);
+            _applyFiltersAndSort();
+          },
+          borderRadius: BorderRadius.circular(14),
+          child: Container(
+            height: 46,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: selected ? theme.cardColor : Colors.transparent,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Text(
+              label.tr,
+              style: theme.textTheme.labelLarge?.copyWith(
+                color: selected
+                    ? const Color(0xFF2FC1BE)
+                    : theme.textTheme.labelLarge?.color?.withValues(
+                        alpha: 0.58,
+                      ),
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Container(
+      width: 300,
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: theme.brightness == Brightness.dark
+            ? const Color(0xFF2C2C2E)
+            : const Color(0xFFE8F1F1),
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Row(children: [option('Buy', 0), option('Rent', 1)]),
+    );
+  }
+
+  Widget _desktopSortMenu(ThemeData theme) {
+    return PopupMenuButton<String>(
+      onSelected: (value) {
+        setState(() => _sortBy = value);
+        _applyFiltersAndSort();
+      },
+      offset: const Offset(0, 44),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      color: theme.cardColor,
+      child: Container(
+        height: 48,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        decoration: BoxDecoration(
+          color: theme.cardColor,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: theme.dividerColor.withValues(alpha: 0.45)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.sort_rounded, color: theme.colorScheme.primary),
+            const SizedBox(width: 8),
+            Text(
+              _getSortLabel().tr,
+              style: theme.textTheme.labelLarge?.copyWith(
+                color: theme.colorScheme.primary,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(width: 4),
+            Icon(
+              Icons.keyboard_arrow_down_rounded,
+              color: theme.colorScheme.primary,
+            ),
+          ],
+        ),
+      ),
+      itemBuilder: (context) => [
+        PopupMenuItem(value: 'recommended', child: Text('Recommended'.tr)),
+        PopupMenuItem(value: 'price_low', child: Text('Price: Low to High'.tr)),
+        PopupMenuItem(
+          value: 'price_high',
+          child: Text('Price: High to Low'.tr),
+        ),
+        PopupMenuItem(value: 'rating', child: Text('Rating'.tr)),
+      ],
     );
   }
 
@@ -214,7 +348,7 @@ class _PropertySearchScreenState extends State<PropertySearchScreen> {
 
   void _performSearch(String query) {
     final queryLower = query.toLowerCase();
-    
+
     final results = controller.allPropertiesData.where((property) {
       final title = (property['title'] ?? '').toString().toLowerCase();
       final address = (property['address'] ?? '').toString().toLowerCase();
@@ -236,7 +370,9 @@ class _PropertySearchScreenState extends State<PropertySearchScreen> {
   }
 
   void _applyFiltersAndSort() {
-    List<Map<String, dynamic>> results = List.from(controller.allPropertiesData);
+    List<Map<String, dynamic>> results = List.from(
+      controller.allPropertiesData,
+    );
 
     // Apply search filter
     if (_hasSearched && _searchController.text.isNotEmpty) {
@@ -252,9 +388,17 @@ class _PropertySearchScreenState extends State<PropertySearchScreen> {
     results = _filterByListingType(results);
 
     // Apply property type filter
-    if (_activeFilters != null && _activeFilters!['propertyTypeIndex'] != null) {
+    if (_activeFilters != null &&
+        _activeFilters!['propertyTypeIndex'] != null) {
       final typeIndex = _activeFilters!['propertyTypeIndex'] as int;
-      final propertyTypes = ['House', 'Apartment', 'Condo', 'Land', 'Villa', 'Townhouse'];
+      final propertyTypes = [
+        'House',
+        'Apartment',
+        'Condo',
+        'Land',
+        'Villa',
+        'Townhouse',
+      ];
       if (typeIndex > 0 && typeIndex <= propertyTypes.length) {
         final selectedType = propertyTypes[typeIndex - 1];
         results = results.where((property) {
@@ -272,7 +416,9 @@ class _PropertySearchScreenState extends State<PropertySearchScreen> {
     });
   }
 
-  List<Map<String, dynamic>> _sortProperties(List<Map<String, dynamic>> properties) {
+  List<Map<String, dynamic>> _sortProperties(
+    List<Map<String, dynamic>> properties,
+  ) {
     final sorted = List<Map<String, dynamic>>.from(properties);
     switch (_sortBy) {
       case 'price_low':
@@ -319,6 +465,145 @@ class _PropertySearchScreenState extends State<PropertySearchScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     _showSearchBar = widget.searchQuery == null || widget.searchQuery!.isEmpty;
+    final isDesktopWeb = kIsWeb && MediaQuery.sizeOf(context).width >= 900;
+
+    if (isDesktopWeb) {
+      return Scaffold(
+        backgroundColor: theme.scaffoldBackgroundColor,
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 30),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    IconButton(
+                      onPressed: () => Get.back(),
+                      icon: const Icon(Icons.arrow_back_rounded),
+                      color: const Color(0xFF2FC1BE),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Featured Properties'.tr,
+                            style: theme.textTheme.headlineMedium?.copyWith(
+                              color: const Color(0xFF2FC1BE),
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            'Discover exclusive properties'.tr,
+                            style: theme.textTheme.bodyLarge?.copyWith(
+                              color: theme.textTheme.bodyLarge?.color
+                                  ?.withValues(alpha: 0.66),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    _desktopListingTypeToggle(theme),
+                  ],
+                ),
+                const SizedBox(height: 22),
+                Row(
+                  children: [
+                    Expanded(
+                      child: SizedBox(
+                        height: 52,
+                        child: TextField(
+                          controller: _searchController,
+                          onChanged: (value) {
+                            if (value.isEmpty) {
+                              setState(() {
+                                _hasSearched = false;
+                                _filteredProperties = [];
+                              });
+                            }
+                          },
+                          onSubmitted: (value) {
+                            if (value.isNotEmpty) _performSearch(value);
+                          },
+                          decoration: InputDecoration(
+                            hintText: 'Search Properties...'.tr,
+                            prefixIcon: const Icon(Icons.search_rounded),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    SizedBox(
+                      height: 48,
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            backgroundColor: Colors.transparent,
+                            builder: (context) => PropertyFilterBottomSheet(
+                              onApply: _applyFilters,
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF2FC1BE),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                        ),
+                        icon: const Icon(Icons.tune_rounded),
+                        label: Text('Filters'.tr),
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    _desktopSortMenu(theme),
+                  ],
+                ),
+                const SizedBox(height: 22),
+                Obx(() {
+                  final allProperties = _filterByListingType(
+                    controller.allPropertiesData,
+                  );
+                  final foundCount = _hasSearched
+                      ? _filterByListingType(_filteredProperties).length
+                      : allProperties.length;
+                  return Text(
+                    '$foundCount Properties Found'.tr,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w900,
+                    ),
+                  );
+                }),
+                const SizedBox(height: 16),
+                Expanded(
+                  child: Obx(() {
+                    if (controller.isFetchingProperties.value) {
+                      return const Center(
+                        child: CircularProgressIndicator(
+                          color: Color(0xFF2FC1BE),
+                        ),
+                      );
+                    }
+                    final properties = _hasSearched
+                        ? _filterByListingType(_filteredProperties)
+                        : _filterByListingType(controller.allPropertiesData);
+                    return _buildDesktopPropertyGrid(
+                      theme: theme,
+                      controller: controller,
+                      properties: properties,
+                    );
+                  }),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -337,7 +622,8 @@ class _PropertySearchScreenState extends State<PropertySearchScreen> {
                       size: 28,
                     ),
                   ),
-                  Text('Featured Properties'.tr,
+                  Text(
+                    'Featured Properties'.tr,
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.w700,
@@ -351,7 +637,8 @@ class _PropertySearchScreenState extends State<PropertySearchScreen> {
               padding: const EdgeInsets.only(left: 56, right: 24),
               child: Align(
                 alignment: Alignment.centerLeft,
-                child: Text('Discover exclusive properties'.tr,
+                child: Text(
+                  'Discover exclusive properties'.tr,
                   style: TextStyle(
                     fontSize: 16,
                     color: theme.brightness == Brightness.dark
@@ -493,7 +780,8 @@ class _PropertySearchScreenState extends State<PropertySearchScreen> {
                                 : null,
                           ),
                           alignment: Alignment.center,
-                          child: Text('Buy'.tr,
+                          child: Text(
+                            'Buy'.tr,
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
@@ -528,7 +816,8 @@ class _PropertySearchScreenState extends State<PropertySearchScreen> {
                                 : null,
                           ),
                           alignment: Alignment.center,
-                          child: Text('Rent'.tr,
+                          child: Text(
+                            'Rent'.tr,
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
@@ -555,16 +844,12 @@ class _PropertySearchScreenState extends State<PropertySearchScreen> {
                 count: _filterByListingType(_filteredProperties).length,
               )
             else
-              Obx(
-                () {
-                  final filtered =
-                      _filterByListingType(controller.allPropertiesData);
-                  return _buildCountRow(
-                    theme: theme,
-                    count: filtered.length,
-                  );
-                },
-              ),
+              Obx(() {
+                final filtered = _filterByListingType(
+                  controller.allPropertiesData,
+                );
+                return _buildCountRow(theme: theme, count: filtered.length);
+              }),
             const SizedBox(height: 20),
 
             Expanded(
@@ -574,17 +859,16 @@ class _PropertySearchScreenState extends State<PropertySearchScreen> {
                       controller: controller,
                       properties: _filterByListingType(_filteredProperties),
                     )
-                  : Obx(
-                      () {
-                        final filtered =
-                            _filterByListingType(controller.allPropertiesData);
-                        return _buildPropertyList(
-                          theme: theme,
-                          controller: controller,
-                          properties: filtered,
-                        );
-                      },
-                    ),
+                  : Obx(() {
+                      final filtered = _filterByListingType(
+                        controller.allPropertiesData,
+                      );
+                      return _buildPropertyList(
+                        theme: theme,
+                        controller: controller,
+                        properties: filtered,
+                      );
+                    }),
             ),
           ],
         ),

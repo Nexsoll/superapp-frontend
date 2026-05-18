@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -50,6 +51,13 @@ class _AddPropertyScreenState extends State<AddPropertyScreen> {
 
   final ImagePicker _picker = ImagePicker();
   final ListingService _listingService = ListingService();
+
+  ImageProvider _imageProviderForXFile(XFile file) {
+    if (kIsWeb) {
+      return NetworkImage(file.path);
+    }
+    return FileImage(File(file.path));
+  }
 
   final List<String> _propertyTypes = ['Villa', 'Apartment', 'House', 'Condo'];
 
@@ -436,8 +444,8 @@ class _AddPropertyScreenState extends State<AddPropertyScreen> {
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(16),
                             image: DecorationImage(
-                              image: FileImage(
-                                File(_selectedImages[index].path),
+                              image: _imageProviderForXFile(
+                                _selectedImages[index],
                               ),
                               fit: BoxFit.cover,
                             ),

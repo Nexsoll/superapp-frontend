@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:superapp/app_routes.dart';
 import 'package:superapp/screens/admin/admin_dashboard_screen.dart';
 import 'package:superapp/screens/staff/staff_dashboard_screen.dart';
 import 'package:superapp/screens/bottomNavScreen/edit_profile_screen.dart';
@@ -9,7 +10,6 @@ import 'package:superapp/screens/my_wallet_screen.dart';
 import 'package:superapp/screens/notification_setting_screen.dart';
 import 'package:superapp/screens/photo_detail_screen.dart';
 import 'package:superapp/screens/security_setting_screen.dart';
-import 'package:superapp/screens/auth/wellcome_screen.dart';
 import 'package:superapp/services/auth_service.dart';
 import 'package:superapp/services/listing_service.dart';
 import 'package:superapp/screens/bottomNavScreen/preferences_screen.dart';
@@ -86,7 +86,7 @@ class ProfileController extends GetxController {
     if (token.isEmpty) return;
     try {
       final data = await AuthService().getMe(token: token);
-      
+
       // Update observables
       firstName.value = data['firstName'] ?? '';
       username.value = data['fullName'] ?? (data['username'] ?? '');
@@ -120,8 +120,7 @@ class ProfileController extends GetxController {
 
       final service = AuthService();
       await service.updateMyFcmToken(token: token, fcmToken: fcmToken);
-    } catch (_) {
-    }
+    } catch (_) {}
   }
 
   Future<void> saveUserData({
@@ -196,7 +195,6 @@ class ProfileController extends GetxController {
     final saved = prefs.getBool(_themeKey);
 
     isDark.value = saved ?? true;
-    Get.changeThemeMode(isDark.value ? ThemeMode.dark : ThemeMode.light);
 
     if (saved == null) {
       await prefs.setBool(_themeKey, isDark.value);
@@ -205,7 +203,6 @@ class ProfileController extends GetxController {
 
   Future<void> toggleTheme(bool value) async {
     isDark.value = value;
-    Get.changeThemeMode(isDark.value ? ThemeMode.dark : ThemeMode.light);
 
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_themeKey, isDark.value);
@@ -246,7 +243,7 @@ class ProfileController extends GetxController {
     userId = 0;
     token = '';
 
-    Get.offAll(() => const WellcomeScreen());
+    Get.offAllNamed(AppRoutes.welcome);
   }
 
   void onAdminDashboard() => Get.to(() => const AdminDashboardScreen());

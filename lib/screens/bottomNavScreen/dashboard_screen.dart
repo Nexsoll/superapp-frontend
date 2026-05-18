@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:superapp/controllers/dashboard_controller.dart';
@@ -9,6 +10,122 @@ class DashboardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.put(DashboardController());
     final theme = Theme.of(context);
+    final isDesktopWeb = kIsWeb && MediaQuery.sizeOf(context).width >= 900;
+
+    if (isDesktopWeb) {
+      return Container(
+        color: theme.scaffoldBackgroundColor,
+        child: SafeArea(
+          child: RefreshIndicator(
+            onRefresh: controller.refreshOwnerSummary,
+            color: theme.colorScheme.primary,
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 32),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 1120),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Dashboard'.tr,
+                                  style: theme.textTheme.headlineMedium
+                                      ?.copyWith(
+                                        color: theme.colorScheme.primary,
+                                        fontWeight: FontWeight.w900,
+                                      ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'Track earnings, listings, requests, and owner tools.'
+                                      .tr,
+                                  style: theme.textTheme.bodyLarge?.copyWith(
+                                    color: theme.textTheme.bodyLarge?.color
+                                        ?.withValues(alpha: 0.68),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          TextButton.icon(
+                            onPressed: controller.onViewReport,
+                            icon: const Icon(Icons.bar_chart_rounded),
+                            label: Text('View Report'.tr),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 28),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            flex: 2,
+                            child: Obx(
+                              () => _EarningsCard(
+                                total: controller.earningsFormatted,
+                                chipText: controller.growthText,
+                                onTap: controller.onTotalEarnings,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 18),
+                          Expanded(
+                            child: Obx(
+                              () => _MiniStatCard(
+                                onTap: controller.onActiveListings,
+                                icon: Icons.home_outlined,
+                                iconBg: const Color(0xFFE6F7F7),
+                                iconColor: theme.colorScheme.primary,
+                                title: 'Active Listings',
+                                value: '${controller.activeListings.value}',
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 18),
+                          Expanded(
+                            child: Obx(
+                              () => _MiniRequestCard(
+                                onTap: controller.onPendingRequests,
+                                badgeText:
+                                    controller.pendingRequestsBadge.value,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 30),
+                      Text(
+                        'Management Tools'.tr,
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Obx(
+                        () => _DesktopToolsGrid(
+                          onMyListings: controller.onMyListings,
+                          onEarnings: controller.onEarnings,
+                          onExpenses: controller.onExpenses,
+                          onAnalytics: controller.onAnalytics,
+                          propertyCount: controller.activeProperties.value,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
 
     return Container(
       color: theme.scaffoldBackgroundColor,
@@ -32,7 +149,8 @@ class DashboardScreen extends StatelessWidget {
                         minimumSize: const Size(0, 0),
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       ),
-                      child: Text('View Report'.tr,
+                      child: Text(
+                        'View Report'.tr,
                         style: theme.textTheme.labelLarge?.copyWith(
                           color: theme.colorScheme.primary,
                           fontWeight: FontWeight.w600,
@@ -84,7 +202,8 @@ class DashboardScreen extends StatelessWidget {
 
                 const SizedBox(height: 14),
 
-                Text('Management Tools'.tr,
+                Text(
+                  'Management Tools'.tr,
                   style: theme.textTheme.titleMedium?.copyWith(
                     color: Get.isDarkMode
                         ? Colors.white
@@ -111,6 +230,68 @@ class DashboardScreen extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _DesktopToolsGrid extends StatelessWidget {
+  const _DesktopToolsGrid({
+    required this.onMyListings,
+    required this.onEarnings,
+    required this.onExpenses,
+    required this.onAnalytics,
+    required this.propertyCount,
+  });
+
+  final VoidCallback onMyListings;
+  final VoidCallback onEarnings;
+  final VoidCallback onExpenses;
+  final VoidCallback onAnalytics;
+  final int propertyCount;
+
+  @override
+  Widget build(BuildContext context) {
+    return GridView.count(
+      crossAxisCount: 4,
+      mainAxisSpacing: 16,
+      crossAxisSpacing: 16,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      childAspectRatio: 1.35,
+      children: [
+        _ToolTile(
+          icon: Icons.home_outlined,
+          iconBg: const Color(0xFFE6F7F7),
+          iconColor: Theme.of(context).colorScheme.primary,
+          title: 'My Listings',
+          subtitle: 'Manage $propertyCount properties',
+          onTap: onMyListings,
+        ),
+        _ToolTile(
+          icon: Icons.receipt_long_outlined,
+          iconBg: const Color(0xFFE9F7EC),
+          iconColor: const Color(0xFF22C55E),
+          title: 'Earnings',
+          subtitle: 'Payouts & History',
+          onTap: onEarnings,
+        ),
+        _ToolTile(
+          icon: Icons.description_outlined,
+          iconBg: const Color(0xFFFFECEC),
+          iconColor: const Color(0xFFEF4444),
+          title: 'Expenses',
+          subtitle: 'Track maintenance',
+          onTap: onExpenses,
+        ),
+        _ToolTile(
+          icon: Icons.bar_chart_rounded,
+          iconBg: const Color(0xFFF3E8FF),
+          iconColor: const Color(0xFF8B5CF6),
+          title: 'Analytics',
+          subtitle: 'Insights & Trends',
+          onTap: onAnalytics,
+        ),
+      ],
     );
   }
 }
@@ -185,7 +366,8 @@ class _EarningsCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 10),
-            Text('Total Earnings'.tr,
+            Text(
+              'Total Earnings'.tr,
               style: theme.textTheme.labelMedium?.copyWith(
                 color: Colors.white.withOpacity(0.9),
                 fontWeight: FontWeight.w700,
@@ -200,7 +382,8 @@ class _EarningsCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8),
-            Text('This month'.tr,
+            Text(
+              'This month'.tr,
               style: theme.textTheme.labelMedium?.copyWith(
                 color: Colors.white.withOpacity(0.85),
                 fontWeight: FontWeight.w700,
@@ -350,7 +533,8 @@ class _MiniRequestCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 6),
-                Text('Pending\nRequests'.tr,
+                Text(
+                  'Pending\nRequests'.tr,
                   style: theme.textTheme.labelMedium?.copyWith(
                     color: isDark ? Colors.white70 : const Color(0xFF9AA0AF),
                     fontWeight: FontWeight.w700,
@@ -363,7 +547,8 @@ class _MiniRequestCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('3'.tr,
+                      Text(
+                        '3'.tr,
                         style: theme.textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.w900,
                           color: isDark ? Colors.white : null,

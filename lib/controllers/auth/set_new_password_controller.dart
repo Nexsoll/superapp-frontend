@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:superapp/app_routes.dart';
 import 'package:superapp/screens/auth/new_password_success_screen.dart';
 import 'package:superapp/services/auth_service.dart';
 
@@ -23,7 +24,14 @@ class SetNewPasswordController extends GetxController {
     otp = args['otp'] ?? '';
   }
 
-  void back() => Get.back();
+  void back() {
+    if (Get.key.currentState?.canPop() ?? false) {
+      Get.back();
+      return;
+    }
+
+    Get.offAllNamed(AppRoutes.forgotPassword);
+  }
 
   void showNewPassword() => obscureNew.value = !obscureNew.value;
   void showConfirmPassword() => obscureConfirm.value = !obscureConfirm.value;

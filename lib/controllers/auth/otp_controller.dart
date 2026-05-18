@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'package:superapp/screens/auth/set_new_password_screen.dart';
+import 'package:superapp/app_routes.dart';
 import 'package:superapp/screens/complete_profile_screen.dart';
 import 'package:superapp/services/auth_service.dart';
 
@@ -24,7 +24,16 @@ class OtpController extends GetxController {
     }
   }
 
-  void back() => Get.back();
+  void back() {
+    if (Get.key.currentState?.canPop() ?? false) {
+      Get.back();
+      return;
+    }
+
+    Get.offAllNamed(
+      flow == 'forgot_password' ? AppRoutes.forgotPassword : AppRoutes.signUp,
+    );
+  }
 
   void setOtp(String v) => otp.value = v;
 
@@ -40,8 +49,8 @@ class OtpController extends GetxController {
         // Verify OTP via API first
         await _authService.verifyResetOtp(email: email, otp: otp.value);
         // OTP is valid — navigate to set new password screen
-        Get.to(
-          () => const SetNewPasswordScreen(),
+        Get.toNamed(
+          AppRoutes.setNewPassword,
           arguments: {'email': email, 'otp': otp.value},
         );
       } else {

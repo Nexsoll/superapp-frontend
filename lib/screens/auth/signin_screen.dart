@@ -1,6 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:superapp/controllers/auth/signin_controller.dart';
+import 'package:superapp/widgets/auth_desktop_shell.dart';
 import 'package:superapp/widgets/auth_social_button.dart';
 import 'package:superapp/widgets/auth_text_form_field.dart';
 
@@ -11,6 +13,101 @@ class SignInScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.put(SignInController());
     final theme = Theme.of(context);
+    final isDesktopWeb = kIsWeb && MediaQuery.sizeOf(context).width >= 900;
+
+    if (isDesktopWeb) {
+      return AuthDesktopShell(
+        logoAsset: 'assets/signin_logo.png',
+        title: 'Welcome back'.tr,
+        subtitle:
+            'Sign in to manage bookings, properties, and your account.'.tr,
+        heroTitle: 'A calmer way to run stays and properties',
+        heroSubtitle:
+            'Access guest bookings, saved places, owner tools, and messages from one web workspace.',
+        children: [
+          AuthTextFormField(
+            controller: controller.emailController,
+            hint: 'Enter your email',
+            prefixIcon: Icons.email_outlined,
+            keyboardType: TextInputType.emailAddress,
+            textInputAction: TextInputAction.next,
+          ),
+          const SizedBox(height: 14),
+          Obx(() {
+            return AuthTextFormField(
+              controller: controller.passwordController,
+              hint: 'Enter your password',
+              prefixIcon: Icons.lock_outline,
+              obscureText: controller.obscurePassword.value,
+              suffixIcon: controller.obscurePassword.value
+                  ? Icons.visibility_off_outlined
+                  : Icons.visibility_outlined,
+              onSuffixTap: controller.showPassword,
+              textInputAction: TextInputAction.done,
+            );
+          }),
+          const SizedBox(height: 10),
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton(
+              onPressed: controller.forgotPassword,
+              child: Text('Forgot password?'.tr),
+            ),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            height: 52,
+            child: Obx(
+              () => ElevatedButton(
+                onPressed: controller.isLoading.value
+                    ? null
+                    : controller.signIn,
+                child: controller.isLoading.value
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : Text('Sign In'.tr),
+              ),
+            ),
+          ),
+          const SizedBox(height: 18),
+          AuthDivider(label: 'or'.tr),
+          const SizedBox(height: 18),
+          SocialButton(
+            text: 'Sign in with Google',
+            icon: 'assets/google.png',
+            onTap: controller.signInWithGoogle,
+          ),
+          const SizedBox(height: 12),
+          SocialButton(
+            text: 'Sign in with Apple',
+            icon: 'assets/apple.png',
+            onTap: controller.signInWithApple,
+          ),
+        ],
+        footer: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              "Don't have an account?".tr,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: const Color(0xFF6B7280),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            TextButton(
+              onPressed: controller.goToSignup,
+              child: Text('Sign Up'.tr),
+            ),
+          ],
+        ),
+      );
+    }
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -33,7 +130,8 @@ class SignInScreen extends StatelessWidget {
 
               const SizedBox(height: 12),
 
-              Text('Sign in with your email'.tr,
+              Text(
+                'Sign in with your email'.tr,
                 style: theme.textTheme.titleMedium?.copyWith(
                   color: theme.colorScheme.primary,
                   fontWeight: FontWeight.w700,
@@ -74,7 +172,8 @@ class SignInScreen extends StatelessWidget {
                   onTap: controller.forgotPassword,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 6),
-                    child: Text('Forgot password?'.tr,
+                    child: Text(
+                      'Forgot password?'.tr,
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.primary,
                         fontWeight: FontWeight.w700,
@@ -110,7 +209,8 @@ class SignInScreen extends StatelessWidget {
                               strokeWidth: 2,
                             ),
                           )
-                        : Text('Sign In'.tr,
+                        : Text(
+                            'Sign In'.tr,
                             style: theme.textTheme.bodyMedium?.copyWith(
                               color: Colors.white,
                               fontWeight: FontWeight.w700,
@@ -127,7 +227,8 @@ class SignInScreen extends StatelessWidget {
                   Expanded(child: Divider(color: Color(0xFF6B7280))),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 10),
-                    child: Text('or'.tr,
+                    child: Text(
+                      'or'.tr,
                       style: TextStyle(
                         color: Color(0xFF6B7280),
                         fontWeight: FontWeight.w500,
@@ -157,7 +258,8 @@ class SignInScreen extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("Don't have an account?".tr,
+                  Text(
+                    "Don't have an account?".tr,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: const Color(0xFF6B7280),
                       fontWeight: FontWeight.w500,
@@ -165,7 +267,8 @@ class SignInScreen extends StatelessWidget {
                   ),
                   TextButton(
                     onPressed: controller.goToSignup,
-                    child: Text('Sign Up'.tr,
+                    child: Text(
+                      'Sign Up'.tr,
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.primary,
                         fontWeight: FontWeight.w900,

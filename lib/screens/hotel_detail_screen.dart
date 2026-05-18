@@ -1,7 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import '../controllers/main_screen_controller.dart';
 import '../controllers/profile_controller.dart';
+import '../controllers/wishlist_controller.dart';
 import '../screens/main_screen.dart';
 import '../screens/select_dates_screen.dart';
 import '../services/currency_service.dart';
@@ -111,7 +114,10 @@ class _HotelDetailScreenState extends State<HotelDetailScreen> {
         ? Get.find<ProfileController>()
         : Get.put(ProfileController());
     final userCurrency = profileController.userCurrency.value;
-    final convertedPrice = CurrencyService.convertFromUSD(priceUsd, userCurrency);
+    final convertedPrice = CurrencyService.convertFromUSD(
+      priceUsd,
+      userCurrency,
+    );
     return '${CurrencyService.formatAmount(convertedPrice, userCurrency, decimals: 0)}/night';
   }
 
@@ -143,9 +149,12 @@ class _HotelDetailScreenState extends State<HotelDetailScreen> {
 
     final checkInRaw = result['checkIn'];
     final checkOutRaw = result['checkOut'];
-    final nextCheckIn = checkInRaw is String ? DateTime.tryParse(checkInRaw) : null;
-    final nextCheckOut =
-        checkOutRaw is String ? DateTime.tryParse(checkOutRaw) : null;
+    final nextCheckIn = checkInRaw is String
+        ? DateTime.tryParse(checkInRaw)
+        : null;
+    final nextCheckOut = checkOutRaw is String
+        ? DateTime.tryParse(checkOutRaw)
+        : null;
 
     if (nextCheckIn == null || nextCheckOut == null) return;
 
@@ -172,12 +181,15 @@ class _HotelDetailScreenState extends State<HotelDetailScreen> {
     final reviews = (_hotelData['reviews'] as List<dynamic>?) ?? [];
     final images = (_hotelData['images'] as List<dynamic>?) ?? [];
     final hotelId = _toInt(_hotelData['id']);
-    final heroHotelImageUrl =
-        images.isNotEmpty && hotelId != null
-            ? ListingService.hotelImageUrl(hotelId, 0)
-            : null;
+    final heroHotelImageUrl = images.isNotEmpty && hotelId != null
+        ? ListingService.hotelImageUrl(hotelId, 0)
+        : null;
     final selectedRoomsCount = _selectedRoomsCount();
     final selectedNightlyTotal = _selectedNightlyTotal(rooms);
+    final isDesktopWeb = kIsWeb && MediaQuery.sizeOf(context).width >= 900;
+    final wishlistController = Get.isRegistered<WishlistController>()
+        ? Get.find<WishlistController>()
+        : Get.put(WishlistController());
 
     // Calculate rating
     double rating = 0.0;
@@ -201,6 +213,261 @@ class _HotelDetailScreenState extends State<HotelDetailScreen> {
       ratingLabel = 'Good';
     } else if (rating > 0) {
       ratingLabel = 'Average';
+    }
+
+    if (isDesktopWeb) {
+      return Scaffold(
+        backgroundColor: theme.scaffoldBackgroundColor,
+        body: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(40, 28, 40, 40),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 1240),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        IconButton(
+                          onPressed: () => Get.back(),
+                          icon: const Icon(Icons.arrow_back_rounded),
+                          color: const Color(0xFF2FC1BE),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Hotel details'.tr,
+                          style: theme.textTheme.titleLarge?.copyWith(
+                            color: const Color(0xFF2FC1BE),
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 18),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          flex: 7,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Stack(
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(28),
+                                    child: SizedBox(
+                                      height: 420,
+                                      width: double.infinity,
+                                      child: heroHotelImageUrl != null
+                                          ? Image.network(
+                                              heroHotelImageUrl,
+                                              fit: BoxFit.cover,
+                                              errorBuilder: (_, __, ___) =>
+                                                  Image.asset(
+                                                    'assets/hotel1.png',
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                            )
+                                          : Image.asset(
+                                              'assets/hotel1.png',
+                                              fit: BoxFit.cover,
+                                            ),
+                                    ),
+                                  ),
+                                  Positioned(
+                                    top: 18,
+                                    right: 18,
+                                    child: Row(
+                                      children: [
+                                        _DesktopHeroCircleButton(
+                                          icon: Icons.share_outlined,
+                                          onTap: () {},
+                                        ),
+                                        const SizedBox(width: 12),
+                                        if (hotelId != null)
+                                          Obx(
+                                            () => _DesktopHeroHeartButton(
+                                              isFilled: wishlistController
+                                                  .isHotelInWishlistSync(
+                                                    hotelId,
+                                                  ),
+                                              onTap: () => wishlistController
+                                                  .toggleHotelWishlist(hotelId),
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 28),
+                              HotelHeaderInfo(
+                                name: title,
+                                rating: rating,
+                                ratingLabel: ratingLabel,
+                                reviewCount: reviews.length,
+                                location: address,
+                              ),
+                              const SizedBox(height: 28),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    child: CheckInOutSection(
+                                      checkInDate: _checkInDate,
+                                      checkOutDate: _checkOutDate,
+                                      onCheckInTap: () => _openDatesSelection(
+                                        initialTabIndex: 0,
+                                        createBookingOnContinue: false,
+                                        hotelId: hotelId,
+                                        hotelTitle: title,
+                                        hotelAddress: address,
+                                        hotelImageUrl: heroHotelImageUrl,
+                                        rooms: rooms,
+                                      ),
+                                      onCheckOutTap: () => _openDatesSelection(
+                                        initialTabIndex: 1,
+                                        createBookingOnContinue: false,
+                                        hotelId: hotelId,
+                                        hotelTitle: title,
+                                        hotelAddress: address,
+                                        hotelImageUrl: heroHotelImageUrl,
+                                        rooms: rooms,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 22),
+                                  const Expanded(child: ARExperienceSection()),
+                                ],
+                              ),
+                              const SizedBox(height: 28),
+                              HotelAmenitiesSection(amenities: amenities),
+                              const SizedBox(height: 28),
+                              HotelAboutSection(description: description),
+                              const SizedBox(height: 28),
+                              SelectRoomSection(
+                                rooms: rooms,
+                                selectedQuantities: _selectedRoomQuantities,
+                                onQuantityChanged: _onQuantityChanged,
+                              ),
+                              const SizedBox(height: 28),
+                              HotelReviewsSection(
+                                reviews: reviews,
+                                hotelId: hotelId,
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 34),
+                        SizedBox(
+                          width: 360,
+                          child: Column(
+                            children: [
+                              Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.all(24),
+                                decoration: BoxDecoration(
+                                  color: theme.cardColor,
+                                  borderRadius: BorderRadius.circular(24),
+                                  border: Border.all(
+                                    color: theme.dividerColor.withValues(
+                                      alpha: 0.35,
+                                    ),
+                                  ),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      selectedRoomsCount > 0
+                                          ? '$selectedRoomsCount Room${selectedRoomsCount > 1 ? 's' : ''}'
+                                          : 'Select rooms'.tr,
+                                      style: theme.textTheme.titleMedium
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.w900,
+                                          ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      selectedRoomsCount > 0
+                                          ? _formatNightlyPrice(
+                                              selectedNightlyTotal,
+                                            )
+                                          : 'Choose a room to continue booking.'
+                                                .tr,
+                                      style: theme.textTheme.headlineSmall
+                                          ?.copyWith(
+                                            color: const Color(0xFF2FC1BE),
+                                            fontWeight: FontWeight.w900,
+                                          ),
+                                    ),
+                                    const SizedBox(height: 18),
+                                    SizedBox(
+                                      width: double.infinity,
+                                      height: 52,
+                                      child: ElevatedButton.icon(
+                                        onPressed: selectedRoomsCount > 0
+                                            ? () => _openDatesSelection(
+                                                initialTabIndex: 0,
+                                                createBookingOnContinue: true,
+                                                hotelId: hotelId,
+                                                hotelTitle: title,
+                                                hotelAddress: address,
+                                                hotelImageUrl:
+                                                    heroHotelImageUrl,
+                                                rooms: rooms,
+                                              )
+                                            : null,
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: const Color(
+                                            0xFF2FC1BE,
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              16,
+                                            ),
+                                          ),
+                                        ),
+                                        icon: const Icon(Icons.login_rounded),
+                                        label: Text('Check In'.tr),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 18),
+                              Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.all(20),
+                                decoration: BoxDecoration(
+                                  color: const Color(
+                                    0xFF2FC1BE,
+                                  ).withValues(alpha: 0.10),
+                                  borderRadius: BorderRadius.circular(22),
+                                ),
+                                child: Text(
+                                  'Free cancellation is available until 24 hours before check-in.'
+                                      .tr,
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    height: 1.45,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
     }
 
     return Scaffold(
@@ -267,10 +534,7 @@ class _HotelDetailScreenState extends State<HotelDetailScreen> {
                     onQuantityChanged: _onQuantityChanged,
                   ),
                   const SizedBox(height: 24),
-                  HotelReviewsSection(
-                    reviews: reviews,
-                    hotelId: hotelId,
-                  ),
+                  HotelReviewsSection(reviews: reviews, hotelId: hotelId),
                   const SizedBox(height: 100),
                 ],
               ),
@@ -385,13 +649,10 @@ class _HotelBookingBottomBar extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
-                      Icons.login,
-                      color: Colors.white,
-                      size: 18,
-                    ),
+                    Icon(Icons.login, color: Colors.white, size: 18),
                     SizedBox(width: 8),
-                    Text('Check In'.tr,
+                    Text(
+                      'Check In'.tr,
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 15,
@@ -404,6 +665,80 @@ class _HotelBookingBottomBar extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _DesktopHeroCircleButton extends StatelessWidget {
+  const _DesktopHeroCircleButton({required this.icon, required this.onTap});
+
+  final IconData icon;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(999),
+      child: Container(
+        width: 46,
+        height: 46,
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.92),
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.12),
+              blurRadius: 18,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: Icon(icon, color: Colors.black, size: 22),
+      ),
+    );
+  }
+}
+
+class _DesktopHeroHeartButton extends StatelessWidget {
+  const _DesktopHeroHeartButton({required this.isFilled, required this.onTap});
+
+  final bool isFilled;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(999),
+      child: Container(
+        width: 46,
+        height: 46,
+        decoration: BoxDecoration(
+          color: isFilled
+              ? const Color(0xFFFF6B6B).withValues(alpha: 0.92)
+              : Colors.white.withValues(alpha: 0.92),
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.12),
+              blurRadius: 18,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: Center(
+          child: SvgPicture.asset(
+            'assets/heart.svg',
+            width: 22,
+            height: 22,
+            colorFilter: ColorFilter.mode(
+              isFilled ? Colors.white : Colors.black,
+              BlendMode.srcIn,
+            ),
+          ),
+        ),
       ),
     );
   }

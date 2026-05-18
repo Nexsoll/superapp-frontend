@@ -1,9 +1,11 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../controllers/main_screen_controller.dart';
 import '../controllers/profile_controller.dart';
+import '../controllers/wishlist_controller.dart';
 import '../services/listing_service.dart';
 import '../services/currency_service.dart';
 import '../widgets/hotel_image_carousel.dart';
@@ -156,12 +158,341 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
     return _ownerId == profileController.userId;
   }
 
+  String _priceLabel() {
+    final price = _propertyData['price'];
+    var priceStr = '\$1.8 M';
+
+    if (price == null) return priceStr;
+
+    double priceValue = 0;
+    if (price is num) {
+      priceValue = price.toDouble();
+    } else if (price is String) {
+      priceValue = double.tryParse(price) ?? 0;
+    }
+
+    if (priceValue <= 0) return priceStr;
+
+    final profileController = Get.isRegistered<ProfileController>()
+        ? Get.find<ProfileController>()
+        : Get.put(ProfileController());
+    final userCurrency = profileController.userCurrency.value;
+    final convertedPrice = CurrencyService.convertFromUSD(
+      priceValue,
+      userCurrency,
+    );
+
+    if (convertedPrice >= 1000000) {
+      return '${CurrencyService.formatAmount(convertedPrice / 1000000, userCurrency, decimals: 1)} M';
+    }
+    if (convertedPrice >= 1000) {
+      return '${CurrencyService.formatAmount(convertedPrice / 1000, userCurrency, decimals: 0)} K';
+    }
+    return CurrencyService.formatAmount(
+      convertedPrice,
+      userCurrency,
+      decimals: 0,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final controller = Get.isRegistered<MainScreenController>()
         ? Get.find<MainScreenController>()
         : Get.put(MainScreenController());
     final theme = Theme.of(context);
+    final isDesktopWeb = kIsWeb && MediaQuery.sizeOf(context).width >= 900;
+    final wishlistController = Get.isRegistered<WishlistController>()
+        ? Get.find<WishlistController>()
+        : Get.put(WishlistController());
+
+    if (isDesktopWeb) {
+      final propertyId = _propertyData['id'] as int?;
+      final reviews = (_propertyData['reviews'] as List<dynamic>?) ?? [];
+      final imageUrl = _imageUrls.isNotEmpty ? _imageUrls.first : null;
+
+      return Scaffold(
+        backgroundColor: theme.scaffoldBackgroundColor,
+        body: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(40, 28, 40, 40),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 1240),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        IconButton(
+                          onPressed: () => Get.back(),
+                          icon: const Icon(Icons.arrow_back_rounded),
+                          color: const Color(0xFF2FC1BE),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Property details'.tr,
+                          style: theme.textTheme.titleLarge?.copyWith(
+                            color: const Color(0xFF2FC1BE),
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 18),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          flex: 7,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Stack(
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(28),
+                                    child: SizedBox(
+                                      height: 430,
+                                      width: double.infinity,
+                                      child: imageUrl != null
+                                          ? Image.network(
+                                              imageUrl,
+                                              fit: BoxFit.cover,
+                                              errorBuilder: (_, __, ___) =>
+                                                  Image.asset(
+                                                    'assets/property-header.png',
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                            )
+                                          : Image.asset(
+                                              'assets/property-header.png',
+                                              fit: BoxFit.cover,
+                                            ),
+                                    ),
+                                  ),
+                                  Positioned(
+                                    top: 18,
+                                    right: 18,
+                                    child: Row(
+                                      children: [
+                                        _DesktopPropertyHeroCircleButton(
+                                          icon: Icons.share_outlined,
+                                          onTap: () {},
+                                        ),
+                                        const SizedBox(width: 12),
+                                        if (propertyId != null)
+                                          Obx(
+                                            () =>
+                                                _DesktopPropertyHeroHeartButton(
+                                                  isFilled: wishlistController
+                                                      .isPropertyInWishlistSync(
+                                                        propertyId,
+                                                      ),
+                                                  onTap: () => wishlistController
+                                                      .togglePropertyWishlist(
+                                                        propertyId,
+                                                      ),
+                                                ),
+                                          ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 28),
+                              _PropertyHeaderInfo(
+                                theme: theme,
+                                title: _title,
+                                address: _address,
+                              ),
+                              const SizedBox(height: 28),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    child: _PropertyFeaturesSection(
+                                      theme: theme,
+                                      bedrooms: _rooms,
+                                      bathrooms: _bathrooms,
+                                      area: _area,
+                                      type: _propertyType,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 24),
+                                  Expanded(
+                                    child: _PropertyARExperienceSection(theme),
+                                  ),
+                                ],
+                              ),
+                              if (_amenities.isNotEmpty) ...[
+                                const SizedBox(height: 28),
+                                _PropertyAmenitiesSection(
+                                  theme: theme,
+                                  amenities: _amenities,
+                                ),
+                              ],
+                              const SizedBox(height: 28),
+                              _InvestmentAnalysisSection(
+                                theme: theme,
+                                propertyId: propertyId,
+                              ),
+                              if (_description.isNotEmpty) ...[
+                                const SizedBox(height: 28),
+                                _AboutSection(
+                                  theme: theme,
+                                  description: _description,
+                                ),
+                              ],
+                              if (_neighborhoodInsights.isNotEmpty) ...[
+                                const SizedBox(height: 28),
+                                _NeighborhoodInsightsSection(
+                                  theme: theme,
+                                  insights: _neighborhoodInsights,
+                                ),
+                              ],
+                              const SizedBox(height: 28),
+                              HotelReviewsSection(
+                                reviews: reviews,
+                                propertyId: propertyId,
+                              ),
+                              if (!_isOwner && _owner != null) ...[
+                                const SizedBox(height: 28),
+                                _ListedBySection(
+                                  theme: theme,
+                                  owner: _owner!,
+                                  propertyData: _propertyData,
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 34),
+                        SizedBox(
+                          width: 360,
+                          child: Column(
+                            children: [
+                              Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.all(24),
+                                decoration: BoxDecoration(
+                                  color: theme.cardColor,
+                                  borderRadius: BorderRadius.circular(24),
+                                  border: Border.all(
+                                    color: theme.dividerColor.withValues(
+                                      alpha: 0.35,
+                                    ),
+                                  ),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Price'.tr,
+                                      style: theme.textTheme.titleMedium
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.w900,
+                                          ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      _priceLabel(),
+                                      style: theme.textTheme.headlineMedium
+                                          ?.copyWith(
+                                            color: const Color(0xFF2FC1BE),
+                                            fontWeight: FontWeight.w900,
+                                          ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      _propertyType,
+                                      style: theme.textTheme.bodyMedium
+                                          ?.copyWith(
+                                            color: theme
+                                                .textTheme
+                                                .bodyMedium
+                                                ?.color
+                                                ?.withValues(alpha: 0.66),
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                    ),
+                                    const SizedBox(height: 22),
+                                    SizedBox(
+                                      width: double.infinity,
+                                      height: 52,
+                                      child: ElevatedButton.icon(
+                                        onPressed: _isOwner
+                                            ? null
+                                            : () {
+                                                Get.to(
+                                                  () => BookingSummaryScreen(
+                                                    bookingType: 'property',
+                                                    propertyData: _propertyData,
+                                                  ),
+                                                );
+                                              },
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: const Color(
+                                            0xFF2FC1BE,
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              16,
+                                            ),
+                                          ),
+                                        ),
+                                        icon: const Icon(
+                                          Icons.calendar_today_outlined,
+                                        ),
+                                        label: Text('Schedule Visit'.tr),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 18),
+                              Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.all(20),
+                                decoration: BoxDecoration(
+                                  color: const Color(
+                                    0xFF2FC1BE,
+                                  ).withValues(alpha: 0.10),
+                                  borderRadius: BorderRadius.circular(22),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Buyer tools'.tr,
+                                      style: theme.textTheme.titleSmall
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.w900,
+                                          ),
+                                    ),
+                                    const SizedBox(height: 10),
+                                    Text(
+                                      'Review features, neighborhood signals, investment analysis, and owner contact before scheduling.'
+                                          .tr,
+                                      style: theme.textTheme.bodyMedium
+                                          ?.copyWith(height: 1.45),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -222,7 +553,8 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                     ],
                     const SizedBox(height: 22),
                     HotelReviewsSection(
-                      reviews: (_propertyData['reviews'] as List<dynamic>?) ?? [],
+                      reviews:
+                          (_propertyData['reviews'] as List<dynamic>?) ?? [],
                       propertyId: _propertyData['id'] as int?,
                     ),
                     if (!_isOwner && _owner != null) ...[
@@ -295,7 +627,8 @@ class _PropertyHeaderInfo extends StatelessWidget {
               const SizedBox(height: 10),
               Row(
                 children: [
-                  Text('Superb'.tr,
+                  Text(
+                    'Superb'.tr,
                     style: TextStyle(
                       color: Color(0xFF2FC1BE),
                       fontWeight: FontWeight.w600,
@@ -348,7 +681,8 @@ class _PropertyHeaderInfo extends StatelessWidget {
             children: [
               const Icon(Icons.star, color: Color(0xFFFFB300), size: 18),
               const SizedBox(width: 4),
-              Text('4.8'.tr,
+              Text(
+                '4.8'.tr,
                 style: TextStyle(
                   fontWeight: FontWeight.w900,
                   fontSize: 16,
@@ -403,7 +737,8 @@ class _PropertyARExperienceSection extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Experience in AR'.tr,
+                    Text(
+                      'Experience in AR'.tr,
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
@@ -413,7 +748,8 @@ class _PropertyARExperienceSection extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    Text('Take a closer property in augmented reality'.tr,
+                    Text(
+                      'Take a closer property in augmented reality'.tr,
                       style: TextStyle(
                         color: theme.brightness == Brightness.dark
                             ? Colors.white70
@@ -440,7 +776,8 @@ class _PropertyARExperienceSection extends StatelessWidget {
                 ),
                 elevation: 0,
               ),
-              child: Text('Start Tour'.tr,
+              child: Text(
+                'Start Tour'.tr,
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 16,
@@ -475,7 +812,8 @@ class _PropertyFeaturesSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Property Features'.tr,
+        Text(
+          'Property Features'.tr,
           style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.w900,
@@ -588,7 +926,8 @@ class _PropertyAmenitiesSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Amenities'.tr,
+        Text(
+          'Amenities'.tr,
           style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.w900,
@@ -723,7 +1062,8 @@ class _InvestmentAnalysisSectionState
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('AI Investment Analysis'.tr,
+                    Text(
+                      'AI Investment Analysis'.tr,
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w900,
@@ -735,8 +1075,8 @@ class _InvestmentAnalysisSectionState
                       _isLoading
                           ? 'Analyzing property data...'
                           : _source == 'gemini-ai'
-                              ? 'Powered by Gemini AI'
-                              : 'Based on market trends and location data',
+                          ? 'Powered by Gemini AI'
+                          : 'Based on market trends and location data',
                       style: TextStyle(
                         color: subColor,
                         fontSize: 13,
@@ -845,7 +1185,8 @@ class _AboutSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('About This Property'.tr,
+        Text(
+          'About This Property'.tr,
           style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.w900,
@@ -885,7 +1226,8 @@ class _NeighborhoodInsightsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Neighborhood Insights'.tr,
+        Text(
+          'Neighborhood Insights'.tr,
           style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.w900,
@@ -1000,7 +1342,8 @@ class _ListedBySection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Listed By'.tr,
+        Text(
+          'Listed By'.tr,
           style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.w900,
@@ -1073,7 +1416,8 @@ class _ListedBySection extends StatelessWidget {
                           size: 16,
                         ),
                         const SizedBox(width: 4),
-                        Text('4.9'.tr,
+                        Text(
+                          '4.9'.tr,
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w700,
@@ -1083,7 +1427,8 @@ class _ListedBySection extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 4),
-                        Text('(127 reviews)'.tr,
+                        Text(
+                          '(127 reviews)'.tr,
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
@@ -1120,7 +1465,8 @@ class _ListedBySection extends StatelessWidget {
                           height: 12,
                         ),
                         const SizedBox(width: 4),
-                        Text('Verified'.tr,
+                        Text(
+                          'Verified'.tr,
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 11,
@@ -1136,9 +1482,12 @@ class _ListedBySection extends StatelessWidget {
                     onTap: () {
                       final ownerId = owner['id'] as int?;
                       final ownerName =
-                          owner['fullName'] ?? owner['firstName'] ?? 'Property Owner';
+                          owner['fullName'] ??
+                          owner['firstName'] ??
+                          'Property Owner';
                       final ownerAvatar = owner['avatar'] as String?;
-                      final avatarUrl = (ownerAvatar != null && ownerAvatar.isNotEmpty)
+                      final avatarUrl =
+                          (ownerAvatar != null && ownerAvatar.isNotEmpty)
                           ? ListingService.avatarImageUrl(ownerAvatar)
                           : '';
 
@@ -1183,7 +1532,8 @@ class _ListedBySection extends StatelessWidget {
                                 : const Color(0xFF1D2330),
                           ),
                           const SizedBox(width: 6),
-                          Text('Contact'.tr,
+                          Text(
+                            'Contact'.tr,
                             style: TextStyle(
                               color: theme.brightness == Brightness.dark
                                   ? Colors.white
@@ -1230,14 +1580,33 @@ class _BottomBar extends StatelessWidget {
             ? Get.find<ProfileController>()
             : Get.put(ProfileController());
         final userCurrency = profileController.userCurrency.value;
-        final convertedPrice = CurrencyService.convertFromUSD(priceValue, userCurrency);
+        final convertedPrice = CurrencyService.convertFromUSD(
+          priceValue,
+          userCurrency,
+        );
 
         if (convertedPrice >= 1000000) {
-          priceStr = CurrencyService.formatAmount(convertedPrice / 1000000, userCurrency, decimals: 1) + ' M';
+          priceStr =
+              CurrencyService.formatAmount(
+                convertedPrice / 1000000,
+                userCurrency,
+                decimals: 1,
+              ) +
+              ' M';
         } else if (convertedPrice >= 1000) {
-          priceStr = CurrencyService.formatAmount(convertedPrice / 1000, userCurrency, decimals: 0) + ' K';
+          priceStr =
+              CurrencyService.formatAmount(
+                convertedPrice / 1000,
+                userCurrency,
+                decimals: 0,
+              ) +
+              ' K';
         } else {
-          priceStr = CurrencyService.formatAmount(convertedPrice, userCurrency, decimals: 0);
+          priceStr = CurrencyService.formatAmount(
+            convertedPrice,
+            userCurrency,
+            decimals: 0,
+          );
         }
       }
     }
@@ -1253,7 +1622,9 @@ class _BottomBar extends StatelessWidget {
             offset: const Offset(0, -4),
           ),
         ],
-        border: const Border(top: BorderSide(color: Color(0xFF2FC1BE), width: 1.5)),
+        border: const Border(
+          top: BorderSide(color: Color(0xFF2FC1BE), width: 1.5),
+        ),
       ),
       child: Row(
         children: [
@@ -1263,17 +1634,24 @@ class _BottomBar extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Price'.tr,
+                Text(
+                  'Price'.tr,
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w800,
-                    color: theme.brightness == Brightness.dark ? Colors.white : const Color(0xFF1D2330),
+                    color: theme.brightness == Brightness.dark
+                        ? Colors.white
+                        : const Color(0xFF1D2330),
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   priceStr,
-                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: Color(0xFF2FC1BE)),
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w800,
+                    color: Color(0xFF2FC1BE),
+                  ),
                 ),
               ],
             ),
@@ -1285,20 +1663,36 @@ class _BottomBar extends StatelessWidget {
               height: 52,
               child: ElevatedButton(
                 onPressed: () {
-                  Get.to(() => BookingSummaryScreen(bookingType: 'property', propertyData: propertyData));
+                  Get.to(
+                    () => BookingSummaryScreen(
+                      bookingType: 'property',
+                      propertyData: propertyData,
+                    ),
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF2FC1BE),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
                   elevation: 0,
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.calendar_today_outlined, color: Colors.white, size: 18),
+                    Icon(
+                      Icons.calendar_today_outlined,
+                      color: Colors.white,
+                      size: 18,
+                    ),
                     SizedBox(width: 8),
-                    Text('Schedule Visit'.tr,
-                      style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w700),
+                    Text(
+                      'Schedule Visit'.tr,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ],
                 ),
@@ -1306,6 +1700,86 @@ class _BottomBar extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _DesktopPropertyHeroCircleButton extends StatelessWidget {
+  const _DesktopPropertyHeroCircleButton({
+    required this.icon,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(999),
+      child: Container(
+        width: 46,
+        height: 46,
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.92),
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.12),
+              blurRadius: 18,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: Icon(icon, color: Colors.black, size: 22),
+      ),
+    );
+  }
+}
+
+class _DesktopPropertyHeroHeartButton extends StatelessWidget {
+  const _DesktopPropertyHeroHeartButton({
+    required this.isFilled,
+    required this.onTap,
+  });
+
+  final bool isFilled;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(999),
+      child: Container(
+        width: 46,
+        height: 46,
+        decoration: BoxDecoration(
+          color: isFilled
+              ? const Color(0xFFFF6B6B).withValues(alpha: 0.92)
+              : Colors.white.withValues(alpha: 0.92),
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.12),
+              blurRadius: 18,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: Center(
+          child: SvgPicture.asset(
+            'assets/heart.svg',
+            width: 22,
+            height: 22,
+            colorFilter: ColorFilter.mode(
+              isFilled ? Colors.white : Colors.black,
+              BlendMode.srcIn,
+            ),
+          ),
+        ),
       ),
     );
   }

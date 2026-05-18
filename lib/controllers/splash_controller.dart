@@ -1,8 +1,6 @@
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:superapp/screens/auth/wellcome_screen.dart';
-import 'package:superapp/screens/main_screen.dart';
-import 'package:superapp/screens/on_boarding_screen.dart';
+import 'package:superapp/app_routes.dart';
 
 class SplashController extends GetxController {
   static const _onboardingDoneKey = 'onboarding_done';
@@ -24,13 +22,13 @@ class SplashController extends GetxController {
     if (!onboardingDone) {
       // First launch — show onboarding, then mark as done
       await prefs.setBool(_onboardingDoneKey, true);
-      Get.offAll(() => const OnboardingScreen());
+      Get.offAllNamed(AppRoutes.onboarding);
     } else if (userId > 0) {
       // User is signed in
-      Get.offAll(() => const MainScreen());
+      Get.offAllNamed(AppRoutes.main);
     } else {
       // User is logged out
-      Get.offAll(() => const WellcomeScreen());
+      Get.offAllNamed(AppRoutes.welcome);
     }
   }
 }

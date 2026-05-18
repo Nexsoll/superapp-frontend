@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'dart:convert';
 import 'dart:math';
@@ -6,11 +7,9 @@ import 'package:crypto/crypto.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+import 'package:superapp/app_routes.dart';
 import 'package:superapp/controllers/profile_controller.dart';
 import 'package:superapp/screens/complete_profile_screen.dart';
-import 'package:superapp/screens/main_screen.dart';
-import 'package:superapp/screens/auth/otp_screen.dart';
-import 'package:superapp/screens/auth/signup_screen.dart';
 import 'package:superapp/services/auth_service.dart';
 
 class SignInController extends GetxController {
@@ -26,7 +25,7 @@ class SignInController extends GetxController {
 
   void showPassword() => obscurePassword.value = !obscurePassword.value;
 
-  void goToSignup() => Get.to(() => const SignupScreen());
+  void goToSignup() => Get.toNamed(AppRoutes.signUp);
 
   Future<void> signIn() async {
     isLoading.value = true;
@@ -55,7 +54,7 @@ class SignInController extends GetxController {
       if (!isProfileComplete) {
         Get.offAll(() => const CompleteProfileScreen(), arguments: result);
       } else {
-        Get.offAll(() => const MainScreen());
+        Get.offAllNamed(AppRoutes.main);
       }
     } catch (e) {
       Get.snackbar('Error', e.toString().replaceFirst('Exception: ', ''));
@@ -71,8 +70,8 @@ class SignInController extends GetxController {
       return;
     }
 
-    Get.to(
-      () => const OtpScreen(),
+    Get.toNamed(
+      AppRoutes.otp,
       arguments: {'email': email, 'flow': 'forgot_password'},
     );
   }
@@ -80,22 +79,27 @@ class SignInController extends GetxController {
   Future<void> signInWithGoogle() async {
     isLoading.value = true;
     try {
-      // Initialize GoogleSignIn with web client ID (required for server-side auth)
-      await _googleSignIn.initialize(
-        clientId:
-            '634639795131-0uth2jlnhp540gn8ksvl6rfvtoblpofg.apps.googleusercontent.com',
-      );
-      final googleUser = await _googleSignIn.authenticate();
-      final googleAuth = await googleUser.authentication;
-      final googleIdToken = googleAuth.idToken;
-      if (googleIdToken == null || googleIdToken.isEmpty) {
-        throw Exception('Google sign-in failed (missing id token)');
-      }
-      final credential = GoogleAuthProvider.credential(idToken: googleIdToken);
+      late final UserCredential userCredential;
 
-      final userCredential = await _firebaseAuth.signInWithCredential(
-        credential,
-      );
+      if (kIsWeb) {
+        final provider = GoogleAuthProvider();
+        provider.setCustomParameters({'prompt': 'select_account'});
+        userCredential = await _firebaseAuth.signInWithPopup(provider);
+      } else {
+        await _googleSignIn.initialize();
+        final googleUser = await _googleSignIn.authenticate();
+        final googleAuth = googleUser.authentication;
+        final googleIdToken = googleAuth.idToken;
+        if (googleIdToken == null || googleIdToken.isEmpty) {
+          throw Exception('Google sign-in failed (missing id token)');
+        }
+
+        final credential = GoogleAuthProvider.credential(
+          idToken: googleIdToken,
+        );
+        userCredential = await _firebaseAuth.signInWithCredential(credential);
+      }
+
       final firebaseUser = userCredential.user;
       if (firebaseUser == null) {
         throw Exception('Google sign-in failed');
@@ -199,7 +203,7 @@ class SignInController extends GetxController {
     if (!isProfileComplete) {
       Get.offAll(() => const CompleteProfileScreen(), arguments: result);
     } else {
-      Get.offAll(() => const MainScreen());
+      Get.offAllNamed(AppRoutes.main);
     }
   }
 

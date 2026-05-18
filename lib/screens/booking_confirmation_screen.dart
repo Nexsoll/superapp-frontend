@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:superapp/controllers/main_screen_controller.dart';
 import 'package:superapp/screens/main_screen.dart';
@@ -6,10 +7,8 @@ import 'package:superapp/widgets/booking_reference_card.dart';
 import 'package:superapp/widgets/qr_code_card.dart';
 import 'package:superapp/widgets/booking_details_card.dart';
 import 'package:screenshot/screenshot.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:open_file/open_file.dart';
-import 'dart:io';
 import '../services/receipt_service.dart';
 
 class BookingConfirmationScreen extends StatefulWidget {
@@ -48,7 +47,8 @@ class BookingConfirmationScreen extends StatefulWidget {
   });
 
   @override
-  State<BookingConfirmationScreen> createState() => _BookingConfirmationScreenState();
+  State<BookingConfirmationScreen> createState() =>
+      _BookingConfirmationScreenState();
 }
 
 class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
@@ -111,10 +111,9 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
         roomType2: widget.detailLine2,
       );
 
-      await Share.shareXFiles(
-        [XFile(pdfFile.path)],
-        text: 'Booking Receipt: ${widget.referenceNumber}',
-      );
+      await Share.shareXFiles([
+        XFile(pdfFile.path),
+      ], text: 'Booking Receipt: ${widget.referenceNumber}');
     } catch (e) {
       Get.snackbar(
         'Error',
@@ -135,6 +134,180 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDesktopWeb = kIsWeb && MediaQuery.sizeOf(context).width >= 900;
+
+    if (isDesktopWeb) {
+      return Scaffold(
+        backgroundColor: theme.scaffoldBackgroundColor,
+        body: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 34),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 1120),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Image.asset(
+                            'assets/success.png',
+                            width: 92,
+                            height: 92,
+                          ),
+                          const SizedBox(height: 24),
+                          Text(
+                            'Booking Confirmed!'.tr,
+                            style: theme.textTheme.headlineMedium?.copyWith(
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            'Your reservation has been successfully completed'
+                                .tr,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              color: theme.textTheme.titleMedium?.color
+                                  ?.withValues(alpha: 0.66),
+                              height: 1.45,
+                            ),
+                          ),
+                          const SizedBox(height: 28),
+                          BookingReferenceCard(
+                            referenceNumber: widget.referenceNumber,
+                          ),
+                          const SizedBox(height: 18),
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              color: const Color(
+                                0xFF79C7EE,
+                              ).withValues(alpha: 0.10),
+                              borderRadius: BorderRadius.circular(18),
+                              border: Border.all(
+                                color: const Color(
+                                  0xFF79C7EE,
+                                ).withValues(alpha: 0.3),
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(
+                                  Icons.mark_email_read_outlined,
+                                  color: Color(0xFF2FC1BE),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    '${'Confirmation email sent to'.tr} ${widget.email}',
+                                    style: theme.textTheme.bodyMedium,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 28),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: SizedBox(
+                                  height: 54,
+                                  child: ElevatedButton.icon(
+                                    onPressed: () {
+                                      final controller =
+                                          Get.isRegistered<
+                                            MainScreenController
+                                          >()
+                                          ? Get.find<MainScreenController>()
+                                          : Get.put(
+                                              MainScreenController(),
+                                              permanent: true,
+                                            );
+                                      controller.bottomIndex.value = 2;
+                                      controller.categoryIndex.value =
+                                          widget.bookingType == 'property'
+                                          ? 1
+                                          : 0;
+                                      Get.offAll(() => const MainScreen());
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xFF2FC1BE),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                      ),
+                                    ),
+                                    icon: const Icon(
+                                      Icons.calendar_today_outlined,
+                                    ),
+                                    label: Text('View My Bookings'.tr),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 14),
+                              Expanded(
+                                child: SizedBox(
+                                  height: 54,
+                                  child: OutlinedButton.icon(
+                                    onPressed: () {
+                                      Get.offAll(() => const MainScreen());
+                                    },
+                                    style: OutlinedButton.styleFrom(
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                      ),
+                                    ),
+                                    icon: const Icon(Icons.home_outlined),
+                                    label: Text('Back To Home'.tr),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 34),
+                    SizedBox(
+                      width: 440,
+                      child: Column(
+                        children: [
+                          Screenshot(
+                            controller: _screenshotController,
+                            child: QrCodeCard(
+                              qrData: _generateQRData(),
+                              onDownload: _downloadQRCode,
+                              onShare: _shareQRCode,
+                            ),
+                          ),
+                          const SizedBox(height: 18),
+                          BookingDetailsCard(
+                            hotelName: widget.listingTitle,
+                            location: widget.location,
+                            imageUrl: widget.imageUrl,
+                            detailLabel: widget.detailLabel,
+                            roomType1: widget.detailLine1,
+                            roomType2: widget.detailLine2,
+                            checkIn: widget.checkIn,
+                            checkOut: widget.checkOut,
+                            guests: widget.guests,
+                            totalPaid: widget.totalPaid,
+                            paymentMethod: widget.paymentMethod,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
@@ -148,7 +321,8 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
                 const SizedBox(height: 20),
 
                 // Title
-                Text('Booking Confirmed!'.tr,
+                Text(
+                  'Booking Confirmed!'.tr,
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
@@ -158,7 +332,8 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
                 const SizedBox(height: 8),
 
                 // Subtitle
-                Text('Your reservation has been successfully\ncompleted'.tr,
+                Text(
+                  'Your reservation has been successfully\ncompleted'.tr,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 14,
@@ -216,7 +391,8 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
 
                   child: Column(
                     children: [
-                      Text('Confirmation email sent to'.tr,
+                      Text(
+                        'Confirmation email sent to'.tr,
                         style: TextStyle(
                           fontSize: 15,
                           color: Color(0xFF5A606A),
@@ -242,7 +418,8 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
                   height: 54,
                   child: ElevatedButton(
                     onPressed: () {
-                      final controller = Get.isRegistered<MainScreenController>()
+                      final controller =
+                          Get.isRegistered<MainScreenController>()
                           ? Get.find<MainScreenController>()
                           : Get.put(MainScreenController(), permanent: true);
                       controller.bottomIndex.value = 2;
@@ -267,7 +444,8 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
                           color: Colors.white,
                         ),
                         SizedBox(width: 10),
-                        Text('View My Bookings'.tr,
+                        Text(
+                          'View My Bookings'.tr,
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -306,7 +484,8 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
                           color: theme.textTheme.bodyLarge?.color,
                         ),
                         const SizedBox(width: 10),
-                        Text('Back To Home'.tr,
+                        Text(
+                          'Back To Home'.tr,
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,

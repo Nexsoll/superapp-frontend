@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -18,6 +19,108 @@ class AiAssistantScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDesktopWeb = kIsWeb && MediaQuery.sizeOf(context).width >= 900;
+    if (isDesktopWeb) {
+      return Scaffold(
+        backgroundColor: theme.scaffoldBackgroundColor,
+        body: SafeArea(
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1040),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 28,
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.primary.withValues(
+                              alpha: 0.13,
+                            ),
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: Icon(
+                            Icons.auto_awesome_rounded,
+                            color: theme.colorScheme.primary,
+                          ),
+                        ),
+                        const SizedBox(width: 14),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'AI Assistant'.tr,
+                              style: theme.textTheme.headlineSmall?.copyWith(
+                                color: theme.colorScheme.primary,
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
+                            Text(
+                              'Ask about hotels, prices, rooms, staff, and operations.'
+                                  .tr,
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: theme.textTheme.bodyMedium?.color
+                                    ?.withValues(alpha: 0.66),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 22),
+                    Expanded(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: theme.dividerColor.withValues(alpha: 0.35),
+                          ),
+                          borderRadius: BorderRadius.circular(24),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(24),
+                          child: Obx(
+                            () => ListView.builder(
+                              controller: controller.scrollController,
+                              padding: const EdgeInsets.all(24),
+                              itemCount:
+                                  controller.messages.length +
+                                  (controller.isLoading.value ? 1 : 0),
+                              itemBuilder: (context, index) {
+                                if (index == controller.messages.length) {
+                                  return const Padding(
+                                    padding: EdgeInsets.all(16),
+                                    child: Center(
+                                      child: CircularProgressIndicator(),
+                                    ),
+                                  );
+                                }
+
+                                final message = controller.messages[index];
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 20),
+                                  child: _buildMessageItem(context, message),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    _buildInputArea(context),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       body: Column(
@@ -59,12 +162,13 @@ class AiAssistantScreen extends StatelessWidget {
 
   Widget _buildMessageItem(BuildContext context, AiChatMessage message) {
     if (message.isUser) {
+      final maxWidth = kIsWeb && MediaQuery.sizeOf(context).width >= 900
+          ? 560.0
+          : MediaQuery.of(context).size.width * 0.85;
       return Align(
         alignment: Alignment.centerRight,
         child: ConstrainedBox(
-          constraints: BoxConstraints(
-            maxWidth: MediaQuery.of(context).size.width * 0.85,
-          ),
+          constraints: BoxConstraints(maxWidth: maxWidth),
           child: _UserMessage(message: message.text ?? ''),
         ),
       );
@@ -82,12 +186,13 @@ class AiAssistantScreen extends StatelessWidget {
           break;
       }
 
+      final maxWidth = kIsWeb && MediaQuery.sizeOf(context).width >= 900
+          ? 640.0
+          : MediaQuery.of(context).size.width * 0.85;
       return Align(
         alignment: Alignment.centerLeft,
         child: ConstrainedBox(
-          constraints: BoxConstraints(
-            maxWidth: MediaQuery.of(context).size.width * 0.85,
-          ),
+          constraints: BoxConstraints(maxWidth: maxWidth),
           child: content,
         ),
       );
@@ -106,14 +211,16 @@ class AiAssistantScreen extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('AI Assistant'.tr,
+              Text(
+                'AI Assistant'.tr,
                 style: GoogleFonts.outfit(
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
                   color: Colors.white,
                 ),
               ),
-              Text('Powered by machine learning'.tr,
+              Text(
+                'Powered by machine learning'.tr,
                 style: GoogleFonts.outfit(
                   fontSize: 12,
                   fontWeight: FontWeight.w400,
@@ -303,7 +410,8 @@ class _AiMessage extends StatelessWidget {
                 color: const Color(0xFF1CB5B3),
               ),
               const SizedBox(width: 8),
-              Text('AI Assistant'.tr,
+              Text(
+                'AI Assistant'.tr,
                 style: GoogleFonts.outfit(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
@@ -644,7 +752,8 @@ class _PricePredictionCard extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Current Price'.tr,
+                  Text(
+                    'Current Price'.tr,
                     style: GoogleFonts.outfit(
                       fontSize: 12,
                       color: const Color(0xFF6B7280),
@@ -668,7 +777,8 @@ class _PricePredictionCard extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text('Best Price'.tr,
+                  Text(
+                    'Best Price'.tr,
                     style: GoogleFonts.outfit(
                       fontSize: 12,
                       color: const Color(0xFF6B7280),

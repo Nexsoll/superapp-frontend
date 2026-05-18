@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/profile_controller.dart';
@@ -60,6 +61,168 @@ class _SelectDatesScreenState extends State<SelectDatesScreen> {
     final bool isContinueEnabled =
         !_isSubmitting && _checkIn != null && _checkOut != null;
     final theme = Theme.of(context);
+    final isDesktopWeb = kIsWeb && MediaQuery.sizeOf(context).width >= 900;
+
+    if (isDesktopWeb) {
+      return Scaffold(
+        backgroundColor: theme.scaffoldBackgroundColor,
+        body: SafeArea(
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1120),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 34,
+                  vertical: 30,
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      width: 330,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          TextButton.icon(
+                            onPressed: () => Get.back(),
+                            icon: const Icon(Icons.arrow_back_rounded),
+                            label: Text('Back'.tr),
+                          ),
+                          const SizedBox(height: 34),
+                          Text(
+                            'Select Dates'.tr,
+                            style: theme.textTheme.headlineMedium?.copyWith(
+                              color: const Color(0xFF2FC1BE),
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            widget.hotelTitle.isNotEmpty
+                                ? widget.hotelTitle
+                                : 'Choose your stay window'.tr,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          _dateTopCard(
+                            label: 'CHECK-IN',
+                            date: _formatTopDate(_checkIn),
+                            isActive: _tabIndex == 0,
+                            onTap: () => setState(() => _tabIndex = 0),
+                          ),
+                          const SizedBox(height: 14),
+                          _dateTopCard(
+                            label: 'CHECK-OUT',
+                            date: _formatTopDate(_checkOut),
+                            isActive: _tabIndex == 1,
+                            onTap: () => setState(() => _tabIndex = 1),
+                          ),
+                          const Spacer(),
+                          SizedBox(
+                            width: double.infinity,
+                            height: 54,
+                            child: ElevatedButton(
+                              onPressed: isContinueEnabled
+                                  ? _onContinuePressed
+                                  : null,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF2FC1BE),
+                                disabledBackgroundColor: const Color(
+                                  0xFF2FC1BE,
+                                ).withValues(alpha: 0.45),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(18),
+                                ),
+                                elevation: 0,
+                              ),
+                              child: Text(
+                                _isSubmitting
+                                    ? 'Please wait...'
+                                    : widget.createBookingOnContinue
+                                    ? 'Continue Booking'
+                                    : 'Save Dates',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 48),
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.all(28),
+                        decoration: BoxDecoration(
+                          color: theme.cardColor,
+                          borderRadius: BorderRadius.circular(28),
+                          border: Border.all(
+                            color: theme.dividerColor.withValues(alpha: 0.35),
+                          ),
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  _monthTitle(_visibleMonth),
+                                  style: theme.textTheme.titleLarge?.copyWith(
+                                    fontWeight: FontWeight.w900,
+                                  ),
+                                ),
+                                Row(
+                                  children: [
+                                    IconButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          _visibleMonth = _addMonths(
+                                            _visibleMonth,
+                                            -1,
+                                          );
+                                        });
+                                      },
+                                      icon: const Icon(Icons.chevron_left),
+                                      color: const Color(0xFF2FC1BE),
+                                    ),
+                                    IconButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          _visibleMonth = _addMonths(
+                                            _visibleMonth,
+                                            1,
+                                          );
+                                        });
+                                      },
+                                      icon: const Icon(Icons.chevron_right),
+                                      color: const Color(0xFF2FC1BE),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 22),
+                            _weekHeader(),
+                            const SizedBox(height: 14),
+                            _calendarGrid(),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -79,7 +242,8 @@ class _SelectDatesScreenState extends State<SelectDatesScreen> {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  Text('Select Dates'.tr,
+                  Text(
+                    'Select Dates'.tr,
                     style: TextStyle(
                       color: Color(0xFF2FC1BE),
                       fontSize: 18,

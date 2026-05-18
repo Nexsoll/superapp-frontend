@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:superapp/controllers/property_analytics_controller.dart';
@@ -9,6 +10,278 @@ class PropertyAnalyticsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.put(PropertyAnalyticsController());
     final theme = Theme.of(context);
+    final isDesktopWeb = kIsWeb && MediaQuery.sizeOf(context).width >= 900;
+
+    if (isDesktopWeb) {
+      return Scaffold(
+        backgroundColor: theme.scaffoldBackgroundColor,
+        body: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 32),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 1160),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        IconButton(
+                          onPressed: controller.back,
+                          icon: const Icon(Icons.arrow_back_rounded),
+                          color: theme.colorScheme.primary,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Property Analytics".tr,
+                                style: theme.textTheme.headlineMedium?.copyWith(
+                                  color: theme.colorScheme.primary,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                "Track occupancy, yield, viewings, and income performance."
+                                    .tr,
+                                style: theme.textTheme.bodyLarge?.copyWith(
+                                  color: theme.textTheme.bodyLarge?.color
+                                      ?.withValues(alpha: 0.66),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          height: 48,
+                          child: ElevatedButton.icon(
+                            onPressed: controller.onExport,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: theme.colorScheme.primary,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                            ),
+                            icon: const Icon(Icons.download_rounded, size: 18),
+                            label: Text("Export Full Report".tr),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    Obx(
+                      () => SizedBox(
+                        width: 560,
+                        child: _RangeTabs(
+                          selected: controller.range.value,
+                          onTap: controller.setRange,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    Obx(
+                      () => GridView.count(
+                        crossAxisCount: 4,
+                        crossAxisSpacing: 16,
+                        mainAxisSpacing: 16,
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        childAspectRatio: 1.35,
+                        children: [
+                          _StatCard(
+                            label: "Occupancy",
+                            valueText:
+                                "${controller.occupancy.value.toStringAsFixed(0)}%",
+                            deltaText:
+                                "+${controller.occupancyDelta.value.toStringAsFixed(1)}%",
+                            deltaSubText: "vs last mo",
+                            positive: true,
+                            icon: Icons.home_outlined,
+                            iconBg: theme.colorScheme.primary.withValues(
+                              alpha: 0.12,
+                            ),
+                            iconFg: theme.colorScheme.primary,
+                          ),
+                          _StatCard(
+                            label: "Yield",
+                            valueText:
+                                "${controller.yieldValue.value.toStringAsFixed(1)}%",
+                            deltaText:
+                                "+${controller.yieldDelta.value.toStringAsFixed(1)}%",
+                            deltaSubText: "vs target",
+                            positive: true,
+                            icon: Icons.percent_rounded,
+                            iconBg: theme.colorScheme.primary.withValues(
+                              alpha: 0.12,
+                            ),
+                            iconFg: theme.colorScheme.primary,
+                          ),
+                          _StatCard(
+                            label: "Viewings",
+                            valueText: "${controller.viewings.value}",
+                            deltaText: "",
+                            deltaSubText: "Total this month",
+                            positive: true,
+                            icon: Icons.visibility_outlined,
+                            iconBg: theme.colorScheme.primary.withValues(
+                              alpha: 0.12,
+                            ),
+                            iconFg: theme.colorScheme.primary,
+                            showDelta: false,
+                          ),
+                          _StatCard(
+                            label: "Avg. Stay",
+                            valueText:
+                                "${controller.avgStay.value.toStringAsFixed(1)}",
+                            unitText: "Nights",
+                            deltaText:
+                                "+${controller.avgStayDelta.value.toStringAsFixed(1)}",
+                            deltaSubText: "",
+                            positive: true,
+                            icon: Icons.access_time_rounded,
+                            iconBg: theme.colorScheme.primary.withValues(
+                              alpha: 0.12,
+                            ),
+                            iconFg: theme.colorScheme.primary,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          flex: 3,
+                          child: _Card(
+                            child: Padding(
+                              padding: const EdgeInsets.all(22),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      Text(
+                                        "Occupancy Trends".tr,
+                                        style: theme.textTheme.titleMedium
+                                            ?.copyWith(
+                                              fontWeight: FontWeight.w900,
+                                            ),
+                                      ),
+                                      const Spacer(),
+                                      Icon(
+                                        Icons.more_horiz_rounded,
+                                        color: theme.colorScheme.primary,
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      "Daily occupancy rate over selected period"
+                                          .tr,
+                                      style: theme.textTheme.bodySmall
+                                          ?.copyWith(
+                                            color: theme
+                                                .textTheme
+                                                .bodySmall
+                                                ?.color
+                                                ?.withValues(alpha: 0.62),
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 22),
+                                  SizedBox(
+                                    height: 190,
+                                    child: _LineChart(
+                                      points: controller.occupancyTrend,
+                                      stroke: theme.colorScheme.primary,
+                                      dot: theme.colorScheme.primary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 20),
+                        Expanded(
+                          flex: 2,
+                          child: Obx(
+                            () => _Card(
+                              child: Padding(
+                                padding: const EdgeInsets.all(22),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Text(
+                                          "Financial Breakdown".tr,
+                                          style: theme.textTheme.titleMedium
+                                              ?.copyWith(
+                                                fontWeight: FontWeight.w900,
+                                              ),
+                                        ),
+                                        const Spacer(),
+                                        Icon(
+                                          Icons.bar_chart_rounded,
+                                          color: theme.colorScheme.primary,
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 18),
+                                    Row(
+                                      children: [
+                                        Text(
+                                          "\$${controller.netIncome.value.toStringAsFixed(0)}",
+                                          style: theme.textTheme.headlineSmall
+                                              ?.copyWith(
+                                                fontWeight: FontWeight.w900,
+                                              ),
+                                        ),
+                                        const SizedBox(width: 10),
+                                        Text(
+                                          "Net income".tr,
+                                          style: theme.textTheme.labelLarge
+                                              ?.copyWith(
+                                                color: theme
+                                                    .textTheme
+                                                    .labelLarge
+                                                    ?.color
+                                                    ?.withValues(alpha: 0.62),
+                                                fontWeight: FontWeight.w800,
+                                              ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 18),
+                                    _Bars(
+                                      gross: controller.grossValue.value,
+                                      net: controller.netValue.value,
+                                      primary: theme.colorScheme.primary,
+                                      theme: theme,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -32,7 +305,8 @@ class PropertyAnalyticsScreen extends StatelessWidget {
                       ),
                       const SizedBox(width: 2),
                       Expanded(
-                        child: Text("Property Analytics".tr,
+                        child: Text(
+                          "Property Analytics".tr,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: theme.textTheme.titleMedium?.copyWith(
@@ -129,7 +403,8 @@ class PropertyAnalyticsScreen extends StatelessWidget {
                         children: [
                           Row(
                             children: [
-                              Text("Occupancy Trends".tr,
+                              Text(
+                                "Occupancy Trends".tr,
                                 style: theme.textTheme.titleSmall?.copyWith(
                                   color: Get.isDarkMode
                                       ? Colors.white
@@ -148,7 +423,8 @@ class PropertyAnalyticsScreen extends StatelessWidget {
                           const SizedBox(height: 4),
                           Align(
                             alignment: Alignment.centerLeft,
-                            child: Text("Daily occupancy rate over selected period".tr,
+                            child: Text(
+                              "Daily occupancy rate over selected period".tr,
                               style: theme.textTheme.labelSmall?.copyWith(
                                 color: Get.isDarkMode
                                     ? Colors.white54
@@ -191,7 +467,8 @@ class PropertyAnalyticsScreen extends StatelessWidget {
                           children: [
                             Row(
                               children: [
-                                Text("Financial Breakdown".tr,
+                                Text(
+                                  "Financial Breakdown".tr,
                                   style: theme.textTheme.titleSmall?.copyWith(
                                     color: Get.isDarkMode
                                         ? Colors.white
@@ -231,7 +508,8 @@ class PropertyAnalyticsScreen extends StatelessWidget {
                                   ),
                                 ),
                                 const SizedBox(width: 8),
-                                Text("Net income".tr,
+                                Text(
+                                  "Net income".tr,
                                   style: theme.textTheme.labelMedium?.copyWith(
                                     color: Get.isDarkMode
                                         ? Colors.white54
@@ -287,7 +565,8 @@ class PropertyAnalyticsScreen extends StatelessWidget {
                         size: 18,
                         color: theme.iconTheme.color,
                       ),
-                      label: Text("Export Full Report".tr,
+                      label: Text(
+                        "Export Full Report".tr,
                         style: theme.textTheme.titleSmall?.copyWith(
                           color: Colors.white,
                           fontWeight: FontWeight.w800,
