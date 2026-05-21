@@ -1,0 +1,24 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+  RewriteRule ^index\.html$ - [L]
+
+  # Firebase auth helper routes for custom authDomain (idseurope.com).
+  # Hostinger shared hosting often blocks proxy passthrough, so use redirects.
+  RewriteRule ^__/auth/(.*)$ https://super-app-ditto.firebaseapp.com/__/auth/$1 [R=302,L,NE,QSA]
+  RewriteRule ^__/firebase/init\.json$ https://super-app-ditto.firebaseapp.com/__/firebase/init.json [R=302,L,NE,QSA]
+
+  # Flutter web SPA routing: send unknown routes to index.html
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /index.html [L]
+</IfModule>
+
+<IfModule mod_headers.c>
+  # Prevent stale shell/service-worker after new deploys
+  <FilesMatch "^(index\.html|flutter_service_worker\.js)$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires "0"
+  </FilesMatch>
+</IfModule>

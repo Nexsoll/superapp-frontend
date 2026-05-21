@@ -11,18 +11,35 @@ import 'package:superapp/services/listing_service.dart';
 import 'package:superapp/screens/hotel_detail_screen.dart';
 import 'package:superapp/screens/property_detail_screen.dart';
 
-class AiAssistantScreen extends StatelessWidget {
-  AiAssistantScreen({super.key});
-
-  final AiAssistantController controller = Get.put(AiAssistantController());
+class DedicatedAiChatScreen extends StatelessWidget {
+  const DedicatedAiChatScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // Instantiate or find the controller
+    final AiAssistantController controller = Get.put(AiAssistantController());
     final theme = Theme.of(context);
     final isDesktopWeb = kIsWeb && MediaQuery.sizeOf(context).width >= 900;
+
     if (isDesktopWeb) {
       return Scaffold(
         backgroundColor: theme.scaffoldBackgroundColor,
+        appBar: AppBar(
+          backgroundColor: theme.scaffoldBackgroundColor,
+          elevation: 0,
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back_rounded, color: theme.colorScheme.primary),
+            onPressed: () => Get.back(),
+          ),
+          title: Text(
+            'Back to Stays'.tr,
+            style: GoogleFonts.outfit(
+              color: theme.colorScheme.primary,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
         body: SafeArea(
           child: Center(
             child: ConstrainedBox(
@@ -30,7 +47,7 @@ class AiAssistantScreen extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 32,
-                  vertical: 28,
+                  vertical: 16,
                 ),
                 child: Column(
                   children: [
@@ -62,8 +79,7 @@ class AiAssistantScreen extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              'Ask about hotels, prices, rooms, staff, and operations.'
-                                  .tr,
+                              'Ask about hotels, prices, rooms, staff, and operations.'.tr,
                               style: theme.textTheme.bodyMedium?.copyWith(
                                 color: theme.textTheme.bodyMedium?.color
                                     ?.withValues(alpha: 0.66),
@@ -88,8 +104,7 @@ class AiAssistantScreen extends StatelessWidget {
                             () => ListView.builder(
                               controller: controller.scrollController,
                               padding: const EdgeInsets.all(24),
-                              itemCount:
-                                  controller.messages.length +
+                              itemCount: controller.messages.length +
                                   (controller.isLoading.value ? 1 : 0),
                               itemBuilder: (context, index) {
                                 if (index == controller.messages.length) {
@@ -112,7 +127,7 @@ class AiAssistantScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-                    _buildInputArea(context),
+                    _buildInputArea(context, controller),
                   ],
                 ),
               ),
@@ -121,11 +136,26 @@ class AiAssistantScreen extends StatelessWidget {
         ),
       );
     }
+
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF1CB5B3),
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
+          onPressed: () => Get.back(),
+        ),
+        title: Text(
+          'AI Assistant'.tr,
+          style: GoogleFonts.outfit(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
       body: Column(
         children: [
-          _buildHeader(context),
           Expanded(
             child: Obx(
               () => ListView.builder(
@@ -134,8 +164,7 @@ class AiAssistantScreen extends StatelessWidget {
                   horizontal: 16,
                   vertical: 20,
                 ),
-                itemCount:
-                    controller.messages.length +
+                itemCount: controller.messages.length +
                     (controller.isLoading.value ? 1 : 0),
                 itemBuilder: (context, index) {
                   if (index == controller.messages.length) {
@@ -154,7 +183,7 @@ class AiAssistantScreen extends StatelessWidget {
               ),
             ),
           ),
-          _buildInputArea(context),
+          _buildInputArea(context, controller),
         ],
       ),
     );
@@ -199,42 +228,7 @@ class AiAssistantScreen extends StatelessWidget {
     }
   }
 
-  Widget _buildHeader(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(16, 60, 16, 24),
-      decoration: const BoxDecoration(
-        color: Color(0xFF1CB5B3),
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(0)),
-      ),
-      child: Row(
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'AI Assistant'.tr,
-                style: GoogleFonts.outfit(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white,
-                ),
-              ),
-              Text(
-                'Powered by machine learning'.tr,
-                style: GoogleFonts.outfit(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w400,
-                  color: Colors.white.withOpacity(0.8),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildInputArea(BuildContext context) {
+  Widget _buildInputArea(BuildContext context, AiAssistantController controller) {
     final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 40),
@@ -339,7 +333,6 @@ class AiAssistantScreen extends StatelessWidget {
 
 class _SuggestionChip extends StatelessWidget {
   final String label;
-
   const _SuggestionChip({required this.label});
 
   @override
@@ -445,7 +438,10 @@ class _UserMessage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final profileController = Get.find<ProfileController>();
+    ProfileController? profileController;
+    try {
+      profileController = Get.find<ProfileController>();
+    } catch (_) {}
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -465,41 +461,24 @@ class _UserMessage extends StatelessWidget {
         children: [
           Row(
             children: [
-              Obx(() {
-                final photo = profileController.photoUrl.value;
-                return ClipOval(
-                  child: photo.isNotEmpty
-                      ? Image.network(
-                          photo,
-                          width: 24,
-                          height: 24,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => SvgPicture.asset(
-                            'assets/Ai.svg',
-                            width: 24,
-                            height: 24,
-                            // ignore: deprecated_member_use
-                            color: const Color(0xFF1CB5B3),
-                          ),
-                        )
-                      : SvgPicture.asset(
-                          'assets/Ai.svg',
-                          width: 24,
-                          height: 24,
-                          // ignore: deprecated_member_use
-                          color: const Color(0xFF1CB5B3),
-                        ),
-                );
-              }),
+              ClipOval(
+                child: profileController != null && profileController.photoUrl.value.isNotEmpty
+                    ? Image.network(
+                        profileController.photoUrl.value,
+                        width: 24,
+                        height: 24,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => _buildDefaultAvatar(),
+                      )
+                    : _buildDefaultAvatar(),
+              ),
               const SizedBox(width: 8),
-              Obx(
-                () => Text(
-                  profileController.displayName,
-                  style: GoogleFonts.outfit(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: const Color(0xFF1CB5B3),
-                  ),
+              Text(
+                profileController != null ? profileController.displayName : 'Guest Traveler',
+                style: GoogleFonts.outfit(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFF1CB5B3),
                 ),
               ),
             ],
@@ -517,6 +496,19 @@ class _UserMessage extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildDefaultAvatar() {
+    return Container(
+      width: 24,
+      height: 24,
+      color: const Color(0x201CB5B3),
+      child: const Icon(
+        Icons.person_rounded,
+        size: 16,
+        color: Color(0xFF1CB5B3),
       ),
     );
   }
@@ -557,15 +549,7 @@ class _HotelRecommendationCard extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
-        // Debug: Print what data we have
-        print('AI Item ID: ${hotel.id}');
-        print('AI Item Name: ${hotel.name}');
-        print('AI Item Type: ${hotel.type}');
-        print('AI Item Data: ${hotel.hotelData}');
-
-        // Navigate with hotelData if available, otherwise create minimal data with ID
-        final data =
-            hotel.hotelData ??
+        final data = hotel.hotelData ??
             {
               'id': hotel.id,
               'title': hotel.name,
@@ -573,9 +557,6 @@ class _HotelRecommendationCard extends StatelessWidget {
               'images': ['placeholder'],
             };
 
-        print('Navigating with data: $data');
-
-        // Navigate to appropriate detail screen based on type
         if (isProperty) {
           Get.to(() => PropertyDetailScreen(propertyData: data));
         } else {
@@ -606,8 +587,8 @@ class _HotelRecommendationCard extends StatelessWidget {
               child: Image.network(
                 hotel.id > 0
                     ? (isProperty
-                          ? ListingService.propertyImageUrl(hotel.id, 0)
-                          : ListingService.hotelImageUrl(hotel.id, 0))
+                        ? ListingService.propertyImageUrl(hotel.id, 0)
+                        : ListingService.hotelImageUrl(hotel.id, 0))
                     : hotel.image,
                 width: 100,
                 height: 100,
@@ -798,120 +779,85 @@ class _PricePredictionCard extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: theme.brightness == Brightness.dark
-                  ? const Color(0xFF059669).withOpacity(0.2)
-                  : const Color(0xFFECFDF5),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Row(
-              children: [
-                const Icon(
-                  Icons.lightbulb_outline,
-                  color: Color(0xFFFCD34D),
-                  size: 16,
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Book on Feb 5 to save \$39', // Could also be dynamic
-                        style: GoogleFonts.outfit(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: const Color(0xFF059669),
-                        ),
-                      ),
-                      Text(
-                        '${data!.confidence}% confidence based on AI analysis',
-                        style: GoogleFonts.outfit(
-                          fontSize: 10,
-                          color: const Color(0xFF6B7280),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 24),
-          SizedBox(
-            height: 150,
-            width: double.infinity,
+            height: 180,
+            padding: const EdgeInsets.only(top: 10, right: 10),
             child: LineChart(
               LineChartData(
                 gridData: FlGridData(
                   show: true,
                   drawVerticalLine: false,
                   getDrawingHorizontalLine: (value) => FlLine(
-                    color: const Color(0xFFE5E7EB),
+                    color: theme.dividerColor.withValues(alpha: 0.1),
                     strokeWidth: 1,
-                    dashArray: [4, 4],
                   ),
                 ),
                 titlesData: FlTitlesData(
                   show: true,
-                  bottomTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      reservedSize: 22,
-                      getTitlesWidget: (value, meta) {
-                        final index = value.toInt();
-                        if (index >= 0 && index < data!.xLabels.length) {
-                          return Text(
-                            data!.xLabels[index],
-                            style: GoogleFonts.outfit(
-                              color: const Color(0xFF9CA3AF),
-                              fontSize: 9,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          );
-                        }
-                        return const Text('');
-                      },
-                    ),
+                  rightTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
+                  topTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
                   ),
                   leftTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
-                      reservedSize: 28,
+                      reservedSize: 35,
                       getTitlesWidget: (value, meta) {
                         return Text(
                           '\$${value.toInt()}',
-                          style: GoogleFonts.outfit(
+                          style: TextStyle(
                             color: const Color(0xFF9CA3AF),
-                            fontSize: 9,
-                            fontWeight: FontWeight.w500,
+                            fontSize: 10,
                           ),
                         );
                       },
                     ),
                   ),
-                  topTitles: AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
-                  ),
-                  rightTitles: AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
+                  bottomTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      reservedSize: 22,
+                      getTitlesWidget: (value, meta) {
+                        final idx = value.toInt();
+                        if (idx >= 0 && idx < data!.xLabels.length) {
+                          return Text(
+                            data!.xLabels[idx],
+                            style: const TextStyle(
+                              color: Color(0xFF9CA3AF),
+                              fontSize: 9,
+                            ),
+                          );
+                        }
+                        return const SizedBox.shrink();
+                      },
+                    ),
                   ),
                 ),
                 borderData: FlBorderData(show: false),
+                minX: 0,
+                maxX: (data!.points.length - 1).toDouble(),
+                minY: (data!.bestPrice - 20).clamp(0.0, double.infinity),
+                maxY: data!.currentPrice + 20,
                 lineBarsData: [
                   LineChartBarData(
-                    spots: data!.points.asMap().entries.map((e) {
-                      return FlSpot(
-                        e.key.toDouble(),
-                        (e.value['y'] as num).toDouble(),
-                      );
-                    }).toList(),
+                    spots: data!.points
+                        .asMap()
+                        .entries
+                        .map((e) => FlSpot(
+                              e.key.toDouble(),
+                              (e.value['y'] as num).toDouble(),
+                            ))
+                        .toList(),
                     isCurved: true,
-                    color: const Color(0xFF60A5FA),
-                    barWidth: 2.5,
-                    dotData: FlDotData(show: true),
-                    belowBarData: BarAreaData(show: false),
+                    color: const Color(0xFF1CB5B3),
+                    barWidth: 3,
+                    isStrokeCapRound: true,
+                    dotData: const FlDotData(show: true),
+                    belowBarData: BarAreaData(
+                      show: true,
+                      color: const Color(0xFF1CB5B3).withValues(alpha: 0.15),
+                    ),
                   ),
                 ],
               ),

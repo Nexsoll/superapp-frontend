@@ -1,10 +1,31 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:superapp/app_routes.dart';
 import 'package:superapp/controllers/auth/wellcome_controller.dart';
 
-class WellcomeScreen extends StatelessWidget {
+class WellcomeScreen extends StatefulWidget {
   const WellcomeScreen({super.key});
+
+  @override
+  State<WellcomeScreen> createState() => _WellcomeScreenState();
+}
+
+class _WellcomeScreenState extends State<WellcomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    _redirectWebAuth();
+  }
+
+  Future<void> _redirectWebAuth() async {
+    if (!kIsWeb) return;
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getInt('user_id') ?? 0;
+    if (!mounted) return;
+    Get.offAllNamed(userId > 0 ? AppRoutes.main : AppRoutes.landing);
+  }
 
   @override
   Widget build(BuildContext context) {

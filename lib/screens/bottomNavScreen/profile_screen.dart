@@ -256,23 +256,41 @@ class ProfileScreen extends StatelessWidget {
                   ],
                 ),
 
-                const SizedBox(height: 14),
-                _SectionTitle(title: 'Admin', theme: theme),
-                const SizedBox(height: 14),
-                _CardGroup(
-                  children: [
-                    _MenuTile(
-                      icon: Icons.dashboard_rounded,
-                      title: 'Admin Dashboard',
-                      onTap: controller.onAdminDashboard,
-                    ),
-                    _MenuTile(
-                      icon: Icons.assignment_outlined,
-                      title: 'Staff Dashboard',
-                      onTap: controller.onStaffDashboard,
-                    ),
-                  ],
-                ),
+                Obx(() {
+                  if (!controller.canAccessAnyDashboard) {
+                    return const SizedBox.shrink();
+                  }
+
+                  final dashboardTiles = <Widget>[];
+                  if (controller.canAccessAdminDashboards) {
+                    dashboardTiles.add(
+                      _MenuTile(
+                        icon: Icons.dashboard_rounded,
+                        title: 'Admin Dashboard',
+                        onTap: controller.onAdminDashboard,
+                      ),
+                    );
+                  }
+                  if (controller.canAccessStaffDashboard) {
+                    dashboardTiles.add(
+                      _MenuTile(
+                        icon: Icons.assignment_outlined,
+                        title: 'Staff Dashboard',
+                        onTap: controller.onStaffDashboard,
+                      ),
+                    );
+                  }
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 14),
+                      _SectionTitle(title: 'Dashboards', theme: theme),
+                      const SizedBox(height: 14),
+                      _CardGroup(children: dashboardTiles),
+                    ],
+                  );
+                }),
 
                 const SizedBox(height: 16),
 

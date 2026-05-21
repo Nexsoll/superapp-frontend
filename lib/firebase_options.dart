@@ -27,7 +27,7 @@ class DefaultFirebaseOptions {
     appId: '1:634639795131:web:06c0941abf49c68078fa9e',
     messagingSenderId: '634639795131',
     projectId: 'super-app-ditto',
-    authDomain: 'super-app-ditto.firebaseapp.com',
+    authDomain: 'idseurope.com',
     storageBucket: 'super-app-ditto.firebasestorage.app',
     measurementId: 'G-4ZLVXY0GL3',
   );

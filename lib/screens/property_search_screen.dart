@@ -331,7 +331,13 @@ class _PropertySearchScreenState extends State<PropertySearchScreen> {
         : Get.put(MainScreenController());
 
     if (controller.allPropertiesData.isEmpty) {
-      controller.fetchFeaturedProperties();
+      controller.fetchFeaturedProperties().then((_) {
+        if (mounted &&
+            widget.searchQuery != null &&
+            widget.searchQuery!.isNotEmpty) {
+          _performSearch(widget.searchQuery!);
+        }
+      });
     }
 
     if (widget.searchQuery != null && widget.searchQuery!.isNotEmpty) {
@@ -346,14 +352,29 @@ class _PropertySearchScreenState extends State<PropertySearchScreen> {
     super.dispose();
   }
 
+  bool _matchesSearchQuery(
+    Map<String, dynamic> property,
+    String queryLower,
+  ) {
+    final title = (property['title'] ?? '').toString().toLowerCase();
+    final address = (property['address'] ?? '').toString().toLowerCase();
+    final city = (property['city'] ?? '').toString().toLowerCase();
+    final country = (property['country'] ?? '').toString().toLowerCase();
+    final location = (property['location'] ?? '').toString().toLowerCase();
+
+    return title.contains(queryLower) ||
+        address.contains(queryLower) ||
+        city.contains(queryLower) ||
+        country.contains(queryLower) ||
+        location.contains(queryLower);
+  }
+
   void _performSearch(String query) {
     final queryLower = query.toLowerCase();
 
-    final results = controller.allPropertiesData.where((property) {
-      final title = (property['title'] ?? '').toString().toLowerCase();
-      final address = (property['address'] ?? '').toString().toLowerCase();
-      return title.contains(queryLower) || address.contains(queryLower);
-    }).toList();
+    final results = controller.allPropertiesData
+        .where((property) => _matchesSearchQuery(property, queryLower))
+        .toList();
 
     setState(() {
       _filteredProperties = results;
@@ -377,11 +398,9 @@ class _PropertySearchScreenState extends State<PropertySearchScreen> {
     // Apply search filter
     if (_hasSearched && _searchController.text.isNotEmpty) {
       final queryLower = _searchController.text.toLowerCase();
-      results = results.where((property) {
-        final title = (property['title'] ?? '').toString().toLowerCase();
-        final address = (property['address'] ?? '').toString().toLowerCase();
-        return title.contains(queryLower) || address.contains(queryLower);
-      }).toList();
+      results = results
+          .where((property) => _matchesSearchQuery(property, queryLower))
+          .toList();
     }
 
     // Apply listing type filter (Buy/Rent tabs)

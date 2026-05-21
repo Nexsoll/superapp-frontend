@@ -1,16 +1,15 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:flutter/foundation.dart';
 
 class ApiService {
-  static const String _defaultApiBaseUrl =
+  static const String _devBaseUrlWebAndIOS = 'http://localhost:3000';
+  static const String _devBaseUrlAndroidEmulator = 'http://10.0.2.2:3000';
+  static const String _prodBaseUrl =
       'https://super-app-831462757011.asia-south1.run.app';
-  static const String _configuredApiBaseUrl = String.fromEnvironment(
-    'API_BASE_URL',
-    defaultValue: _defaultApiBaseUrl,
-  );
 
   static String get baseUrl {
-    return _configuredApiBaseUrl;
+    return _prodBaseUrl;
   }
 
   static const String hotelBookingsEndpoint = '/listing/hotel-bookings';
@@ -30,7 +29,8 @@ class ApiService {
   static const String staffEndpoint = '/admin/staff';
   static const String adminEndpoint = '/admin';
 
-  // Override with --dart-define=API_BASE_URL=https://api.idseurope.com
+  // http://localhost:3000
+  // https://super-app-831462757011.asia-south1.run.app
   static Map<String, String> headers({String? token}) {
     final h = <String, String>{'Content-Type': 'application/json'};
     if (token != null && token.isNotEmpty) {

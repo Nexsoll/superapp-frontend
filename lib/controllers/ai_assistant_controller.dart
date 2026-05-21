@@ -134,13 +134,18 @@ class AiAssistantController extends GetxController {
   Future<String> _uploadAndTranscribe(File audioFile) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('user_token');
+    final isGuest = token == null || token.isEmpty;
 
     final baseUrl = ApiService.baseUrl;
 
-    final uri = Uri.parse('$baseUrl/ai-assistant/transcribe');
+    final uri = Uri.parse(
+      isGuest
+          ? '$baseUrl/ai-assistant/transcribe-guest'
+          : '$baseUrl/ai-assistant/transcribe',
+    );
     final request = http.MultipartRequest('POST', uri);
 
-    if (token != null && token.isNotEmpty) {
+    if (!isGuest) {
       request.headers['Authorization'] = 'Bearer $token';
     }
 
@@ -180,24 +185,25 @@ class AiAssistantController extends GetxController {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('user_token');
-      // Assuming 'access_token' is stored. If not, we might need to check 'user_token' or similar from AuthController.
-      // Since I can't easily check AuthController state without reading it, I'll assume token is in prefs or not needed for now if I skip auth for demo,
-      // but Backend has @UseGuards(AuthGuard('jwt')). So I NEED the token.
-
-      // Let's assume standard "token" key or "access_token".
-      // From splash_controller.dart, I saw it checks `onboarding_done` and `user_id`.
-      // It doesn't explicitly show where token is stored.
-      // I'll try to find where token is stored. If I can't find it, I will add a TODO or try to get it from ProfileController if accessible.
-      // For now, let's assume 'token'.
+      final isGuest = token == null || token.isEmpty;
 
       final baseUrl = ApiService.baseUrl;
+      final uri = Uri.parse(
+        isGuest
+            ? '$baseUrl/ai-assistant/chat-guest'
+            : '$baseUrl/ai-assistant/chat',
+      );
+
+      final headers = {
+        'Content-Type': 'application/json',
+      };
+      if (!isGuest) {
+        headers['Authorization'] = 'Bearer $token';
+      }
 
       final response = await http.post(
-        Uri.parse('$baseUrl/ai-assistant/chat'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
+        uri,
+        headers: headers,
         body: jsonEncode({'message': text}),
       );
 

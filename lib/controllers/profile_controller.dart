@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get/get.dart';
@@ -15,6 +16,13 @@ import 'package:superapp/services/listing_service.dart';
 import 'package:superapp/screens/bottomNavScreen/preferences_screen.dart';
 
 class ProfileController extends GetxController {
+  static const Set<String> _dashboardAllowedEmails = {
+    'dittukurian@gmail.com',
+    'idseurope1@gmail.com',
+    'sneha.ranijos25@gmail.com',
+    'sales@idseurope.com',
+  };
+
   final bookings = 12.obs;
   final reviews = 8.obs;
   final points = 100.obs;
@@ -190,6 +198,23 @@ class ProfileController extends GetxController {
     return 'User';
   }
 
+  String _normalizeEmail(String rawEmail) => rawEmail.trim().toLowerCase();
+
+  bool get canAccessAdminDashboards =>
+      _dashboardAllowedEmails.contains(_normalizeEmail(email.value));
+
+  bool get canAccessStaffDashboard => role.value.trim().toUpperCase() == 'STAFF';
+
+  bool get canAccessAnyDashboard =>
+      canAccessAdminDashboards || canAccessStaffDashboard;
+
+  void _showDashboardAccessDenied() {
+    Get.snackbar(
+      'Access denied',
+      'You are not allowed to access this dashboard.',
+    );
+  }
+
   Future<void> _loadTheme() async {
     final prefs = await SharedPreferences.getInstance();
     final saved = prefs.getBool(_themeKey);
@@ -243,9 +268,22 @@ class ProfileController extends GetxController {
     userId = 0;
     token = '';
 
-    Get.offAllNamed(AppRoutes.welcome);
+    Get.offAllNamed(kIsWeb ? AppRoutes.landing : AppRoutes.welcome);
   }
 
-  void onAdminDashboard() => Get.to(() => const AdminDashboardScreen());
-  void onStaffDashboard() => Get.to(() => const StaffDashboardScreen());
+  void onAdminDashboard() {
+    if (!canAccessAdminDashboards) {
+      _showDashboardAccessDenied();
+      return;
+    }
+    Get.to(() => const AdminDashboardScreen());
+  }
+
+  void onStaffDashboard() {
+    if (!canAccessStaffDashboard) {
+      _showDashboardAccessDenied();
+      return;
+    }
+    Get.to(() => const StaffDashboardScreen());
+  }
 }

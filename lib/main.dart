@@ -55,7 +55,7 @@ class _MyAppState extends State<MyApp> {
     return Obx(
       () => GetMaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'Flutter Demo',
+        title: 'IDS Europe',
         themeMode: _profileController.isDark.value
             ? ThemeMode.dark
             : ThemeMode.light,

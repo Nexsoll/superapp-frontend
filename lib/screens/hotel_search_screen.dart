@@ -41,7 +41,13 @@ class _HotelSearchScreenState extends State<HotelSearchScreen> {
         : Get.put(MainScreenController());
 
     if (controller.allHotelsData.isEmpty) {
-      controller.fetchFeaturedHotels();
+      controller.fetchFeaturedHotels().then((_) {
+        if (mounted &&
+            widget.searchQuery != null &&
+            widget.searchQuery!.isNotEmpty) {
+          _performSearch(widget.searchQuery!);
+        }
+      });
     }
 
     if (widget.searchQuery != null && widget.searchQuery!.isNotEmpty) {
@@ -54,6 +60,20 @@ class _HotelSearchScreenState extends State<HotelSearchScreen> {
   void dispose() {
     _searchController.dispose();
     super.dispose();
+  }
+
+  bool _matchesSearchQuery(Map<String, dynamic> hotel, String queryLower) {
+    final title = (hotel['title'] ?? '').toString().toLowerCase();
+    final address = (hotel['address'] ?? '').toString().toLowerCase();
+    final city = (hotel['city'] ?? '').toString().toLowerCase();
+    final country = (hotel['country'] ?? '').toString().toLowerCase();
+    final location = (hotel['location'] ?? '').toString().toLowerCase();
+
+    return title.contains(queryLower) ||
+        address.contains(queryLower) ||
+        city.contains(queryLower) ||
+        country.contains(queryLower) ||
+        location.contains(queryLower);
   }
 
   void _applyFilters(Map<String, dynamic> filters) {
@@ -69,11 +89,9 @@ class _HotelSearchScreenState extends State<HotelSearchScreen> {
     // Apply search filter
     if (_hasSearched && _searchController.text.isNotEmpty) {
       final queryLower = _searchController.text.toLowerCase();
-      results = results.where((hotel) {
-        final title = (hotel['title'] ?? '').toString().toLowerCase();
-        final address = (hotel['address'] ?? '').toString().toLowerCase();
-        return title.contains(queryLower) || address.contains(queryLower);
-      }).toList();
+      results = results
+          .where((hotel) => _matchesSearchQuery(hotel, queryLower))
+          .toList();
     }
 
     // Apply amenities filter
@@ -155,11 +173,9 @@ class _HotelSearchScreenState extends State<HotelSearchScreen> {
   void _performSearch(String query) {
     final queryLower = query.toLowerCase();
 
-    final results = controller.allHotelsData.where((hotel) {
-      final title = (hotel['title'] ?? '').toString().toLowerCase();
-      final address = (hotel['address'] ?? '').toString().toLowerCase();
-      return title.contains(queryLower) || address.contains(queryLower);
-    }).toList();
+    final results = controller.allHotelsData
+        .where((hotel) => _matchesSearchQuery(hotel, queryLower))
+        .toList();
 
     setState(() {
       _filteredHotels = results;
